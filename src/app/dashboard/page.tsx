@@ -7,12 +7,12 @@ import { AppSidebar } from '@/components/layout/Sidebar';
 import { SidebarProvider } from '@/components/ui/sidebar';
 
 export default function DashboardPage() {
-   const user = {
+  const user = {
     name: 'John Doe',
     role: 'Staff',
     avatar: '/images/avatar.png',
   };
-   const scheduleData = {
+  const scheduleData = {
     month: new Date().toLocaleString('default', { month: 'long' }),
     scheduleCount: 25,
   };
@@ -29,19 +29,19 @@ export default function DashboardPage() {
       <div className="bg-muted/10 flex h-screen gap-18">
         <AppSidebar />
         <div className="flex flex-1 flex-col">
-          <DashboardHeader user={user}/>
-            <DashboardToolbar
-      exportLabel="Export"
-      onExportClick={handleExport}
-      onFilterClick={handleFilter}
-      onCardClick={handleCard}
-      defaultFromDate="2025-10-01"
-      defaultToDate="2025-10-31"
-    />
+          <DashboardHeader user={user} />
+          <DashboardToolbar
+            exportLabel="Export"
+            onExportClick={handleExport}
+            onFilterClick={handleFilter}
+            onCardClick={handleCard}
+            defaultFromDate="2025-10-01"
+            defaultToDate="2025-10-31"
+          />
           <MonthlyScheduleSummary
-        month={scheduleData.month}
-        scheduleCount={scheduleData.scheduleCount}
-      />
+            month={scheduleData.month}
+            scheduleCount={scheduleData.scheduleCount}
+          />
           <div className="flex-1 overflow-auto">
             <ScheduleTabs />
           </div>

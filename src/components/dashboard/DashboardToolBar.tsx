@@ -40,13 +40,11 @@ export function DashboardToolbar({
   };
 
   return (
-    <Card className="flex flex-col md:flex-row items-center justify-between gap-4 px-6 py-3 border-none shadow-none bg-transparent">
+    <Card className="flex flex-col items-center justify-between gap-4 border-none bg-transparent px-6 py-3 shadow-none md:flex-row">
       {/* Left section: Date and range */}
-      <div className="flex flex-col md:flex-row items-center gap-6 w-full md:w-auto">
+      <div className="flex w-full flex-col items-center gap-6 md:w-auto md:flex-row">
         {/* Current date */}
-        <h2 className="text-lg font-semibold text-gray-800 whitespace-nowrap">
-          {formattedDate}
-        </h2>
+        <h2 className="text-lg font-semibold whitespace-nowrap text-gray-800">{formattedDate}</h2>
 
         {/* Date range inputs */}
         <div className="flex items-center gap-2 text-sm text-gray-600">
@@ -70,22 +68,14 @@ export function DashboardToolbar({
       {/* Right section: Buttons */}
       <div className="flex items-center gap-2">
         {showFilter && (
-          <Button
-            variant="outline"
-            className="flex items-center gap-2"
-            onClick={onFilterClick}
-          >
+          <Button variant="outline" className="flex items-center gap-2" onClick={onFilterClick}>
             <Filter className="h-4 w-4" />
             Filter
           </Button>
         )}
 
         {showCard && (
-          <Button
-            variant="outline"
-            className="flex items-center gap-2"
-            onClick={onCardClick}
-          >
+          <Button variant="outline" className="flex items-center gap-2" onClick={onCardClick}>
             <CreditCard className="h-4 w-4" />
             Card
           </Button>

@@ -13,13 +13,12 @@ export default function MonthlyScheduleSummary({
   scheduleCount,
 }: MonthlyScheduleSummaryProps) {
   return (
-    <Card className="flex flex-row items-center justify-between px-6 py-3 border-none shadow-none bg-transparent">
+    <Card className="flex flex-row items-center justify-between border-none bg-transparent px-6 py-3 shadow-none">
       {/* Left side — text */}
       <div className="flex flex-col">
         <p className="text-sm text-gray-600">
-          You have{' '}
-          <span className="font-medium text-gray-900">{scheduleCount}</span>{' '}
-          schedules this month.
+          You have <span className="font-medium text-gray-900">{scheduleCount}</span> schedules this
+          month.
         </p>
       </div>
 

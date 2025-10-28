@@ -5,7 +5,11 @@ import { Button } from '@/components/ui/button';
 import { Bell, Search } from 'lucide-react';
 import Image from 'next/image';
 
-export function DashboardHeader({ user }: { user: { name: string; role: string; avatar: string } }) {
+export function DashboardHeader({
+  user,
+}: {
+  user: { name: string; role: string; avatar: string };
+}) {
   return (
     <header className="flex items-center justify-between border-b bg-white px-6 py-3">
       <div>
@@ -14,7 +18,7 @@ export function DashboardHeader({ user }: { user: { name: string; role: string; 
       </div>
 
       <div className="flex items-center gap-3">
-        <div className="relative w-114 mr-5">
+        <div className="relative mr-5 w-114">
           <Input placeholder="Search" className="pr-8" />
           <Search className="text-muted-foreground absolute top-2.5 right-2 h-4 w-4" />
         </div>

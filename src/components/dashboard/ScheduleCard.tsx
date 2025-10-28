@@ -31,8 +31,8 @@ export function ScheduleCard({
       {/* Card clickable */}
       <Card
         onClick={onSelect}
-        className={`transition-shadow hover:shadow-md overflow-hidden cursor-pointer ${
-          selected ? 'ring-2 ring-primary' : ''
+        className={`cursor-pointer overflow-hidden transition-shadow hover:shadow-md ${
+          selected ? 'ring-primary ring-2' : ''
         }`}
       >
         <CardHeader>
@@ -53,7 +53,7 @@ export function ScheduleCard({
         <CardFooter className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             {image && (
-              <div className="relative h-10 w-10 rounded-full overflow-hidden">
+              <div className="relative h-10 w-10 overflow-hidden rounded-full">
                 <Image
                   src={image}
                   alt={`${speaker} photo`}
@@ -72,7 +72,7 @@ export function ScheduleCard({
       </Card>
 
       {/* 🧩 Keep height stable by reserving space */}
-      <div className="h-12 flex items-center justify-center">
+      <div className="flex h-12 items-center justify-center">
         {selected && (
           <Button size="sm" variant="default" className="bg-blue-500">
             See Detail
