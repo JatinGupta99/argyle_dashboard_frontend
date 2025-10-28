@@ -7,18 +7,43 @@ import { Card } from '@/components/ui/card';
 import { format } from 'date-fns';
 import { Filter, FileDown, CreditCard } from 'lucide-react';
 
-export function DashboardToolbar() {
-  const [fromDate, setFromDate] = useState('');
-  const [toDate, setToDate] = useState('');
+interface DashboardToolbarProps {
+  exportLabel?: string;
+  showFilter?: boolean;
+  showCard?: boolean;
+  onFilterClick?: () => void;
+  onCardClick?: () => void;
+  onExportClick?: (range: { fromDate: string; toDate: string }) => void;
+  defaultFromDate?: string;
+  defaultToDate?: string;
+}
 
-  const today = new Date(2025, 9, 23); // October = month index 9
-  const formattedDate = format(today, 'EEEE, d MMMM yyyy'); // "Thursday, 23 October 2025"
+export function DashboardToolbar({
+  exportLabel = 'Export',
+  showFilter = true,
+  showCard = true,
+  onFilterClick,
+  onCardClick,
+  onExportClick,
+  defaultFromDate = '',
+  defaultToDate = '',
+}: DashboardToolbarProps) {
+  const [fromDate, setFromDate] = useState(defaultFromDate);
+  const [toDate, setToDate] = useState(defaultToDate);
+
+  // ✅ Make date dynamic (today’s date)
+  const today = new Date();
+  const formattedDate = format(today, 'EEEE, d MMMM yyyy');
+
+  const handleExport = () => {
+    if (onExportClick) onExportClick({ fromDate, toDate });
+  };
 
   return (
     <Card className="flex flex-col md:flex-row items-center justify-between gap-4 px-6 py-3 border-none shadow-none bg-transparent">
       {/* Left section: Date and range */}
-      <div className="flex items-center gap-6">
-        {/* Date */}
+      <div className="flex flex-col md:flex-row items-center gap-6 w-full md:w-auto">
+        {/* Current date */}
         <h2 className="text-lg font-semibold text-gray-800 whitespace-nowrap">
           {formattedDate}
         </h2>
@@ -44,17 +69,34 @@ export function DashboardToolbar() {
 
       {/* Right section: Buttons */}
       <div className="flex items-center gap-2">
-        <Button variant="outline" className="flex items-center gap-2">
-          <Filter className="h-4 w-4" />
-          Filter
-        </Button>
-        <Button variant="outline" className="flex items-center gap-2">
-          <CreditCard className="h-4 w-4" />
-          Card
-        </Button>
-        <Button className="flex items-center gap-2 bg-sky-500/90 text-white hover:bg-sky-600">
+        {showFilter && (
+          <Button
+            variant="outline"
+            className="flex items-center gap-2"
+            onClick={onFilterClick}
+          >
+            <Filter className="h-4 w-4" />
+            Filter
+          </Button>
+        )}
+
+        {showCard && (
+          <Button
+            variant="outline"
+            className="flex items-center gap-2"
+            onClick={onCardClick}
+          >
+            <CreditCard className="h-4 w-4" />
+            Card
+          </Button>
+        )}
+
+        <Button
+          onClick={handleExport}
+          className="flex items-center gap-2 bg-sky-500/90 text-white hover:bg-sky-600"
+        >
           <FileDown className="h-4 w-4" />
-          Export
+          {exportLabel}
         </Button>
       </div>
     </Card>

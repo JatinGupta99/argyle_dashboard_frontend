@@ -4,7 +4,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScheduleList } from './ScheduleList';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 
-// Static tab definitions (cleaner to keep together)
 const TABS = [
   { value: 'pending', label: 'Pending', count: 3 },
   { value: 'upcoming', label: 'Upcoming', count: 5 },
