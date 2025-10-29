@@ -2,12 +2,18 @@
 
 export function AgendaTable() {
   const data = [
-    { id: 1, title: 'AI & Cloud Conference', date: '23-10-2025', time: '10:00 AM', speaker: 'John Deo' },
+    {
+      id: 1,
+      title: 'AI & Cloud Conference',
+      date: '23-10-2025',
+      time: '10:00 AM',
+      speaker: 'John Deo',
+    },
   ];
 
   return (
-    <div className="bg-white rounded-xl shadow p-4">
-      <h2 className="text-lg font-semibold mb-3">Event Content (Agenda)</h2>
+    <div className="rounded-xl bg-white p-4 shadow">
+      <h2 className="mb-3 text-lg font-semibold">Event Content (Agenda)</h2>
       <table className="w-full border-collapse text-sm">
         <thead>
           <tr className="border-b text-left">
@@ -19,7 +25,7 @@ export function AgendaTable() {
         </thead>
         <tbody>
           {data.map((row) => (
-            <tr key={row.id} className="border-b hover:bg-muted/30">
+            <tr key={row.id} className="hover:bg-muted/30 border-b">
               <td className="p-2">{row.title}</td>
               <td className="p-2">{row.date}</td>
               <td className="p-2">{row.time}</td>

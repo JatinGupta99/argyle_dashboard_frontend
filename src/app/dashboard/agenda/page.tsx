@@ -2,7 +2,7 @@
 
 import { AgendaTable } from './components/AgendaTable';
 import { AgendaFormDialog } from './components/AgendaFormDialog';
-import { useDialog } from '@/hooks/useDialog';
+import { useDialog } from '@/redux/useDialog';
 import { DashboardToolbar } from '@/components/dashboard/DashboardToolBar';
 import MonthlyScheduleSummary from '@/components/dashboard/MonthlyScheduleSummary';
 
@@ -13,23 +13,21 @@ export default function AgendaPage() {
     scheduleCount: 25,
   };
   return (
-   <>
-    <DashboardToolbar exportLabel="Agenda">
-      <div className="flex justify-end mb-3">
-        <button
-          onClick={toggle}
-          className="bg-primary text-white px-3 py-1.5 rounded-md"
-        >
-          Add Agenda
-        </button>
-      </div>
+    <>
+      <DashboardToolbar exportLabel="Agenda">
+        <div className="mb-3 flex justify-end">
+          <button onClick={toggle} className="bg-primary rounded-md px-3 py-1.5 text-white">
+            Add Agenda
+          </button>
+        </div>
 
-      <AgendaTable />
-      <AgendaFormDialog open={open} onOpenChange={toggle} />
-    </DashboardToolbar>
-<MonthlyScheduleSummary
-            month={scheduleData.month}
-            scheduleCount={scheduleData.scheduleCount}
-          /></>
+        <AgendaTable />
+        <AgendaFormDialog open={open} onOpenChange={toggle} />
+      </DashboardToolbar>
+      <MonthlyScheduleSummary
+        month={scheduleData.month}
+        scheduleCount={scheduleData.scheduleCount}
+      />
+    </>
   );
 }

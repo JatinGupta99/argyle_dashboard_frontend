@@ -24,7 +24,7 @@ export default function MonthlyScheduleSummary({
 
       <div className="flex items-center space-x-2">
         <CalendarDays className="h-6 w-6 text-gray-500" />
-        <h2 className="text-lg font-semibold text-gray-800">{month}</h2>
+        <h2 className="text-sm font-semibold text-gray-800">{month}</h2>
       </div>
     </Card>
   );

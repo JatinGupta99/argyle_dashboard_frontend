@@ -8,7 +8,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarProvider,
 } from '@/components/ui/sidebar';
 import { Calendar, FileText, LayoutGrid, LogOut, Settings, ChevronDown } from 'lucide-react';
 import Image from 'next/image';
@@ -67,13 +66,10 @@ export function AppSidebar() {
               {openContent && (
                 <div className="text-muted-foreground mt-1 ml-8 space-y-1 text-sm">
                   <button className="hover:text-foreground block w-full px-2 py-1 text-left">
-                    Updates
-                  </button>
-                  <button className="hover:text-foreground block w-full px-2 py-1 text-left">
                     Agenda
                   </button>
                   <button className="hover:text-foreground block w-full px-2 py-1 text-left">
-                    Info
+                    Speaker
                   </button>
                 </div>
               )}

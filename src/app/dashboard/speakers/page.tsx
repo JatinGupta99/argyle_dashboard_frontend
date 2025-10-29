@@ -1,70 +1,67 @@
 'use client';
-
-import { useDialog } from '@/hooks/useDialog';
-
 import { DashboardToolbar } from '@/components/dashboard/DashboardToolBar';
 import MonthlyScheduleSummary from '@/components/dashboard/MonthlyScheduleSummary';
-import { SpeakersTable } from './components/SpeakersTable';
+import type { Speaker } from '@/lib/types/speaker';
+import { useAppDispatch } from '@/redux/hooks';
+import { setExportClick, setExportLabel } from '@/redux/slices/toolbar-slice';
+import { SpeakerService } from '@/services/speaker.service';
+import { useEffect, useState } from 'react';
 import { SpeakerFormDialog } from './components/SpeakerFormDialog';
+import { SpeakersTable } from './components/SpeakersTable';
 
 export default function SpeakersPage() {
-  const { open, setOpen } = useDialog();
+  const [speakers, setSpeakers] = useState<Speaker[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [open, setOpen] = useState(false);
+  const [editData, setEditData] = useState<Speaker | null>(null);
+  const dispatch = useAppDispatch();
+  const fetchSpeakers = async () => {
+    setLoading(true);
+    try {
+      const data = await SpeakerService.getAll();
+      setSpeakers(data);
+    } catch (err: any) {
+      setError(err.message || 'Something went wrong');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchSpeakers();
+
+    // ✅ Set toolbar globally
+    dispatch(setExportLabel('Add Speaker'));
+    dispatch(
+      setExportClick(() => {
+        setEditData(null);
+        setOpen(true);
+      })
+    );
+  }, [dispatch]);
 
   const scheduleData = {
     month: new Date().toLocaleString('default', { month: 'long' }),
     scheduleCount: 25,
   };
 
-  const speakers = [
-    {
-      _id: '6901ba06de3f36994585a25b',
-      name: { firstName: 'John', lastName: 'Doe' },
-      title: 'Senior Developer',
-      email: 'john.doe@example.com',
-      companyName: 'TechCorp',
-      bio: 'John is an experienced backend engineer with 10+ years in software development.',
-      pictureUrl: 'https://example.com/john.jpg',
-      linkedInUrl: 'https://linkedin.com/in/johndoe',
-      createdAt: '2025-10-29T06:53:58.710Z',
-    },
-    {
-      _id: '6901ba16de3f36994585a25e',
-      name: { firstName: 'Agnes', lastName: 'Diva' },
-      title: 'Designer',
-      email: 'agnes.d.va@gmail.com',
-      companyName: 'Rush Technology',
-      bio: 'Agnes is a talented designer with expertise in UI/UX.',
-      pictureUrl: 'https://example.com/agnes.jpg',
-      linkedInUrl: 'https://linkedin.com/in/agnesdiva',
-      createdAt: '2025-10-29T06:54:14.392Z',
-    },
-  ];
-
   return (
-    <>
-      {/* Dashboard Toolbar */}
-      <DashboardToolbar exportLabel="Speakers">
-        <div className="flex justify-end mb-3">
-          <button
-            onClick={() => setOpen(true)}
-            className="bg-primary text-white px-3 py-1.5 rounded-md hover:bg-primary/90"
-          >
-            Add Speaker
-          </button>
-        </div>
-      </DashboardToolbar>
-
-      {/* Monthly Summary */}
+    <div className="w-full space-y-6">
+      <DashboardToolbar />
       <MonthlyScheduleSummary
         month={scheduleData.month}
         scheduleCount={scheduleData.scheduleCount}
       />
-
-      {/* Speakers Table */}
-      <SpeakersTable speakers={speakers} />
-
-      {/* Speaker Dialog */}
-      <SpeakerFormDialog open={open} onOpenChange={setOpen} />
-    </>
+      {loading && <p>Loading speakers...</p>}
+      {error && <p className="text-red-500">{error}</p>}
+      {!loading && !error && <SpeakersTable speakers={speakers} refetch={fetchSpeakers} />}
+      <SpeakerFormDialog
+        open={open}
+        onOpenChange={setOpen}
+        onSuccess={fetchSpeakers}
+        editData={editData}
+      />
+    </div>
   );
 }

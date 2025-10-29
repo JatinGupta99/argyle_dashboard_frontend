@@ -42,7 +42,7 @@ export function ScheduleTabs() {
         <div className="flex-1 overflow-y-auto">
           {TABS.map(({ value }) => (
             <TabsContent key={value} value={value}>
-              <ScheduleList  />
+              <ScheduleList />
             </TabsContent>
           ))}
         </div>

@@ -9,7 +9,7 @@ export function Header() {
   return (
     <>
       {/* Header Section */}
-      <header className="sticky top-0 z-50 flex items-center justify-between border-b bg-white-500 px-6 py-3">
+      <header className="bg-white-500 sticky top-0 z-50 flex items-center justify-between border-b px-6 py-3">
         {/* Left - Welcome Text */}
         <div>
           <h2 className="text-sm font-semibold text-gray-800">Welcome Back Jhon!</h2>
