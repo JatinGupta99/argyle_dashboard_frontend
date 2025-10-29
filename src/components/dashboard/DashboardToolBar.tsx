@@ -16,6 +16,7 @@ interface DashboardToolbarProps {
   onExportClick?: (range: { fromDate: string; toDate: string }) => void;
   defaultFromDate?: string;
   defaultToDate?: string;
+  children?: React.ReactNode;
 }
 
 export function DashboardToolbar({
