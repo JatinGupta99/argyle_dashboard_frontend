@@ -12,10 +12,44 @@ import {
 import { Calendar, FileText, LayoutGrid, LogOut, Settings, ChevronDown } from 'lucide-react';
 import Image from 'next/image';
 import { useState } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
+// ✅ Config-driven sidebar menu
+const mainMenu = [
+  {
+    title: 'Event Schedule',
+    icon: Calendar,
+    href: '/dashboard/schedule',
+  },
+  {
+    title: 'Event Content',
+    icon: LayoutGrid,
+    children: [
+      { title: 'Agenda', href: '/dashboard/agenda' },
+      { title: 'Speaker', href: '/dashboard/speakers' },
+    ],
+  },
+  {
+    title: 'Post Event Analytic',
+    icon: FileText,
+    href: '/dashboard/analytics',
+  },
+];
+
+const otherMenu = [
+  { title: 'Setting', icon: Settings },
+  { title: 'Logout', icon: LogOut, danger: true },
+];
+
 export function AppSidebar() {
-  const [openContent, setOpenContent] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const handleNavigate = (href?: string) => {
+    if (href) router.push(href);
+  };
 
   return (
     <Sidebar className="flex w-56 flex-col border-r bg-white">
@@ -30,82 +64,91 @@ export function AppSidebar() {
         />
       </SidebarHeader>
 
-      {/* Main Content */}
+      {/* Main Menu */}
       <SidebarContent className="mt-6 flex-1">
         <div className="mb-2 px-4 text-xs font-semibold text-black">Main Menu</div>
 
         <div className="space-y-8 pl-4">
           <SidebarMenu>
-            {/* Event Schedule */}
-            <SidebarMenuItem>
-              <SidebarMenuButton
-                className={cn(
-                  'flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium',
-                  'hover:bg-muted/40 transition',
-                  'bg-blue-50 font-semibold text-blue-600'
-                )}
-              >
-                <Calendar size={16} />
-                Event Schedule
-              </SidebarMenuButton>
-            </SidebarMenuItem>
+            {mainMenu.map((item) => {
+              const Icon = item.icon;
+              const isActive = pathname === item.href;
+              const isOpen = openDropdown === item.title;
 
-            {/* Event Content Dropdown */}
-            <SidebarMenuItem>
-              <SidebarMenuButton
-                onClick={() => setOpenContent(!openContent)}
-                className="hover:bg-muted/40 flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition"
-              >
-                <LayoutGrid size={16} />
-                Event Content
-                <ChevronDown
-                  size={16}
-                  className={cn('ml-auto transition-transform', openContent && 'rotate-180')}
-                />
-              </SidebarMenuButton>
-              {openContent && (
-                <div className="text-muted-foreground mt-1 ml-8 space-y-1 text-sm">
-                  <button className="hover:text-foreground block w-full px-2 py-1 text-left">
-                    Agenda
-                  </button>
-                  <button className="hover:text-foreground block w-full px-2 py-1 text-left">
-                    Speaker
-                  </button>
-                </div>
-              )}
-            </SidebarMenuItem>
+              return (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton
+                    onClick={() =>
+                      item.children
+                        ? setOpenDropdown(isOpen ? null : item.title)
+                        : handleNavigate(item.href)
+                    }
+                    className={cn(
+                      'flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition',
+                      'hover:bg-muted/40',
+                      isActive && 'bg-blue-50 text-blue-600 font-semibold'
+                    )}
+                  >
+                    <Icon size={16} />
+                    {item.title}
+                    {item.children && (
+                      <ChevronDown
+                        size={16}
+                        className={cn(
+                          'ml-auto transition-transform',
+                          isOpen && 'rotate-180'
+                        )}
+                      />
+                    )}
+                  </SidebarMenuButton>
 
-            {/* Post Event Analytic */}
-            <SidebarMenuItem>
-              <SidebarMenuButton className="hover:bg-muted/40 flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition">
-                <FileText size={16} />
-                Post Event Analytic
-              </SidebarMenuButton>
-            </SidebarMenuItem>
+                  {/* Dropdown (for Event Content) */}
+                  {item.children && isOpen && (
+                    <div className="text-muted-foreground mt-1 ml-8 space-y-1 text-sm">
+                      {item.children.map((child) => {
+                        const activeChild = pathname === child.href;
+                        return (
+                          <button
+                            key={child.title}
+                            onClick={() => handleNavigate(child.href)}
+                            className={cn(
+                              'block w-full px-2 py-1 text-left hover:text-foreground',
+                              activeChild && 'text-blue-600 font-medium'
+                            )}
+                          >
+                            {child.title}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </SidebarMenuItem>
+              );
+            })}
           </SidebarMenu>
         </div>
-        {/* Other Section Title */}
       </SidebarContent>
 
-      {/* Footer (bottom section) */}
+      {/* Footer */}
       <div className="mt-6 mb-2 px-4 text-xs font-semibold text-black">Other</div>
       <SidebarFooter className="pt-3 pb-8 pl-4">
-        {' '}
-        {/* Increased pb-6 */}
         <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton className="hover:bg-muted/40 flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition">
-              <Settings size={16} />
-              Setting
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-
-          <SidebarMenuItem>
-            <SidebarMenuButton className="mt-2 flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-red-500 transition hover:bg-red-50">
-              <LogOut size={16} />
-              Logout
-            </SidebarMenuButton>
-          </SidebarMenuItem>
+          {otherMenu.map((item) => {
+            const Icon = item.icon;
+            return (
+              <SidebarMenuItem key={item.title}>
+                <SidebarMenuButton
+                  className={cn(
+                    'flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition hover:bg-muted/40',
+                    item.danger && 'text-red-500 hover:bg-red-50'
+                  )}
+                >
+                  <Icon size={16} />
+                  {item.title}
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            );
+          })}
         </SidebarMenu>
       </SidebarFooter>
     </Sidebar>

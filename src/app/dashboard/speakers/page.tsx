@@ -44,6 +44,7 @@ export default function SpeakersPage() {
   const scheduleData = {
     month: new Date().toLocaleString('default', { month: 'long' }),
     scheduleCount: 25,
+    label:'Agenda'
   };
 
   return (
@@ -52,6 +53,7 @@ export default function SpeakersPage() {
       <MonthlyScheduleSummary
         month={scheduleData.month}
         scheduleCount={scheduleData.scheduleCount}
+        label={scheduleData.label}
       />
       {loading && <p>Loading speakers...</p>}
       {error && <p className="text-red-500">{error}</p>}

@@ -19,7 +19,7 @@ const schedules: Schedule[] = [
     day: 'Monday',
     speaker: 'Agnes Diva',
     position: 'CEO of Rush Technology',
-    image: '/images/speakers/agnes-diva.jpg',
+    image: '/images/schedule.webp',
   },
   {
     title: 'Cybersecurity in Smart Cities',
@@ -27,7 +27,7 @@ const schedules: Schedule[] = [
     day: 'Thursday',
     speaker: 'Marcus Lee',
     position: 'CTO, SecureNet',
-    image: '/images/speakers/marcus-lee.jpg',
+    image: '/images/schedule.webp',
   },
   {
     title: 'AI & Robotics in Modern Society',
@@ -35,7 +35,7 @@ const schedules: Schedule[] = [
     day: 'Tuesday',
     speaker: 'Dr. Ethan Wells',
     position: 'Head of Research, Nova Robotics',
-    image: '/images/speakers/ethan-wells.jpg',
+    image: '/images/schedule.webp',
   },
   {
     title: 'Seminar on Infrastructure Technology for Future Life',
@@ -43,7 +43,7 @@ const schedules: Schedule[] = [
     day: 'Monday',
     speaker: 'Agnes Diva',
     position: 'CEO of Rush Technology',
-    image: '/images/speakers/agnes-diva.jpg',
+    image: '/images/schedule.webp',
   },
   {
     title: 'Cybersecurity in Smart Cities',
@@ -51,7 +51,7 @@ const schedules: Schedule[] = [
     day: 'Thursday',
     speaker: 'Marcus Lee',
     position: 'CTO, SecureNet',
-    image: '/images/speakers/marcus-lee.jpg',
+    image: '/images/schedule.webp',
   },
   {
     title: 'AI & Robotics in Modern Society',
@@ -59,7 +59,7 @@ const schedules: Schedule[] = [
     day: 'Tuesday',
     speaker: 'Dr. Ethan Wells',
     position: 'Head of Research, Nova Robotics',
-    image: '/images/speakers/ethan-wells.jpg',
+    image: '/images/schedule.webp',
   },
   {
     title: 'Seminar on Infrastructure Technology for Future Life',
@@ -67,7 +67,7 @@ const schedules: Schedule[] = [
     day: 'Monday',
     speaker: 'Agnes Diva',
     position: 'CEO of Rush Technology',
-    image: '/images/speakers/agnes-diva.jpg',
+    image: '/images/schedule.webp',
   },
   {
     title: 'Cybersecurity in Smart Cities',
@@ -75,7 +75,7 @@ const schedules: Schedule[] = [
     day: 'Thursday',
     speaker: 'Marcus Lee',
     position: 'CTO, SecureNet',
-    image: '/images/speakers/marcus-lee.jpg',
+    image: '/images/schedule.webp',
   },
   {
     title: 'AI & Robotics in Modern Society',
@@ -83,7 +83,7 @@ const schedules: Schedule[] = [
     day: 'Tuesday',
     speaker: 'Dr. Ethan Wells',
     position: 'Head of Research, Nova Robotics',
-    image: '/images/speakers/ethan-wells.jpg',
+    image: '/images/schedule.webp',
   },
 ];
 

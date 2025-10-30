@@ -20,8 +20,8 @@ export function Header() {
         <div className="flex items-center gap-4">
           {/* Search Bar */}
           <div className="relative">
-            <Search className="text-muted-foreground absolute top-2.5 left-2.5 h-4 w-4" />
             <Input placeholder="Search" className="w-56 border-gray-300 pl-8 text-sm" />
+            <Search className="text-muted-foreground absolute top-2.5 left-2.5 h-4 w-4" />
           </div>
 
           {/* Filter Button */}
