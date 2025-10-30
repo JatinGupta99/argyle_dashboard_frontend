@@ -1,14 +1,15 @@
 'use client';
 
+import { useState, useEffect } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { useAppSelector } from '@/redux/hooks';
 import { RootState } from '@/redux/store';
 import { format } from 'date-fns';
-import { FileDown, Filter, Plus, CalendarDays } from 'lucide-react';
-import { useState } from 'react';
-import { useSelector } from 'react-redux';
+import { FileDown, Filter, Plus, CalendarDays, ChevronDown } from 'lucide-react';
 
 interface DashboardToolbarProps {
   showFilter?: boolean;
@@ -27,15 +28,36 @@ export function DashboardToolbar({
   const [toDate, setToDate] = useState(defaultToDate);
   const { exportLabel, onExportClick } = useAppSelector((state: RootState) => state.toolbar);
 
+  const router = useRouter();
+  const pathname = usePathname();
+
+  // Determine if dropdown should show only for these routes
+  const showViewDropdown =
+    pathname === '/dashboard/schedule/table' ||
+    pathname === '/dashboard/schedule/card';
+
+  // Detect current view (default card)
+  const [view, setView] = useState<'card' | 'table'>('card');
+
+  useEffect(() => {
+    if (pathname.includes('table')) setView('table');
+    else setView('card');
+  }, [pathname]);
+
   const today = new Date();
   const day = format(today, 'EEEE');
   const date = format(today, 'd MMMM yyyy');
 
+  // Handle switching views
+  const handleViewChange = (newView: 'card' | 'table') => {
+    setView(newView);
+    router.push(`/dashboard/schedule/${newView}`);
+  };
+
   return (
     <Card className="flex w-full flex-col justify-between gap-4 border-none bg-transparent px-6 py-3 shadow-none md:flex-row md:items-center">
-      {/* Left side — date + range */}
+      {/* Left: Date and range */}
       <div className="flex w-full flex-col items-center gap-4 md:w-auto md:flex-row">
-        {/* Day / Date */}
         <div className="mr-20 flex items-center gap-3 text-gray-800">
           <CalendarDays className="h-6 w-6 text-sky-600" />
           <div className="flex flex-col leading-tight">
@@ -44,7 +66,7 @@ export function DashboardToolbar({
           </div>
         </div>
 
-        {/* Date range */}
+        {/* Date range inputs */}
         <div className="flex items-center gap-2 text-sm text-gray-600">
           <span className="mr-1">From</span>
           <Input
@@ -53,7 +75,7 @@ export function DashboardToolbar({
             onChange={(e) => setFromDate(e.target.value)}
             className="h-8 w-36 text-sm"
           />
-          <span className="mx-2">to</span> {/* space between From and To */}
+          <span className="mx-2">to</span>
           <Input
             type="date"
             value={toDate}
@@ -63,7 +85,7 @@ export function DashboardToolbar({
         </div>
       </div>
 
-      {/* Right side — buttons */}
+      {/* Right: Filter, Export, and View Dropdown */}
       <div className="flex items-center gap-2">
         {showFilter && (
           <Button
@@ -75,13 +97,30 @@ export function DashboardToolbar({
           </Button>
         )}
 
+  {showViewDropdown && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                className="flex h-8 items-center gap-2 border-gray-300 px-3 text-sm text-gray-700 hover:bg-gray-100"
+              >
+                {view === 'card' ? 'Card' : 'Table'}
+              <ChevronDown className="h-4 w-4 text-sky-400" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => handleViewChange('card')}>
+                Card
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleViewChange('table')}>
+                Table
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
         <Button
           onClick={() => onExportClick?.()}
-          className={`flex items-center gap-2 rounded-md px-4 py-2 text-white transition-all duration-200 ${
-            exportLabel?.toLowerCase().includes('add')
-              ? 'bg-sky-400 hover:bg-blue-600'
-              : 'bg-sky-400 hover:bg-blue-600'
-          }`}
+          className="flex items-center gap-2 rounded-md px-4 py-2 text-white transition-all duration-200 bg-sky-400 hover:bg-blue-600"
         >
           {exportLabel}
           {exportLabel?.toLowerCase().includes('add') ? (

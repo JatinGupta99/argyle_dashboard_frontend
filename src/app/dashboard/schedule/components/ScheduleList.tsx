@@ -20,76 +20,11 @@ const schedules: Schedule[] = [
     speaker: 'Agnes Diva',
     position: 'CEO of Rush Technology',
     image: '/images/schedule.webp',
-  },
-  {
-    title: 'Cybersecurity in Smart Cities',
-    time: '03:00 PM - 04:00 PM',
-    day: 'Thursday',
-    speaker: 'Marcus Lee',
-    position: 'CTO, SecureNet',
-    image: '/images/schedule.webp',
-  },
-  {
-    title: 'AI & Robotics in Modern Society',
-    time: '10:00 AM - 11:30 AM',
-    day: 'Tuesday',
-    speaker: 'Dr. Ethan Wells',
-    position: 'Head of Research, Nova Robotics',
-    image: '/images/schedule.webp',
-  },
-  {
-    title: 'Seminar on Infrastructure Technology for Future Life',
-    time: '08:00 AM - 09:00 AM',
-    day: 'Monday',
-    speaker: 'Agnes Diva',
-    position: 'CEO of Rush Technology',
-    image: '/images/schedule.webp',
-  },
-  {
-    title: 'Cybersecurity in Smart Cities',
-    time: '03:00 PM - 04:00 PM',
-    day: 'Thursday',
-    speaker: 'Marcus Lee',
-    position: 'CTO, SecureNet',
-    image: '/images/schedule.webp',
-  },
-  {
-    title: 'AI & Robotics in Modern Society',
-    time: '10:00 AM - 11:30 AM',
-    day: 'Tuesday',
-    speaker: 'Dr. Ethan Wells',
-    position: 'Head of Research, Nova Robotics',
-    image: '/images/schedule.webp',
-  },
-  {
-    title: 'Seminar on Infrastructure Technology for Future Life',
-    time: '08:00 AM - 09:00 AM',
-    day: 'Monday',
-    speaker: 'Agnes Diva',
-    position: 'CEO of Rush Technology',
-    image: '/images/schedule.webp',
-  },
-  {
-    title: 'Cybersecurity in Smart Cities',
-    time: '03:00 PM - 04:00 PM',
-    day: 'Thursday',
-    speaker: 'Marcus Lee',
-    position: 'CTO, SecureNet',
-    image: '/images/schedule.webp',
-  },
-  {
-    title: 'AI & Robotics in Modern Society',
-    time: '10:00 AM - 11:30 AM',
-    day: 'Tuesday',
-    speaker: 'Dr. Ethan Wells',
-    position: 'Head of Research, Nova Robotics',
-    image: '/images/schedule.webp',
-  },
+  }
 ];
 
 export function ScheduleList() {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
-
   const handleSelect = (index: number) => {
     setSelectedIndex(selectedIndex === index ? null : index);
   };
