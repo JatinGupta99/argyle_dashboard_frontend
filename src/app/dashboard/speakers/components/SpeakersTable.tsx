@@ -23,15 +23,15 @@ export function SpeakersTable({ speakers }: SpeakersTableProps) {
   }
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white shadow-sm">
-      <Table>
-        <TableHeader className="bg-gray-50">
+    <div className="h-[40vh] rounded-lg border border-gray-200 shadow-sm">
+      <Table className="w-full text-sm">
+        <TableHeader className="sticky top-0 z-10 bg-gray-50 shadow-sm">
           <TableRow>
-            <TableHead>Name</TableHead>
-            <TableHead>Email</TableHead>
-            <TableHead>Title</TableHead>
-            <TableHead>Company</TableHead>
-            <TableHead className="text-center">LinkedIn</TableHead>
+            <TableHead className="sticky top-0 bg-gray-50">Name</TableHead>
+            <TableHead className="sticky top-0 bg-gray-50">Email</TableHead>
+            <TableHead className="sticky top-0 bg-gray-50">Title</TableHead>
+            <TableHead className="sticky top-0 bg-gray-50">Company</TableHead>
+            <TableHead className="sticky top-0 bg-gray-50 text-center">LinkedIn</TableHead>
           </TableRow>
         </TableHeader>
 
@@ -39,7 +39,7 @@ export function SpeakersTable({ speakers }: SpeakersTableProps) {
           {speakers.map((speaker) => {
             const initials = `${speaker.name?.firstName?.[0] ?? ''}${speaker.name?.lastName?.[0] ?? ''}`;
             return (
-              <TableRow key={speaker._id}>
+              <TableRow key={speaker._id} className="hover:bg-gray-50">
                 <TableCell>
                   <div className="flex items-center gap-3">
                     <Avatar className="h-8 w-8">

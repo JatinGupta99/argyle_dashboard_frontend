@@ -86,7 +86,7 @@ export function AppSidebar() {
                     className={cn(
                       'flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition',
                       'hover:bg-muted/40',
-                      isActive && 'bg-blue-50 text-blue-600 font-semibold'
+                      isActive && 'bg-blue-50 font-semibold text-blue-600'
                     )}
                   >
                     <Icon size={16} />
@@ -94,10 +94,7 @@ export function AppSidebar() {
                     {item.children && (
                       <ChevronDown
                         size={16}
-                        className={cn(
-                          'ml-auto transition-transform',
-                          isOpen && 'rotate-180'
-                        )}
+                        className={cn('ml-auto transition-transform', isOpen && 'rotate-180')}
                       />
                     )}
                   </SidebarMenuButton>
@@ -112,8 +109,8 @@ export function AppSidebar() {
                             key={child.title}
                             onClick={() => handleNavigate(child.href)}
                             className={cn(
-                              'block w-full px-2 py-1 text-left hover:text-foreground',
-                              activeChild && 'text-blue-600 font-medium'
+                              'hover:text-foreground block w-full px-2 py-1 text-left',
+                              activeChild && 'font-medium text-blue-600'
                             )}
                           >
                             {child.title}
@@ -139,7 +136,7 @@ export function AppSidebar() {
               <SidebarMenuItem key={item.title}>
                 <SidebarMenuButton
                   className={cn(
-                    'flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition hover:bg-muted/40',
+                    'hover:bg-muted/40 flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition',
                     item.danger && 'text-red-500 hover:bg-red-50'
                   )}
                 >

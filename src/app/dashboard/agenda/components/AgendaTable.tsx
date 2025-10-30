@@ -11,11 +11,11 @@ export function AgendaTable({ data }: AgendaTableProps) {
       <table className="w-full border-collapse text-sm">
         <thead>
           <tr className="bg-sky-300 text-left">
-            <th className="p-2 rounded-l-lg">Session ID</th>
+            <th className="rounded-l-lg p-2">Session ID</th>
             <th className="p-2">Title</th>
             <th className="p-2">Time & Date</th>
             <th className="p-2">Audience Polls</th>
-            <th className="p-2 rounded-r-lg">Speaker</th>
+            <th className="rounded-r-lg p-2">Speaker</th>
           </tr>
         </thead>
 
@@ -23,9 +23,9 @@ export function AgendaTable({ data }: AgendaTableProps) {
           {(data || []).map((row) => (
             <tr
               key={row.id || `${row.title}-${Math.random()}`}
-              className="border-b hover:bg-muted/30 transition-colors"
+              className="hover:bg-muted/30 border-b transition-colors"
             >
-              <td className="p-2 text-sky-500 font-semibold">{row.id}</td>
+              <td className="p-2 font-semibold text-sky-500">{row.id}</td>
               <td className="p-2">{row.title}</td>
               <td className="p-2">{row.date}</td>
               <td

@@ -2,8 +2,8 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface ToolbarState {
   exportLabel: string;
-  exportAction?: string | null;          // used in other pages
-  onExportClick?: (() => void) | null;   // used in AgendaPage
+  exportAction?: string | null; // used in other pages
+  onExportClick?: (() => void) | null; // used in AgendaPage
 }
 
 const initialState: ToolbarState = {

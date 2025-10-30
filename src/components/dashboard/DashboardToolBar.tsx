@@ -83,12 +83,12 @@ export function DashboardToolbar({
               : 'bg-sky-400 hover:bg-blue-600'
           }`}
         >
+          {exportLabel}
           {exportLabel?.toLowerCase().includes('add') ? (
             <Plus className="h-4 w-4" />
           ) : (
             <FileDown className="h-4 w-4" />
           )}
-          {exportLabel}
         </Button>
       </div>
     </Card>

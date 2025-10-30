@@ -69,7 +69,7 @@ export function AgendaFormDialog({
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    setForm(prev => ({ ...prev, [name]: value }));
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -129,7 +129,7 @@ export function AgendaFormDialog({
                   name="timeStartPeriod"
                   value={form.timeStartPeriod}
                   onChange={handleChange}
-                  className="border rounded-md px-2 py-1 text-sm"
+                  className="rounded-md border px-2 py-1 text-sm"
                 >
                   <option value="AM">AM</option>
                   <option value="PM">PM</option>
@@ -151,7 +151,7 @@ export function AgendaFormDialog({
                   name="timeEndPeriod"
                   value={form.timeEndPeriod}
                   onChange={handleChange}
-                  className="border rounded-md px-2 py-1 text-sm"
+                  className="rounded-md border px-2 py-1 text-sm"
                 >
                   <option value="AM">AM</option>
                   <option value="PM">PM</option>
@@ -181,7 +181,7 @@ export function AgendaFormDialog({
               name="speaker"
               value={form.speaker}
               onChange={handleChange}
-              className="w-full border rounded-md px-3 py-2 text-sm"
+              className="w-full rounded-md border px-3 py-2 text-sm"
             >
               {speakerOptions.map((option, i) => (
                 <option key={i} value={option}>
@@ -192,19 +192,15 @@ export function AgendaFormDialog({
           </div>
 
           {/* ✅ Audience Poll Toggle */}
-          <div className="flex items-center justify-between border rounded-md px-3 py-2">
+          <div className="flex items-center justify-between rounded-md border px-3 py-2">
             <Label htmlFor="audiencePoll" className="text-sm font-medium">
               Enable Audience Poll
             </Label>
             <Switch
               id="audiencePoll"
               checked={form.audiencePoll}
-              onCheckedChange={(checked) =>
-                setForm(prev => ({ ...prev, audiencePoll: checked }))
-              }
-              className={cn(
-                'data-[state=checked]:bg-blue-500 data-[state=unchecked]:bg-gray-300'
-              )}
+              onCheckedChange={(checked) => setForm((prev) => ({ ...prev, audiencePoll: checked }))}
+              className={cn('data-[state=checked]:bg-blue-500 data-[state=unchecked]:bg-gray-300')}
             />
           </div>
 

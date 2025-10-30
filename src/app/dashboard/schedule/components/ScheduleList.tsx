@@ -91,19 +91,15 @@ export function ScheduleList() {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
   const handleSelect = (index: number) => {
-    // if same card clicked again, deselect it
     setSelectedIndex(selectedIndex === index ? null : index);
   };
 
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+    <div className="grid grid-cols-1 items-stretch gap-4 sm:grid-cols-2 xl:grid-cols-3">
       {schedules.map((item, i) => (
-        <ScheduleCard
-          key={i}
-          {...item}
-          selected={selectedIndex === i}
-          onSelect={() => handleSelect(i)}
-        />
+        <div key={i} className="h-full">
+          <ScheduleCard {...item} selected={selectedIndex === i} onSelect={() => handleSelect(i)} />
+        </div>
       ))}
     </div>
   );

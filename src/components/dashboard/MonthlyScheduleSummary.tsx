@@ -15,11 +15,8 @@ export default function MonthlySummary({ month, scheduleCount, label }: MonthlyS
       {/* Left side — text */}
       <div className="flex flex-col">
         <p className="text-sm text-gray-600">
-          You have{' '}
-          <span className="font-semibold text-sky-500">{scheduleCount}</span>{' '}
-          <span className="text-sky-500">
-            {scheduleCount === 1 ? label.slice(0, -1) : label}
-          </span>{' '}
+          You have <span className="font-semibold text-sky-500">{scheduleCount}</span>{' '}
+          <span className="text-sky-500">{scheduleCount === 1 ? label.slice(0, -1) : label}</span>{' '}
           this month.
         </p>
       </div>
