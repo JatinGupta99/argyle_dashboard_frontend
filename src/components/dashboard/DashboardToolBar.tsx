@@ -5,7 +5,12 @@ import { usePathname, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from '@/components/ui/dropdown-menu';
 import { useAppSelector } from '@/redux/hooks';
 import { RootState } from '@/redux/store';
 import { format } from 'date-fns';
@@ -33,8 +38,7 @@ export function DashboardToolbar({
 
   // Determine if dropdown should show only for these routes
   const showViewDropdown =
-    pathname === '/dashboard/schedule/table' ||
-    pathname === '/dashboard/schedule/card';
+    pathname === '/dashboard/schedule/table' || pathname === '/dashboard/schedule/card';
 
   // Detect current view (default card)
   const [view, setView] = useState<'card' | 'table'>('card');
@@ -97,7 +101,7 @@ export function DashboardToolbar({
           </Button>
         )}
 
-  {showViewDropdown && (
+        {showViewDropdown && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -105,16 +109,12 @@ export function DashboardToolbar({
                 className="flex h-8 items-center gap-2 border-gray-300 px-3 text-sm text-gray-700 hover:bg-gray-100"
               >
                 {view === 'card' ? 'Card' : 'Table'}
-              <ChevronDown className="h-4 w-4 text-sky-400" />
+                <ChevronDown className="h-4 w-4 text-sky-400" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => handleViewChange('card')}>
-                Card
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleViewChange('table')}>
-                Table
-              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleViewChange('card')}>Card</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleViewChange('table')}>Table</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         )}

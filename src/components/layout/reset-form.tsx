@@ -1,9 +1,9 @@
-'use client'
+'use client';
 
-import { z } from 'zod'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 
 import {
   Form,
@@ -12,21 +12,15 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
-import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { PasswordInput } from '@/components/ui/password-input'
+} from '@/components/ui/form';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { PasswordInput } from '@/components/ui/password-input';
 
-import { resetPasswordFormSchema } from '@/lib/validation-schemas'
+import { resetPasswordFormSchema } from '@/lib/validation-schemas';
 
-const formSchema = resetPasswordFormSchema
+const formSchema = resetPasswordFormSchema;
 
 export default function ResetPasswordPreview() {
   const form = useForm<z.infer<typeof formSchema>>({
@@ -35,18 +29,16 @@ export default function ResetPasswordPreview() {
       password: '',
       confirmPassword: '',
     },
-  })
+  });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       // Assuming an async reset password function
-      console.log(values)
-      toast.success(
-        'Password reset successful. You can now log in with your new password.',
-      )
+      console.log(values);
+      toast.success('Password reset successful. You can now log in with your new password.');
     } catch (error) {
-      console.error('Error resetting password', error)
-      toast.error('Failed to reset the password. Please try again.')
+      console.error('Error resetting password', error);
+      toast.error('Failed to reset the password. Please try again.');
     }
   }
 
@@ -55,9 +47,7 @@ export default function ResetPasswordPreview() {
       <Card className="mx-auto max-w-sm">
         <CardHeader>
           <CardTitle className="text-2xl">Reset Password</CardTitle>
-          <CardDescription>
-            Enter your new password to reset your password.
-          </CardDescription>
+          <CardDescription>Enter your new password to reset your password.</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -89,9 +79,7 @@ export default function ResetPasswordPreview() {
                   name="confirmPassword"
                   render={({ field }) => (
                     <FormItem className="grid gap-2">
-                      <FormLabel htmlFor="confirmPassword">
-                        Confirm Password
-                      </FormLabel>
+                      <FormLabel htmlFor="confirmPassword">Confirm Password</FormLabel>
                       <FormControl>
                         <PasswordInput
                           id="confirmPassword"
@@ -114,5 +102,5 @@ export default function ResetPasswordPreview() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

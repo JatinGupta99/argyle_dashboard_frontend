@@ -1,4 +1,4 @@
-import ForgetPasswordPreview from "@/components/layout/forget-password"
+import ForgetPasswordPreview from '@/components/layout/forget-password';
 
 export default function Page() {
   return (
@@ -7,5 +7,5 @@ export default function Page() {
         <ForgetPasswordPreview />
       </div>
     </div>
-  )
+  );
 }

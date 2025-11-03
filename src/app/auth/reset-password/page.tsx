@@ -1,4 +1,4 @@
-import ResetPasswordPreview from "@/components/layout/reset-form"
+import ResetPasswordPreview from '@/components/layout/reset-form';
 
 export default function Page() {
   return (
@@ -7,5 +7,5 @@ export default function Page() {
         <ResetPasswordPreview />
       </div>
     </div>
-  )
+  );
 }

@@ -1,9 +1,6 @@
 'use client';
 
-import {
-  Card,
-  CardContent,
-} from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   Table,
   TableHeader,
@@ -60,19 +57,14 @@ export function ScheduleTableContent({ schedules, loading, error }: ScheduleTabl
               <TableBody>
                 {schedules.length === 0 ? (
                   <TableRow>
-                    <TableCell
-                      colSpan={5}
-                      className="py-10 text-center text-gray-500"
-                    >
+                    <TableCell colSpan={5} className="py-10 text-center text-gray-500">
                       No schedules found.
                     </TableCell>
                   </TableRow>
                 ) : (
                   schedules.map((item, idx) => (
                     <TableRow key={idx} className="hover:bg-gray-50">
-                      <TableCell className="font-medium text-sky-400">
-                        {item.title}
-                      </TableCell>
+                      <TableCell className="font-medium text-sky-400">{item.title}</TableCell>
                       <TableCell>{new Date(item.date).toLocaleDateString('en-GB')}</TableCell>
                       <TableCell className="flex items-center gap-2">
                         <Clock className="h-4 w-4 text-sky-400" />
@@ -92,7 +84,9 @@ export function ScheduleTableContent({ schedules, loading, error }: ScheduleTabl
                           </Avatar>
                           <div className="flex flex-col">
                             <span className="font-medium text-gray-900">{item.speaker.name}</span>
-                            <span className="text-xs text-gray-500">{item.speaker.designation}</span>
+                            <span className="text-xs text-gray-500">
+                              {item.speaker.designation}
+                            </span>
                           </div>
                         </div>
                       </TableCell>
@@ -102,8 +96,8 @@ export function ScheduleTableContent({ schedules, loading, error }: ScheduleTabl
                             item.status === 'Upcoming'
                               ? 'bg-blue-100 text-sky-400'
                               : item.status === 'Pending'
-                              ? 'bg-yellow-100 text-yellow-700'
-                              : 'bg-red-100 text-red-700'
+                                ? 'bg-yellow-100 text-yellow-700'
+                                : 'bg-red-100 text-red-700'
                           }`}
                         >
                           {item.status}

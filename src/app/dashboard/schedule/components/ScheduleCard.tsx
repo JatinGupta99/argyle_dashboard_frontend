@@ -44,8 +44,8 @@ export function ScheduleCard({
 
         <CardContent className="text-muted-foreground flex items-center justify-between text-sm">
           <div className="flex items-center gap-2">
-            <Calendar className="h-4 w-4" />
-            <span>{day}</span>
+            <Calendar className="h-2 w-2" />
+            <h3 className="text-xs">{day}</h3>
           </div>
           <span>{time}</span>
         </CardContent>

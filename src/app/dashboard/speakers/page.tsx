@@ -50,10 +50,7 @@ export default function SpeakersPage() {
           {loading && <p className="p-4 text-sm text-gray-600">Loading speakers...</p>}
           {error && <p className="p-4 text-sm text-red-500">{error}</p>}
           {!loading && !error && (
-            <SpeakersTable
-              speakers={speakers}
-              refetch={() => dispatch(fetchSpeakers())} 
-            />
+            <SpeakersTable speakers={speakers} refetch={() => dispatch(fetchSpeakers())} />
           )}
         </section>
       </main>
@@ -61,7 +58,7 @@ export default function SpeakersPage() {
       <SpeakerFormDialog
         open={open}
         onOpenChange={setOpen}
-        onSuccess={() => dispatch(fetchSpeakers())} 
+        onSuccess={() => dispatch(fetchSpeakers())}
         editData={editData}
       />
     </div>
