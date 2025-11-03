@@ -1,55 +1,30 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useAppDispatch } from '@/redux/hooks';
-import { setExportClick, setExportLabel } from '@/redux/slices/toolbar-slice';
+import { setExportLabel } from '@/redux/slices/toolbar-slice';
 import { DashboardToolbar } from '@/components/dashboard/DashboardToolBar';
 import MonthlyScheduleSummary from '@/components/dashboard/MonthlyScheduleSummary';
 import { Header } from '@/components/layout/Header';
 import { SpeakerFormDialog } from './components/SpeakerFormDialog';
 import { SpeakersTable } from './components/SpeakersTable';
-import { SpeakerService } from '@/services/speaker.service';
-import type { Speaker } from '@/lib/types/speaker';
+import { useSpeakers } from './hooks/useSpeakers';
+import { fetchSpeakers } from '@/redux/slices/speaker-slice';
 
 export default function SpeakersPage() {
   const dispatch = useAppDispatch();
-  const [speakers, setSpeakers] = useState<Speaker[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { list: speakers, loading, error } = useSpeakers();
   const [open, setOpen] = useState(false);
-  const [editData, setEditData] = useState<Speaker | null>(null);
+  const [editData, setEditData] = useState<any | null>(null);
 
   useEffect(() => {
-    let mounted = true;
-
-    const loadSpeakers = async () => {
-      setLoading(true);
-      try {
-        const data = await SpeakerService.getAll();
-        if (mounted) {
-          const unique = Array.from(new Map(data.map((s) => [s._id, s])).values());
-          setSpeakers(unique);
-        }
-      } catch (err: any) {
-        if (mounted) setError(err.message || 'Something went wrong');
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    };
-
-    loadSpeakers();
     dispatch(setExportLabel('Add Speaker'));
-    dispatch(
-      setExportClick(() => {
-        setEditData(null);
-        setOpen(true);
-      })
-    );
-
-    return () => {
-      mounted = false;
-    };
   }, [dispatch]);
+
+  const handleAddSpeaker = () => {
+    setEditData(null);
+    setOpen(true);
+  };
 
   const summaryData = useMemo(
     () => ({
@@ -63,6 +38,7 @@ export default function SpeakersPage() {
   return (
     <div className="flex h-screen flex-col bg-gray-50">
       <Header />
+      {/* Pass local handler to toolbar button */}
       <DashboardToolbar />
       <MonthlyScheduleSummary
         month={summaryData.month}
@@ -76,12 +52,7 @@ export default function SpeakersPage() {
           {!loading && !error && (
             <SpeakersTable
               speakers={speakers}
-              refetch={() => {
-                SpeakerService.getAll().then((data) => {
-                  const unique = Array.from(new Map(data.map((s) => [s._id, s])).values());
-                  setSpeakers(unique);
-                });
-              }}
+              refetch={() => dispatch(fetchSpeakers())} 
             />
           )}
         </section>
@@ -90,12 +61,7 @@ export default function SpeakersPage() {
       <SpeakerFormDialog
         open={open}
         onOpenChange={setOpen}
-        onSuccess={() => {
-          SpeakerService.getAll().then((data) => {
-            const unique = Array.from(new Map(data.map((s) => [s._id, s])).values());
-            setSpeakers(unique);
-          });
-        }}
+        onSuccess={() => dispatch(fetchSpeakers())} 
         editData={editData}
       />
     </div>
