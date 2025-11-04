@@ -1,30 +1,28 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import {
   DropdownMenu,
-  DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
 import { useAppSelector } from '@/redux/hooks';
 import { RootState } from '@/redux/store';
 import { format } from 'date-fns';
-import { FileDown, Filter, Plus, CalendarDays, ChevronDown } from 'lucide-react';
+import { CalendarDays, ChevronDown, FileDown, Plus } from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 interface DashboardToolbarProps {
-  showFilter?: boolean;
   onFilterClick?: () => void;
   defaultFromDate?: string;
   defaultToDate?: string;
 }
 
 export function DashboardToolbar({
-  showFilter = true,
   onFilterClick,
   defaultFromDate = '',
   defaultToDate = '',
@@ -56,77 +54,65 @@ export function DashboardToolbar({
   };
 
   return (
-    <Card className="flex w-full flex-col justify-between gap-4 border-none bg-transparent px-6 py-3 shadow-none md:flex-row md:items-center">
-      <div className="flex w-full flex-col items-center gap-4 md:w-auto md:flex-row">
-        <div className="flex items-center gap-3 text-gray-800">
-          <div className="flex items-center justify-center rounded-md bg-sky-200 p-2 shadow-sm">
-            <CalendarDays className="h-5 w-5 text-blue-500" />
-          </div>
-          <div className="flex flex-col leading-tight">
-            <span className="text-base font-semibold">{day}</span>
-            <span className="text-sm font-medium text-sky-500">{date}</span>
-          </div>
-        </div>
+<Card className="flex w-full flex-col justify-between gap-4 border-none bg-transparent px-6 py-3 shadow-none md:flex-row md:items-center md:justify-between">
+  {/* Day & Date */}
+  <div className="flex items-center gap-3 text-gray-800">
+    <div className="flex items-center justify-center rounded-md bg-sky-200 p-2 shadow-sm">
+      <CalendarDays className="h-5 w-5 text-blue-500" />
+    </div>
+    <div className="flex flex-col leading-tight">
+      <span className="text-base font-semibold">{day}</span>
+      <span className="text-sm font-medium text-sky-500">{date}</span>
+    </div>
+  </div>
 
-        <div className="flex items-center gap-2 text-sm text-gray-600">
-          <span className="mr-1">From</span>
-          <Input
-            type="date"
-            value={fromDate}
-            onChange={(e) => setFromDate(e.target.value)}
-            className="h-8 w-36 text-sm"
-          />
-          <span className="mx-2">to</span>
-          <Input
-            type="date"
-            value={toDate}
-            onChange={(e) => setToDate(e.target.value)}
-            className="h-8 w-36 text-sm"
-          />
-        </div>
-      </div>
+  {/* From/To Inputs */}
+  <div className="ml-80 flex items-center gap-2 text-sm text-gray-600">
+    <span>From</span>
+    <Input
+      type="date"
+      value={fromDate}
+      onChange={(e) => setFromDate(e.target.value)}
+      className="h-8 w-36 text-sm"
+    />
+    <span>to</span>
+    <Input
+      type="date"
+      value={toDate}
+      onChange={(e) => setToDate(e.target.value)}
+      className="h-8 w-36 text-sm"
+    />
+  </div>
 
-      <div className="flex items-center gap-2">
-        {showFilter && (
+  {/* View Dropdown & Export Button */}
+  <div className="flex items-center gap-2">
+    {showViewDropdown && (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
           <Button
-            onClick={onFilterClick}
-            className="flex items-center gap-2 bg-sky-400 text-white hover:bg-blue-600"
+            variant="outline"
+            className="flex h-8 items-center gap-2 border-gray-300 px-3 text-sm text-gray-700 hover:bg-gray-100"
           >
-            <Filter className="h-4 w-4" />
-            Filter
+            {view === 'card' ? 'Card' : 'Table'}
+            <ChevronDown className="h-4 w-4 text-sky-400" />
           </Button>
-        )}
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem onClick={() => handleViewChange('card')}>Card</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => handleViewChange('table')}>Table</DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    )}
 
-        {showViewDropdown && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="outline"
-                className="flex h-8 items-center gap-2 border-gray-300 px-3 text-sm text-gray-700 hover:bg-gray-100"
-              >
-                {view === 'card' ? 'Card' : 'Table'}
-                <ChevronDown className="h-4 w-4 text-sky-400" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => handleViewChange('card')}>Card</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleViewChange('table')}>Table</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
+    <Button
+      onClick={() => onExportClick?.()}
+      className="flex items-center gap-2 rounded-md bg-sky-400 px-4 py-2 text-white transition-all duration-200 hover:bg-blue-600"
+    >
+      {exportLabel}
+      {exportLabel?.toLowerCase().includes('add') ? <Plus className="h-4 w-4" /> : <FileDown className="h-4 w-4" />}
+    </Button>
+  </div>
+</Card>
 
-        <Button
-          onClick={() => onExportClick?.()}
-          className="flex items-center gap-2 rounded-md bg-sky-400 px-4 py-2 text-white transition-all duration-200 hover:bg-blue-600"
-        >
-          {exportLabel}
-          {exportLabel?.toLowerCase().includes('add') ? (
-            <Plus className="h-4 w-4" />
-          ) : (
-            <FileDown className="h-4 w-4" />
-          )}
-        </Button>
-      </div>
-    </Card>
   );
 }

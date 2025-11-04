@@ -1,86 +1,66 @@
 'use client';
-
-import { Linkedin } from 'lucide-react';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import type { Speaker } from '@/lib/types/speaker';
+import { Pencil } from 'lucide-react';
 
 interface SpeakersTableProps {
   speakers: Speaker[];
-  refetch?: () => void;
+  onEdit?: (speaker: Speaker) => void;
+  height?: string;
 }
 
-export function SpeakersTable({ speakers }: SpeakersTableProps) {
-  if (!Array.isArray(speakers) || speakers.length === 0) {
-    return <div className="py-10 text-center text-gray-500">No speakers found.</div>;
-  }
-
+export function SpeakersTable({ speakers, onEdit, height = '60vh' }: SpeakersTableProps) {
   return (
-    <div className="h-[40vh] rounded-lg border border-gray-200 shadow-sm">
-      <Table className="w-full border-collapse border-4 text-sm">
-        <TableHeader className="sticky top-0 z-10 bg-gray-50 shadow-sm">
-          <TableRow></TableRow>
-        </TableHeader>
+    <div className="rounded-lg border border-gray-200 shadow-sm" style={{ height }}>
+      <div className="h-full overflow-auto">
+        <table className="w-full border-collapse text-sm">
+          <thead className="bg-sky-200">
+            <tr className="text-left text-blue-500">
+              <th className="sticky top-0 bg-sky-200 p-2">ID</th>
+              <th className="sticky top-0 bg-sky-200 p-2">Name</th>
+              <th className="sticky top-0 bg-sky-200 p-2">Title</th>
+              <th className="sticky top-0 bg-sky-200 p-2">Company</th>
+              <th className="sticky top-0 bg-sky-200 p-2">Email</th>
+              <th className="sticky top-0 bg-sky-200 p-2">Action</th>
+            </tr>
+          </thead>
 
-        <thead className="bg-sky-200">
-          <tr className="text-left text-blue-500">
-            <TableHead className="sticky top-0 bg-gray-50">Name</TableHead>
-            <TableHead className="sticky top-0 bg-gray-50">Email</TableHead>
-            <TableHead className="sticky top-0 bg-gray-50">Title</TableHead>
-            <TableHead className="sticky top-0 bg-gray-50">Company</TableHead>
-            <TableHead className="sticky top-0 bg-gray-50 text-center">LinkedIn</TableHead>
-          </tr>
-        </thead>
-        <TableBody>
-          {speakers.map((speaker) => {
-            const initials = `${speaker.name?.firstName?.[0] ?? ''}${speaker.name?.lastName?.[0] ?? ''}`;
-            return (
-              <TableRow key={speaker._id} className="hover:bg-gray-50">
-                <TableCell>
-                  <div className="flex items-center gap-3">
+          <tbody>
+            {speakers.map((speaker) => {
+              const fullName = `${speaker.name.firstName} ${speaker.name.lastName}`;
+              return (
+                <tr key={speaker._id} className="border-b transition-colors hover:bg-gray-50">
+                  <td className="p-2 font-semibold text-sky-500">{speaker._id}</td>
+                  <td className="flex items-center gap-2 p-2">
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src={speaker.pictureUrl || ''} />
-                      <AvatarFallback>{initials}</AvatarFallback>
+                      {speaker.pictureUrl ? (
+                        <AvatarImage src={speaker.pictureUrl} alt={fullName} />
+                      ) : (
+                        <AvatarFallback>
+                          {speaker.name.firstName[0]}
+                          {speaker.name.lastName[0]}
+                        </AvatarFallback>
+                      )}
                     </Avatar>
-                    <span className="font-medium text-gray-900">
-                      {speaker.name?.firstName} {speaker.name?.lastName}
-                    </span>
-                  </div>
-                </TableCell>
-
-                <TableCell className="text-blue-600 hover:text-blue-800">
-                  <a href={`mailto:${speaker.email}`}>{speaker.email}</a>
-                </TableCell>
-
-                <TableCell>{speaker.title}</TableCell>
-                <TableCell>{speaker.companyName}</TableCell>
-
-                <TableCell className="text-center">
-                  {speaker.linkedInUrl ? (
-                    <a
-                      href={speaker.linkedInUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center justify-center text-blue-600 hover:text-blue-800"
+                    {fullName}
+                  </td>
+                  <td className="p-2">{speaker.title}</td>
+                  <td className="p-2">{speaker.companyName}</td>
+                  <td className="p-2">{speaker.email}</td>
+                  <td className="p-2">
+                    <button
+                      className="flex items-center gap-1 text-sm text-blue-500 hover:underline"
+                      onClick={() => onEdit?.(speaker)}
                     >
-                      <Linkedin className="h-4 w-4" />
-                    </a>
-                  ) : (
-                    <span className="text-gray-400">—</span>
-                  )}
-                </TableCell>
-              </TableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
+                      <Pencil className="h-4 w-4" />
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

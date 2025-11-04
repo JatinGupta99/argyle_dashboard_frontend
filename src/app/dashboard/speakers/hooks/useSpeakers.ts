@@ -1,16 +1,30 @@
 'use client';
 
-import { useEffect } from 'react';
-import { fetchSpeakers } from '@/redux/slices/speaker-slice';
-import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import { useState, useEffect, useCallback } from 'react';
+import { SpeakerService } from '@/services/speaker.service';
+import type { Speaker } from '@/lib/types/speaker';
 
 export const useSpeakers = () => {
-  const dispatch = useAppDispatch();
-  const { list, loading, error } = useAppSelector((state) => state.speakers);
+  const [speakers, setSpeakers] = useState<Speaker[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchSpeakers = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await SpeakerService.getAll();
+      const unique = Array.from(new Map(data.map((s) => [s._id, s])).values());
+      setSpeakers(unique);
+    } catch (err: any) {
+      setError(err.message || 'Something went wrong');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    dispatch(fetchSpeakers());
-  }, [dispatch]);
+    fetchSpeakers();
+  }, [fetchSpeakers]);
 
-  return { list, loading, error };
+  return { speakers, loading, error, refetch: fetchSpeakers };
 };
