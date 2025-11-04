@@ -20,7 +20,47 @@ const schedules: Schedule[] = [
     speaker: 'Agnes Diva',
     position: 'CEO of Rush Technology',
     image: '/images/schedule.webp',
-  }
+  },
+  {
+    title: 'Seminar on Infrastructure Technology for Future Life',
+    time: '08:00 AM - 09:00 AM',
+    day: 'Monday',
+    speaker: 'Agnes Diva',
+    position: 'CEO of Rush Technology',
+    image: '/images/schedule.webp',
+  },
+  {
+    title: 'Seminar on Infrastructure Technology for Future Life',
+    time: '08:00 AM - 09:00 AM',
+    day: 'Monday',
+    speaker: 'Agnes Diva',
+    position: 'CEO of Rush Technology',
+    image: '/images/schedule.webp',
+  },
+  {
+    title: 'Seminar on Infrastructure Technology for Future Life',
+    time: '08:00 AM - 09:00 AM',
+    day: 'Monday',
+    speaker: 'Agnes Diva',
+    position: 'CEO of Rush Technology',
+    image: '/images/schedule.webp',
+  },
+  {
+    title: 'Seminar on Infrastructure Technology for Future Life',
+    time: '08:00 AM - 09:00 AM',
+    day: 'Monday',
+    speaker: 'Agnes Diva',
+    position: 'CEO of Rush Technology',
+    image: '/images/schedule.webp',
+  },
+  {
+    title: 'Seminar on Infrastructure Technology for Future Life',
+    time: '08:00 AM - 09:00 AM',
+    day: 'Monday',
+    speaker: 'Agnes Diva',
+    position: 'CEO of Rush Technology',
+    image: '/images/schedule.webp',
+  },
 ];
 
 export function ScheduleList() {

@@ -9,8 +9,8 @@ export function AgendaTable({ data }: AgendaTableProps) {
   return (
     <div className="rounded-xl bg-white p-4 shadow">
       <table className="w-full border-collapse text-sm">
-        <thead>
-          <tr className="bg-sky-300 text-left">
+        <thead className="bg-sky-200">
+          <tr className="text-left text-blue-500">
             <th className="rounded-l-lg p-2">Session ID</th>
             <th className="p-2">Title</th>
             <th className="p-2">Time & Date</th>

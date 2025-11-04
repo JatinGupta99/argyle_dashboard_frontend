@@ -9,7 +9,7 @@ import { store } from '@/redux/store';
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <Provider store={store}>
-      <SidebarProvider className="">
+      <SidebarProvider>
         <AppSidebar />
         <main className="h-full w-full">{children}</main>
       </SidebarProvider>

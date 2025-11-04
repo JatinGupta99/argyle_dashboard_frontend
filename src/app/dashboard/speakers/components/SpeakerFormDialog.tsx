@@ -100,10 +100,10 @@ export function SpeakerFormDialog({
           <DialogTitle>{editData ? 'Edit Speaker' : 'Add Speaker'}</DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-1">
+        <div className="space-x-4">
           <div className="flex gap-3">
             <div className="flex-1">
-              <Label>First Name</Label>
+              <Label className="mb-2 block">First Name</Label>
               <Input
                 value={formData.name.firstName}
                 onChange={(e) => handleChange('firstName', e.target.value, true)}
@@ -111,7 +111,7 @@ export function SpeakerFormDialog({
               />
             </div>
             <div className="flex-1">
-              <Label>Last Name</Label>
+              <Label className="mb-1 block">Last Name</Label>
               <Input
                 value={formData.name.lastName}
                 onChange={(e) => handleChange('lastName', e.target.value, true)}
@@ -121,7 +121,7 @@ export function SpeakerFormDialog({
           </div>
 
           <div>
-            <Label>Email</Label>
+            <Label className="mb-1 block">Email</Label>
             <Input
               type="email"
               value={formData.email}
@@ -131,7 +131,7 @@ export function SpeakerFormDialog({
           </div>
 
           <div>
-            <Label>Title</Label>
+            <Label className="mb-1 block">Title</Label>
             <Input
               value={formData.title}
               onChange={(e) => handleChange('title', e.target.value)}
@@ -140,7 +140,7 @@ export function SpeakerFormDialog({
           </div>
 
           <div>
-            <Label>Company Name</Label>
+            <Label className="mb-1 block">Company Name</Label>
             <Input
               value={formData.companyName}
               onChange={(e) => handleChange('companyName', e.target.value)}
@@ -149,7 +149,7 @@ export function SpeakerFormDialog({
           </div>
 
           <div>
-            <Label>LinkedIn URL</Label>
+            <Label className="mb-1 block">LinkedIn URL</Label>
             <Input
               value={formData.linkedInUrl}
               onChange={(e) => handleChange('linkedInUrl', e.target.value)}
@@ -158,7 +158,7 @@ export function SpeakerFormDialog({
           </div>
 
           <div>
-            <Label>Picture URL</Label>
+            <Label className="mb-1 block">Picture URL</Label>
             <Input
               value={formData.pictureUrl}
               onChange={(e) => handleChange('pictureUrl', e.target.value)}
@@ -167,7 +167,7 @@ export function SpeakerFormDialog({
           </div>
 
           <div>
-            <Label>Bio</Label>
+            <Label className="mb-1 block">Bio</Label>
             <textarea
               value={formData.bio}
               onChange={(e) => handleChange('bio', e.target.value)}

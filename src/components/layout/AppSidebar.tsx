@@ -52,7 +52,7 @@ export function AppSidebar() {
   };
 
   return (
-    <Sidebar className="flex w-56 flex-col border-r bg-white">
+    <Sidebar className="flex h-screen w-64 flex-col bg-white">
       {/* Header */}
       <SidebarHeader className="flex h-20 items-start justify-start p-5">
         <Image
@@ -99,7 +99,6 @@ export function AppSidebar() {
                     )}
                   </SidebarMenuButton>
 
-                  {/* Dropdown (for Event Content) */}
                   {item.children && isOpen && (
                     <div className="text-muted-foreground mt-1 ml-8 space-y-1 text-sm">
                       {item.children.map((child) => {
@@ -126,15 +125,16 @@ export function AppSidebar() {
         </div>
       </SidebarContent>
 
-      {/* Footer */}
-      <div className="mt-6 mb-2 px-4 text-xs font-semibold text-black">Other</div>
-      <SidebarFooter className="pt-3 pb-8 pl-4">
+      {/* Footer / Other Menu */}
+      {/* <SidebarFooter className="mt-auto px-4 mr-3">
+        <div className="mb-2 text-xs font-semibold text-black">Other</div>
         <SidebarMenu>
           {otherMenu.map((item) => {
             const Icon = item.icon;
             return (
               <SidebarMenuItem key={item.title}>
                 <SidebarMenuButton
+                  onClick={() => item.title === 'Logout' && router.push('/login')}
                   className={cn(
                     'hover:bg-muted/40 flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition',
                     item.danger && 'text-red-500 hover:bg-red-50'
@@ -147,7 +147,7 @@ export function AppSidebar() {
             );
           })}
         </SidebarMenu>
-      </SidebarFooter>
+      </SidebarFooter> */}
     </Sidebar>
   );
 }

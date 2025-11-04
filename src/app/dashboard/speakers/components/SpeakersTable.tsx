@@ -24,17 +24,20 @@ export function SpeakersTable({ speakers }: SpeakersTableProps) {
 
   return (
     <div className="h-[40vh] rounded-lg border border-gray-200 shadow-sm">
-      <Table className="w-full text-sm">
+      <Table className="w-full border-collapse border-4 text-sm">
         <TableHeader className="sticky top-0 z-10 bg-gray-50 shadow-sm">
-          <TableRow>
+          <TableRow></TableRow>
+        </TableHeader>
+
+        <thead className="bg-sky-200">
+          <tr className="text-left text-blue-500">
             <TableHead className="sticky top-0 bg-gray-50">Name</TableHead>
             <TableHead className="sticky top-0 bg-gray-50">Email</TableHead>
             <TableHead className="sticky top-0 bg-gray-50">Title</TableHead>
             <TableHead className="sticky top-0 bg-gray-50">Company</TableHead>
             <TableHead className="sticky top-0 bg-gray-50 text-center">LinkedIn</TableHead>
-          </TableRow>
-        </TableHeader>
-
+          </tr>
+        </thead>
         <TableBody>
           {speakers.map((speaker) => {
             const initials = `${speaker.name?.firstName?.[0] ?? ''}${speaker.name?.lastName?.[0] ?? ''}`;

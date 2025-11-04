@@ -1,3 +1,4 @@
+'use client';
 import { DashboardToolbar } from '@/components/dashboard/DashboardToolBar';
 
 export default function DashboardHome() {
