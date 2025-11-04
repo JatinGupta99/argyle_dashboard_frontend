@@ -43,26 +43,32 @@ export function ScheduleCard({
         </CardHeader>
 
         <CardContent className="text-muted-foreground flex items-center justify-between text-sm">
-          <div className="flex items-center gap-2">
-            <Calendar className="h-4 w-4" />
+          {/* 📅 Calendar inside blue rectangular box */}
+          <div className="flex items-center gap-2 rounded-md bg-sky-500 px-2 py-1 text-xs font-medium text-white">
+            <Calendar className="h-3 w-3" />
             <span>{day}</span>
           </div>
+
           <span>{time}</span>
         </CardContent>
 
         <CardFooter className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             {image && (
-              <div className="relative h-10 w-10 overflow-hidden rounded-full">
+              <button
+                type="button"
+                className="relative flex h-9 w-9 items-center justify-center rounded-md border border-gray-200 bg-gray-50 transition hover:bg-gray-100"
+              >
                 <Image
-                  src={image}
-                  alt={`${speaker} photo`}
+                  src={image} // ✅ use image prop here
+                  alt={speaker} // ✅ use speaker name for alt
                   fill
-                  className="object-cover"
-                  sizes="40px"
+                  className="rounded-md object-cover"
+                  sizes="36px"
                 />
-              </div>
+              </button>
             )}
+
             <div>
               <p className="text-sm font-medium">{speaker}</p>
               <p className="text-muted-foreground text-xs">{position}</p>
@@ -71,7 +77,7 @@ export function ScheduleCard({
         </CardFooter>
       </Card>
 
-      {/* 🧩 Keep height stable by reserving space */}
+      {/* Reserve space for button */}
       <div className="flex h-12 items-center justify-center">
         {selected && (
           <Button size="sm" variant="default" className="bg-blue-500">

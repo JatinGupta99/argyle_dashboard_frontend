@@ -32,7 +32,7 @@ export function Header() {
         <p className="text-xs text-gray-500">Here’s your schedule today</p>
       </div>
       <div className="flex items-center gap-4">
-        <div className="relative mr-6">
+        <div className="relative mr-50">
           <Input
             placeholder="Search..."
             value={searchQuery}
@@ -53,22 +53,10 @@ export function Header() {
             sizes="36px"
           />
         </button>
-        <div className="text-sm leading-tight">
+        <div className="mr-3 text-sm leading-tight">
           <p className="font-semibold text-gray-800">{user.name}</p>
           <p className="text-xs text-gray-500">{user.role}</p>
         </div>
-        <button
-          type="button"
-          onClick={handleNotificationClick}
-          className="relative flex h-9 w-9 items-center justify-center rounded-md border border-blue-200 bg-blue-50 text-blue-600 transition hover:bg-blue-100"
-        >
-          <Bell className="h-5 w-5" />
-          {notifications > 0 && (
-            <span className="absolute top-1 right-1 flex h-3 w-3 items-center justify-center rounded-full bg-sky-500 text-[10px] font-semibold text-white">
-              {notifications}
-            </span>
-          )}
-        </button>
       </div>
     </header>
   );

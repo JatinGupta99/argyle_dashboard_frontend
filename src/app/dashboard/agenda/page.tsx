@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useAppDispatch } from '@/redux/hooks';
-import { setExportClick, setExportLabel } from '@/redux/slices/toolbar-slice';
+import { setExportAction, setExportClick, setExportLabel } from '@/redux/slices/toolbar-slice';
 
 import { Header } from '@/components/layout/Header';
 import { DashboardToolbar } from '@/components/dashboard/DashboardToolBar';
@@ -48,6 +48,7 @@ export default function AgendaPage() {
     fetchAgendas();
     dispatch(setExportLabel('Add Agenda'));
     dispatch(setExportClick(() => setOpen(true)));
+    dispatch(setExportAction('openAgendaDialog'));
   }, [dispatch, fetchAgendas]);
 
   // Derived pagination data

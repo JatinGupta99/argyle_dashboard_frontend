@@ -1,5 +1,5 @@
 export interface Speaker {
-  _id: string;
+  _id?: string;
   name: {
     firstName: string;
     lastName: string;

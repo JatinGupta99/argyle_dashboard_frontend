@@ -45,6 +45,50 @@ export default function ScheduleTable() {
             },
             status: 'Pending',
           },
+          {
+            title: 'Seminar on infrastructure technology for future life',
+            date: '12-10-2025',
+            time: '08:00 AM - 09:00 AM',
+            speaker: {
+              profileUrl: '/images/schedule.webp',
+              name: 'Agnes Diva',
+              designation: 'CEO of Rush Technology',
+            },
+            status: 'Pending',
+          },
+          {
+            title: 'Seminar on infrastructure technology for future life',
+            date: '12-10-2025',
+            time: '08:00 AM - 09:00 AM',
+            speaker: {
+              profileUrl: '/images/schedule.webp',
+              name: 'Agnes Diva',
+              designation: 'CEO of Rush Technology',
+            },
+            status: 'Pending',
+          },
+          {
+            title: 'Seminar on infrastructure technology for future life',
+            date: '12-10-2025',
+            time: '08:00 AM - 09:00 AM',
+            speaker: {
+              profileUrl: '/images/schedule.webp',
+              name: 'Agnes Diva',
+              designation: 'CEO of Rush Technology',
+            },
+            status: 'Pending',
+          },
+          {
+            title: 'Seminar on infrastructure technology for future life',
+            date: '12-10-2025',
+            time: '08:00 AM - 09:00 AM',
+            speaker: {
+              profileUrl: '/images/schedule.webp',
+              name: 'Agnes Diva',
+              designation: 'CEO of Rush Technology',
+            },
+            status: 'Pending',
+          },
         ];
 
         if (mounted) setSchedules(data);

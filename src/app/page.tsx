@@ -1,3 +1,4 @@
+import { redirect, RedirectType } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { redirect, RedirectType } from 'next/navigation'
 export default function Home() {
