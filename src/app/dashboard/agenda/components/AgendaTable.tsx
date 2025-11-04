@@ -1,11 +1,14 @@
 'use client';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Pencil } from 'lucide-react'; // Import Lucid pencil icon
+import { Button } from '@/components/ui/button';
 
 interface AgendaTableProps {
   data: any[];
+  onEdit?: (row: any) => void; // Callback for edit action
 }
 
-export function AgendaTable({ data }: AgendaTableProps) {
+export function AgendaTable({ data, onEdit }: AgendaTableProps) {
   return (
     <div className="rounded-xl bg-white p-4 shadow">
       <table className="w-full border-collapse text-sm">
@@ -15,7 +18,8 @@ export function AgendaTable({ data }: AgendaTableProps) {
             <th className="p-2">Title</th>
             <th className="p-2">Time & Date</th>
             <th className="p-2">Audience Polls</th>
-            <th className="rounded-r-lg p-2">Speaker</th>
+            <th className="p-2">Speaker</th>
+            <th className="rounded-r-lg p-2">Action</th> {/* Action column */}
           </tr>
         </thead>
 
@@ -43,7 +47,7 @@ export function AgendaTable({ data }: AgendaTableProps) {
                     <AvatarFallback>
                       {row.speaker
                         .split(' ')
-                        .map((n) => n[0])
+                        .map((n:string[]) => n[0])
                         .join('')}
                     </AvatarFallback>
                   </Avatar>
@@ -52,6 +56,18 @@ export function AgendaTable({ data }: AgendaTableProps) {
                     <span className="text-xs text-gray-500">{row.position}</span>
                   </div>
                 </div>
+              </td>
+
+              {/* Action column with Pencil icon */}
+              <td className="p-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onEdit && onEdit(row)}
+                  className="p-1"
+                >
+                  <Pencil className="h-4 w-4 text-sky-500" />
+                </Button>
               </td>
             </tr>
           ))}

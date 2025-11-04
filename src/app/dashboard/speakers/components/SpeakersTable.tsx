@@ -1,6 +1,6 @@
 'use client';
 
-import { Linkedin } from 'lucide-react';
+import { Linkedin, Edit2, Pencil } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -14,10 +14,10 @@ import type { Speaker } from '@/lib/types/speaker';
 
 interface SpeakersTableProps {
   speakers: Speaker[];
-  refetch?: () => void;
+  onEdit?: (speaker: Speaker) => void; // Callback for editing
 }
 
-export function SpeakersTable({ speakers }: SpeakersTableProps) {
+export function SpeakersTable({ speakers, onEdit }: SpeakersTableProps) {
   if (!Array.isArray(speakers) || speakers.length === 0) {
     return <div className="py-10 text-center text-gray-500">No speakers found.</div>;
   }
@@ -32,6 +32,7 @@ export function SpeakersTable({ speakers }: SpeakersTableProps) {
             <TableHead className="sticky top-0 bg-gray-50">Title</TableHead>
             <TableHead className="sticky top-0 bg-gray-50">Company</TableHead>
             <TableHead className="sticky top-0 bg-gray-50 text-center">LinkedIn</TableHead>
+            <TableHead className="sticky top-0 bg-gray-50 text-center">Actions</TableHead>
           </TableRow>
         </TableHeader>
 
@@ -72,6 +73,16 @@ export function SpeakersTable({ speakers }: SpeakersTableProps) {
                   ) : (
                     <span className="text-gray-400">—</span>
                   )}
+                </TableCell>
+
+                <TableCell className="text-center">
+                  <button
+                    onClick={() => onEdit?.(speaker)}
+                    className="text-gray-600 hover:text-gray-900"
+                    title="Edit Speaker"
+                  >
+                    <Pencil className="h-4 w-4 text-sky-400" />
+                  </button>
                 </TableCell>
               </TableRow>
             );

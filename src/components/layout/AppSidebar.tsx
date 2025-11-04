@@ -52,7 +52,7 @@ export function AppSidebar() {
   };
 
   return (
-    <Sidebar className="flex w-56 flex-col border-r bg-white">
+    <Sidebar className="flex w-64 flex-col border-r bg-white">
       {/* Header */}
       <SidebarHeader className="flex h-20 items-start justify-start p-5">
         <Image
@@ -128,7 +128,7 @@ export function AppSidebar() {
 
       {/* Footer */}
       <div className="mt-6 mb-2 px-4 text-xs font-semibold text-black">Other</div>
-      <SidebarFooter className="pt-3 pb-8 pl-4">
+      {/* <SidebarFooter className="pt-3 pb-8 pl-4">
         <SidebarMenu>
           {otherMenu.map((item) => {
             const Icon = item.icon;
@@ -147,7 +147,7 @@ export function AppSidebar() {
             );
           })}
         </SidebarMenu>
-      </SidebarFooter>
+      </SidebarFooter> */}
     </Sidebar>
   );
 }

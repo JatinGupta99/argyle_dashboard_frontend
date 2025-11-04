@@ -19,30 +19,31 @@ export default function SpeakersPage() {
   const [open, setOpen] = useState(false);
   const [editData, setEditData] = useState<Speaker | null>(null);
 
+  // Fetch speakers
+  const loadSpeakers = async () => {
+    setLoading(true);
+    try {
+      const data = await SpeakerService.getAll();
+      const unique = Array.from(new Map(data.map((s) => [s._id, s])).values());
+      setSpeakers(unique);
+      setError(null);
+    } catch (err: any) {
+      setError(err.message || 'Something went wrong');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     let mounted = true;
+    if (mounted) loadSpeakers();
 
-    const loadSpeakers = async () => {
-      setLoading(true);
-      try {
-        const data = await SpeakerService.getAll();
-        if (mounted) {
-          const unique = Array.from(new Map(data.map((s) => [s._id, s])).values());
-          setSpeakers(unique);
-        }
-      } catch (err: any) {
-        if (mounted) setError(err.message || 'Something went wrong');
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    };
-
-    loadSpeakers();
+    // Configure toolbar "Add Speaker" button
     dispatch(setExportLabel('Add Speaker'));
     dispatch(
       setExportClick(() => {
-        setEditData(null);
-        setOpen(true);
+        setEditData(null); // clear edit data for new speaker
+        setOpen(true);     // open dialog
       })
     );
 
@@ -69,18 +70,18 @@ export default function SpeakersPage() {
         scheduleCount={summaryData.scheduleCount}
         label={summaryData.label}
       />
+
       <main className="flex flex-1 flex-col p-2 pb-10">
         <section className="flex-1 overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-sm">
           {loading && <p className="p-4 text-sm text-gray-600">Loading speakers...</p>}
           {error && <p className="p-4 text-sm text-red-500">{error}</p>}
+
           {!loading && !error && (
             <SpeakersTable
               speakers={speakers}
-              refetch={() => {
-                SpeakerService.getAll().then((data) => {
-                  const unique = Array.from(new Map(data.map((s) => [s._id, s])).values());
-                  setSpeakers(unique);
-                });
+              onEdit={(speaker) => {
+                setEditData(speaker); // Set selected speaker for editing
+                setOpen(true);         // Open dialog
               }}
             />
           )}
@@ -90,13 +91,8 @@ export default function SpeakersPage() {
       <SpeakerFormDialog
         open={open}
         onOpenChange={setOpen}
-        onSuccess={() => {
-          SpeakerService.getAll().then((data) => {
-            const unique = Array.from(new Map(data.map((s) => [s._id, s])).values());
-            setSpeakers(unique);
-          });
-        }}
         editData={editData}
+        onSuccess={loadSpeakers} // refresh speakers after add/edit
       />
     </div>
   );

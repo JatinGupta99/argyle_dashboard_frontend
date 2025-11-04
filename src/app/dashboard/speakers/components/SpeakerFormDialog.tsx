@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { SpeakerService } from '@/services/speaker.service';
 import type { CreateSpeakerDto, Speaker } from '@/lib/types/speaker';
+import { setExportClick, setExportLabel } from '@/redux/slices/toolbar-slice';
 
 interface SpeakerFormDialogProps {
   open: boolean;
@@ -41,27 +42,32 @@ export function SpeakerFormDialog({
 
   // Prefill form when editing
   useEffect(() => {
-    if (editData) {
-      setFormData({
-        name: editData.name,
-        title: editData.title,
-        email: editData.email,
-        companyName: editData.companyName,
-        bio: editData.bio || '',
-        pictureUrl: editData.pictureUrl || '',
-        linkedInUrl: editData.linkedInUrl || '',
-      });
-    } else {
-      setFormData({
-        name: { firstName: '', lastName: '' },
-        title: '',
-        email: '',
-        companyName: '',
-        bio: '',
-        pictureUrl: '',
-        linkedInUrl: '',
-      });
-    }
+    
+  if (editData) {
+    setFormData({
+      name: {
+        firstName: editData.name.firstName,
+        lastName: editData.name.lastName,
+      },
+      title: editData.title,
+      email: editData.email,
+      companyName: editData.companyName,
+      bio: editData.bio || '',
+      pictureUrl: editData.pictureUrl || '',
+      linkedInUrl: editData.linkedInUrl || '',
+    });
+  } else {
+    setFormData({
+      name: { firstName: '', lastName: '' },
+      title: '',
+      email: '',
+      companyName: '',
+      bio: '',
+      pictureUrl: '',
+      linkedInUrl: '',
+    });
+  }
+  
   }, [editData]);
 
   const handleChange = (field: string, value: string, nested = false) => {
