@@ -42,32 +42,30 @@ export function SpeakerFormDialog({
 
   // Prefill form when editing
   useEffect(() => {
-    
-  if (editData) {
-    setFormData({
-      name: {
-        firstName: editData.name.firstName,
-        lastName: editData.name.lastName,
-      },
-      title: editData.title,
-      email: editData.email,
-      companyName: editData.companyName,
-      bio: editData.bio || '',
-      pictureUrl: editData.pictureUrl || '',
-      linkedInUrl: editData.linkedInUrl || '',
-    });
-  } else {
-    setFormData({
-      name: { firstName: '', lastName: '' },
-      title: '',
-      email: '',
-      companyName: '',
-      bio: '',
-      pictureUrl: '',
-      linkedInUrl: '',
-    });
-  }
-  
+    if (editData) {
+      setFormData({
+        name: {
+          firstName: editData.name.firstName,
+          lastName: editData.name.lastName,
+        },
+        title: editData.title,
+        email: editData.email,
+        companyName: editData.companyName,
+        bio: editData.bio || '',
+        pictureUrl: editData.pictureUrl || '',
+        linkedInUrl: editData.linkedInUrl || '',
+      });
+    } else {
+      setFormData({
+        name: { firstName: '', lastName: '' },
+        title: '',
+        email: '',
+        companyName: '',
+        bio: '',
+        pictureUrl: '',
+        linkedInUrl: '',
+      });
+    }
   }, [editData]);
 
   const handleChange = (field: string, value: string, nested = false) => {

@@ -43,7 +43,7 @@ export default function SpeakersPage() {
     dispatch(
       setExportClick(() => {
         setEditData(null); // clear edit data for new speaker
-        setOpen(true);     // open dialog
+        setOpen(true); // open dialog
       })
     );
 
@@ -81,7 +81,7 @@ export default function SpeakersPage() {
               speakers={speakers}
               onEdit={(speaker) => {
                 setEditData(speaker); // Set selected speaker for editing
-                setOpen(true);         // Open dialog
+                setOpen(true); // Open dialog
               }}
             />
           )}

@@ -20,7 +20,7 @@ const schedules: Schedule[] = [
     speaker: 'Agnes Diva',
     position: 'CEO of Rush Technology',
     image: '/images/schedule.webp',
-  }
+  },
 ];
 
 export function ScheduleList() {

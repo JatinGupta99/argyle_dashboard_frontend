@@ -12,7 +12,6 @@ import { AgendaTable } from './components/AgendaTable';
 import { Button } from '@/components/ui/button';
 import { useAgendas } from './hooks/useAgenda';
 
-
 export default function AgendaPage() {
   const dispatch = useAppDispatch();
   const { agendas, loading, error, fetchAgendas } = useAgendas();
@@ -79,7 +78,11 @@ export default function AgendaPage() {
                   Page <strong>{currentPage}</strong> of {totalPages}
                 </span>
 
-                <Button variant="outline" onClick={handleNextPage} disabled={currentPage === totalPages}>
+                <Button
+                  variant="outline"
+                  onClick={handleNextPage}
+                  disabled={currentPage === totalPages}
+                >
                   &gt;
                 </Button>
               </div>

@@ -47,7 +47,7 @@ export function AgendaTable({ data, onEdit }: AgendaTableProps) {
                     <AvatarFallback>
                       {row.speaker
                         .split(' ')
-                        .map((n:string[]) => n[0])
+                        .map((n: string[]) => n[0])
                         .join('')}
                     </AvatarFallback>
                   </Avatar>

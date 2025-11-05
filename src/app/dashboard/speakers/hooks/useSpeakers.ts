@@ -11,7 +11,7 @@ export const useSpeakers = () => {
 
   useEffect(() => {
     dispatch(setExportLabel('Add Speaker'));
-dispatch(setExportAction('addSpeaker'));
+    dispatch(setExportAction('addSpeaker'));
     dispatch(fetchSpeakers());
   }, [dispatch]);
 
