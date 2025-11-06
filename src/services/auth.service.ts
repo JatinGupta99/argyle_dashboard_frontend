@@ -4,7 +4,14 @@ import { UserLoginDto, UserProfile } from '@/lib/types/auth';
 
 export const AuthService = {
   login: async (payload: UserLoginDto) => {
-    return fetchApi<{ access_token: string; user: UserProfile }>(ENDPOINTS.AUTH.LOGIN, {
+    return fetchApi<{
+      statusCode: number
+      data: {
+        access_token: string
+        expires_in: number
+        user: UserProfile
+      }
+    }>(ENDPOINTS.AUTH.LOGIN, {
       method: 'POST',
       body: JSON.stringify(payload),
     });
