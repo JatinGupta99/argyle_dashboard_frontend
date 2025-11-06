@@ -18,7 +18,7 @@ export function Header() {
 
   useEffect(() => {
     if (!loading && !user) {
-      router.push('/dashboard'); // change for login path is future
+      router.push('/auth/login');
     }
   }, [loading, user, router]);
 
@@ -29,7 +29,7 @@ export function Header() {
     <header className="sticky top-0 z-50 flex items-center justify-between border-gray-100 bg-white px-6 py-3">
       <div>
         <h2 className="text-sm font-semibold text-gray-800">
-          Welcome Back, {user.name.split(' ')[0]}!
+          Welcome Back, {user.name ? user.name.split(' ')[0] : user.email}!
         </h2>
         <p className="text-xs text-gray-500">Here’s your schedule today</p>
       </div>
@@ -50,7 +50,7 @@ export function Header() {
           className="relative flex h-9 w-9 items-center justify-center rounded-md border border-gray-200 bg-gray-50 transition hover:bg-gray-100"
         >
           <Image
-            src={user.avatar}
+            src={user.avatar??'/images/avatar.png'}
             alt={user.name}
             fill
             className="rounded-md object-cover"
@@ -59,7 +59,7 @@ export function Header() {
         </button>
 
         <div className="mr-3 text-sm leading-tight">
-          <p className="font-semibold text-gray-800">{user.name}</p>
+          <p className="font-semibold text-gray-800">{user.name || user.email}</p>
           <p className="text-xs text-gray-500">{user.role}</p>
         </div>
       </div>
