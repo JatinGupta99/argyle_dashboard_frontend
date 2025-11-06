@@ -1,5 +1,8 @@
 export async function fetchApi<T>(url: string, options?: RequestInit): Promise<T> {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}${url}`, {
+  const fullUrl = `${process.env.NESTJS_API_BASE_URL}${url.startsWith('/') ? '' : '/'}${url}`;
+  console.log('🌐 Fetching:', fullUrl);
+
+  const res = await fetch(fullUrl, {
     ...options,
     headers: {
       'Content-Type': 'application/json',

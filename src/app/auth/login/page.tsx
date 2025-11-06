@@ -4,23 +4,22 @@ import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 
 export default function LoginPage() {
-  const { login, loading: authLoading } = useAuth();
+  const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    setLoading(true);
-
+    setIsSubmitting(true);
     try {
       await login(email, password);
     } catch (err: any) {
       setError(err?.response?.data?.message || err.message || 'Invalid email or password');
     } finally {
-      setLoading(false);
+      setIsSubmitting(false);
     }
   };
 
@@ -46,10 +45,10 @@ export default function LoginPage() {
         {error && <p className="text-sm text-red-500">{error}</p>}
         <button
           type="submit"
-          disabled={loading || authLoading}
+          disabled={isSubmitting}
           className="w-full rounded bg-blue-600 py-2 text-white hover:bg-blue-700 disabled:bg-blue-400"
         >
-          {loading || authLoading ? 'Logging in...' : 'Login'}
+          {isSubmitting ? 'Logging in...' : 'Login'}
         </button>
       </form>
     </div>

@@ -1,22 +1,22 @@
-import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 
 const publicPaths = ['/auth/login', '/auth/register'];
 const protectedPaths = ['/dashboard'];
 
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
   const token = req.cookies.get('access_token')?.value;
   const { pathname } = req.nextUrl;
 
-  const isPublic = publicPaths.some((path) => pathname.startsWith(path));
-  const isProtected = protectedPaths.some((path) => pathname.startsWith(pathname));
+  const isPublic = publicPaths.some((p) => pathname.startsWith(p));
+  const isProtected = protectedPaths.some((p) => pathname.startsWith(p));
 
   if (isProtected && !token) {
     return NextResponse.redirect(new URL('/auth/login', req.url));
   }
 
   if (isPublic && token) {
-    return NextResponse.redirect(new URL('/dashboard/schedule/card', req.url));
+    return NextResponse.redirect(new URL('/dashboard', req.url));
   }
 
   return NextResponse.next();
