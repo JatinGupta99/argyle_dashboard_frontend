@@ -5,12 +5,12 @@ import { UserLoginDto, UserProfile } from '@/lib/types/auth';
 export const AuthService = {
   login: async (payload: UserLoginDto) => {
     return fetchApi<{
-      statusCode: number
+      statusCode: number;
       data: {
-        access_token: string
-        expires_in: number
-        user: UserProfile
-      }
+        access_token: string;
+        expires_in: number;
+        user: UserProfile;
+      };
     }>(ENDPOINTS.AUTH.LOGIN, {
       method: 'POST',
       body: JSON.stringify(payload),
@@ -22,8 +22,8 @@ export const AuthService = {
   },
 
   getProfile: async (): Promise<UserProfile> => {
-    return fetchApi<UserProfile>(ENDPOINTS.USER.GET_PROFILE,{
-      method:'GET'
+    return fetchApi<UserProfile>(ENDPOINTS.USER.GET_PROFILE, {
+      method: 'GET',
     });
   },
 };

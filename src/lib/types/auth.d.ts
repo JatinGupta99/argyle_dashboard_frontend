@@ -12,40 +12,40 @@ export interface UserLoginDto {
 }
 
 export type SignInData = {
-  email: string
-  password: string
-}
+  email: string;
+  password: string;
+};
 
 export type SignUpData = {
-  name: string
-  email: string
-  password: string
-}
+  name: string;
+  email: string;
+  password: string;
+};
 
 export type DecodedUser = {
   /** Unique user ID (from JWT 'sub') */
-  sub: string
+  sub: string;
 
   /** Email of the user */
-  email: string
+  email: string;
 
   /** Role (if provided in token) */
-  role?: string
-  
-  avatar?: string
+  role?: string;
+
+  avatar?: string;
 
   /** Issued-at timestamp */
-  iat?: number
+  iat?: number;
 
   /** Expiration timestamp */
-  exp?: number
-}
+  exp?: number;
+};
 
 export type Credentials = {
-  access_token: string
-  expires_in: number
-  refresh_token: string
-  refresh_expires_in: number
-  token_type: string
-  session_state: string
-}
+  access_token: string;
+  expires_in: number;
+  refresh_token: string;
+  refresh_expires_in: number;
+  token_type: string;
+  session_state: string;
+};

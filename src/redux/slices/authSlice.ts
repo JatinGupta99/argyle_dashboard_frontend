@@ -19,18 +19,15 @@ const initialState: AuthState = {
 };
 
 // 🔑 Login thunk
-export const login = createAsyncThunk(
-  'auth/login',
-  async (payload: UserLoginDto, thunkAPI) => {
-    try {
-      const response = await AuthService.login(payload);
-      localStorage.setItem('token', response.access_token);
-      return response;
-    } catch (error: any) {
-      return thunkAPI.rejectWithValue(error.message || 'Login failed');
-    }
+export const login = createAsyncThunk('auth/login', async (payload: UserLoginDto, thunkAPI) => {
+  try {
+    const response = await AuthService.login(payload);
+    localStorage.setItem('token', response.access_token);
+    return response;
+  } catch (error: any) {
+    return thunkAPI.rejectWithValue(error.message || 'Login failed');
   }
-);
+});
 
 // 👤 Get profile thunk
 export const getProfile = createAsyncThunk('auth/getProfile', async (_, thunkAPI) => {
