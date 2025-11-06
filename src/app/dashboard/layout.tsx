@@ -8,13 +8,13 @@ import { Provider } from 'react-redux';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
- <AuthProvider>
-     <Provider store={store}>
-      <SidebarProvider>
-        <AppSidebar />
-        <main className="h-full w-full">{children}</main>
-      </SidebarProvider>
-    </Provider>
- </AuthProvider>
+    <AuthProvider>
+      <Provider store={store}>
+        <SidebarProvider>
+          <AppSidebar />
+          <main className="h-full w-full">{children}</main>
+        </SidebarProvider>
+      </Provider>
+    </AuthProvider>
   );
 }

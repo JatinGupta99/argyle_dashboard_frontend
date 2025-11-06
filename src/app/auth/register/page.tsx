@@ -1,8 +1,8 @@
-import Link from "next/link"
+import Link from 'next/link';
 
-import { cn } from "@/lib/utils"
-import { buttonVariants } from "@/components/ui/button"
-import { Icons } from "@/components/icons"
+import { cn } from '@/lib/utils';
+import { buttonVariants } from '@/components/ui/button';
+import { Icons } from '@/components/icons';
 // import { UserAuthForm } from "@/components/user-auth-form"
 
 export default function RegisterPage() {
@@ -11,8 +11,8 @@ export default function RegisterPage() {
       <Link
         href="/"
         className={cn(
-          buttonVariants({ variant: "ghost" }),
-          "absolute left-4 top-4 md:left-8 md:top-8"
+          buttonVariants({ variant: 'ghost' }),
+          'absolute top-4 left-4 md:top-8 md:left-8'
         )}
       >
         <>
@@ -23,25 +23,23 @@ export default function RegisterPage() {
       <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
         <div className="flex flex-col space-y-2 text-center">
           <Icons.logo className="mx-auto size-6" />
-          <h1 className="text-2xl font-semibold tracking-tight">
-            Create an account
-          </h1>
-          <p className="text-sm text-muted-foreground">
+          <h1 className="text-2xl font-semibold tracking-tight">Create an account</h1>
+          <p className="text-muted-foreground text-sm">
             Create an account with your email and password
           </p>
         </div>
         {/* <UserAuthForm type="register" /> */}
-        <p className="px-8 text-center text-sm text-muted-foreground">
-          Already have an account?{" "}
+        <p className="text-muted-foreground px-8 text-center text-sm">
+          Already have an account?{' '}
           <Link
             href="/login"
             className="hover:text-brand font-semibold text-gray-800 underline underline-offset-4"
           >
             Sign in
-          </Link>{" "}
+          </Link>{' '}
           instead.
         </p>
       </div>
     </div>
-  )
+  );
 }
