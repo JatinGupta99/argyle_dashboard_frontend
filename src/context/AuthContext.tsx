@@ -4,20 +4,25 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { AuthService } from '@/services/auth.service';
 import { getAuthToken, setAuthToken, clearAuthToken } from '@/utils/auth';
-import type { UserProfile } from '@/lib/types/auth';
+import type { UserProfile, UserLoginDto, AuthResponse } from '@/lib/types/auth';
 
 type AuthContextType = {
   user: UserProfile | null;
-  loading: boolean; // only for global/session check
-  login: (email: string, password: string) => Promise<void>;
+  loading: boolean;
+  login: (payload: UserLoginDto) => Promise<AuthResponse>;
   logout: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
-  login: async () => {},
-  logout: async () => {},
+  // 🧠 default implementations now throw clear errors if used before provider
+  login: async () => {
+    throw new Error('AuthContext not initialized yet. Wrap your app in <AuthProvider>.');
+  },
+  logout: async () => {
+    throw new Error('AuthContext not initialized yet. Wrap your app in <AuthProvider>.');
+  },
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -26,24 +31,29 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
   const pathname = usePathname();
 
-  // ✅ Initialize auth session
+  // --- ✅ Check existing token and fetch profile on load ---
   useEffect(() => {
     const initAuth = async () => {
-      const { accessToken } = getAuthToken();
+      console.log('[Auth] Initializing...');
+      const { access_token } = getAuthToken() || {};
 
-      if (!accessToken) {
+      if (!access_token) {
+        console.log('[Auth] No token found, user unauthenticated');
         setUser(null);
         setLoading(false);
         return;
       }
 
       try {
+        console.log('[Auth] Token found, fetching profile...');
         const profile = await AuthService.getProfile();
         setUser(profile);
-      } catch {
+        console.log('[Auth] Profile fetched successfully:', profile);
+      } catch (err) {
+        console.error('[Auth] Invalid token. Clearing credentials.');
         clearAuthToken();
         setUser(null);
-        if (!pathname.startsWith('/auth')) router.push('/auth/login');
+        if (!pathname.startsWith('/auth')) router.replace('/auth/login');
       } finally {
         setLoading(false);
       }
@@ -52,41 +62,37 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     initAuth();
   }, [router, pathname]);
 
-  // ✅ Login (does not affect global loading)
-  const login = async (email: string, password: string) => {
-    try {
-      const response = await AuthService.login({ email, password });
-      const { access_token, expires_in } = response.data;
-      if (!access_token) throw new Error('No access token returned');
+  // --- ✅ Login Flow ---
 
-      setAuthToken({
-        access_token,
-        refresh_token: '',
-        expires_in,
-        refresh_expires_in: 0,
-        token_type: 'Bearer',
-        session_state: '',
-      });
+const login = async ({ email, password }: UserLoginDto): Promise<AuthResponse> => {
+  const data = await AuthService.login({ email, password });
+  const { access_token, expires_in, user } = data;
+  if (!access_token) throw new Error('No access token returned from API.');
+  
+  setAuthToken({
+    access_token,
+    refresh_token: '',
+    expires_in,
+    refresh_expires_in: 0,
+    token_type: 'Bearer',
+    session_state: '',
+  });
+  const UserProfile=await AuthService.getProfile()
+  console.log(UserProfile,'1221121212121221')
+  setUser(UserProfile);
 
-      const profile = await AuthService.getProfile();
-      setUser(profile);
+  router.replace('/dashboard/schedule/card');
 
-      // Wait for cookies to write before redirect
-      await new Promise((r) => setTimeout(r, 100));
-      router.replace('/dashboard');
-    } catch (err) {
-      clearAuthToken();
-      setUser(null);
-      throw err;
-    }
-  };
+  return data;
+};
 
-  // ✅ Logout
+  // --- ✅ Logout Flow ---
   const logout = async () => {
+    console.log('[Auth] Logging out...');
     try {
       await AuthService.logout();
-    } catch {
-      // Ignore API errors
+    } catch (err) {
+      console.warn('[Auth] Backend logout failed:', err);
     } finally {
       clearAuthToken();
       setUser(null);

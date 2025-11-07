@@ -1,13 +1,13 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
-import { useAppDispatch } from '@/redux/hooks';
-import { setExportClick, setExportLabel } from '@/redux/slices/toolbar-slice';
-import { Header } from '@/components/layout/Header';
 import { DashboardToolbar } from '@/components/dashboard/DashboardToolBar';
 import MonthlyScheduleSummary from '@/components/dashboard/MonthlyScheduleSummary';
+import { Header } from '@/components/layout/Header';
+import { useAppDispatch } from '@/redux/hooks';
+import { useEffect, useMemo, useState } from 'react';
 import { SpeakerFormDialog } from '../../speakers/components/SpeakerFormDialog';
-import { ScheduleTableContent, ScheduleItem } from '../components/ScheduleTableContent';
+import { ScheduleItem, ScheduleTableContent } from '../components/ScheduleTableContent';
+import { setExportLabel } from '@/redux/slices/toolbar-slice';
 
 export default function ScheduleTable() {
   const dispatch = useAppDispatch();
@@ -22,6 +22,7 @@ export default function ScheduleTable() {
     const loadSchedules = async () => {
       setLoading(true);
       try {
+        // Mock data (you can replace this with real API)
         const data: ScheduleItem[] = [
           {
             title: 'Seminar on infrastructure technology for future life',
@@ -35,6 +36,17 @@ export default function ScheduleTable() {
             status: 'Upcoming',
           },
           {
+            title: 'Seminar on smart cities and sustainability',
+            date: '15-10-2025',
+            time: '02:00 PM - 03:30 PM',
+            speaker: {
+              profileUrl: '/images/schedule.webp',
+              name: 'John Smith',
+              designation: 'Urban Planner, FutureCity Labs',
+            },
+            status: 'Pending',
+          },
+          {
             title: 'Seminar on infrastructure technology for future life',
             date: '12-10-2025',
             time: '08:00 AM - 09:00 AM',
@@ -42,6 +54,61 @@ export default function ScheduleTable() {
               profileUrl: '/images/schedule.webp',
               name: 'Agnes Diva',
               designation: 'CEO of Rush Technology',
+            },
+            status: 'Upcoming',
+          },
+          {
+            title: 'Seminar on smart cities and sustainability',
+            date: '15-10-2025',
+            time: '02:00 PM - 03:30 PM',
+            speaker: {
+              profileUrl: '/images/schedule.webp',
+              name: 'John Smith',
+              designation: 'Urban Planner, FutureCity Labs',
+            },
+            status: 'Pending',
+          },
+          {
+            title: 'Seminar on infrastructure technology for future life',
+            date: '12-10-2025',
+            time: '08:00 AM - 09:00 AM',
+            speaker: {
+              profileUrl: '/images/schedule.webp',
+              name: 'Agnes Diva',
+              designation: 'CEO of Rush Technology',
+            },
+            status: 'Upcoming',
+          },
+          {
+            title: 'Seminar on smart cities and sustainability',
+            date: '15-10-2025',
+            time: '02:00 PM - 03:30 PM',
+            speaker: {
+              profileUrl: '/images/schedule.webp',
+              name: 'John Smith',
+              designation: 'Urban Planner, FutureCity Labs',
+            },
+            status: 'Pending',
+          },
+          {
+            title: 'Seminar on infrastructure technology for future life',
+            date: '12-10-2025',
+            time: '08:00 AM - 09:00 AM',
+            speaker: {
+              profileUrl: '/images/schedule.webp',
+              name: 'Agnes Diva',
+              designation: 'CEO of Rush Technology',
+            },
+            status: 'Upcoming',
+          },
+          {
+            title: 'Seminar on smart cities and sustainability',
+            date: '15-10-2025',
+            time: '02:00 PM - 03:30 PM',
+            speaker: {
+              profileUrl: '/images/schedule.webp',
+              name: 'John Smith',
+              designation: 'Urban Planner, FutureCity Labs',
             },
             status: 'Pending',
           },
@@ -57,13 +124,12 @@ export default function ScheduleTable() {
 
     loadSchedules();
 
-    dispatch(setExportLabel('Exports'));
-    dispatch(setExportClick(() => setOpen(true)));
+    dispatch(setExportLabel('Export'));
 
     return () => {
       mounted = false;
     };
-  }, [dispatch]);
+  }, [dispatch, schedules.length]);
 
   const summaryData = useMemo(
     () => ({

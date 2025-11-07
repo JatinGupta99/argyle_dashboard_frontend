@@ -50,8 +50,8 @@ export function Header() {
           className="relative flex h-9 w-9 items-center justify-center rounded-md border border-gray-200 bg-gray-50 transition hover:bg-gray-100"
         >
           <Image
-            src={user.avatar??'/images/avatar.png'}
-            alt={user.name}
+            src={user.avatar ?? '/images/avatar.png'}
+            alt={user.name || 'User'}
             fill
             className="rounded-md object-cover"
             sizes="36px"

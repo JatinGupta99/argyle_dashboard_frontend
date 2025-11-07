@@ -1,25 +1,25 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { SpeakerService } from '@/services/speaker.service';
 import type { CreateSpeakerDto, Speaker } from '@/lib/types/speaker';
-import { setExportClick, setExportLabel } from '@/redux/slices/toolbar-slice';
+import { SpeakerService } from '@/services/speaker.service';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 interface SpeakerFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;
-  editData?: Speaker | null; // Optional — used for editing
+  editData?: Speaker | null;
 }
 
 export function SpeakerFormDialog({
@@ -40,7 +40,7 @@ export function SpeakerFormDialog({
 
   const [loading, setLoading] = useState(false);
 
-  // Prefill form when editing
+  // Prefill form on edit
   useEffect(() => {
     if (editData) {
       setFormData({
@@ -70,12 +70,12 @@ export function SpeakerFormDialog({
 
   const handleChange = (field: string, value: string, nested = false) => {
     if (nested) {
-      setFormData((prev) => ({
+      setFormData((prev:any) => ({
         ...prev,
         name: { ...prev.name, [field]: value },
       }));
     } else {
-      setFormData((prev) => ({ ...prev, [field]: value }));
+      setFormData((prev:any) => ({ ...prev, [field]: value }));
     }
   };
 
@@ -84,14 +84,32 @@ export function SpeakerFormDialog({
     try {
       if (editData) {
         await SpeakerService.update(editData._id, formData);
+        toast.success('Speaker updated successfully', {
+          description: `${formData.name.firstName || 'The speaker'} has been updated.`,
+        });
       } else {
         await SpeakerService.create(formData);
+        toast.success('Speaker added successfully', {
+          description: `${formData.name.firstName || 'New speaker'} has been created.`,
+        });
       }
+
       onSuccess?.();
       onOpenChange(false);
     } catch (error: any) {
       console.error('Failed to save speaker:', error);
-      alert(error.message || 'Something went wrong.');
+
+      let message = 'Something went wrong.';
+      try {
+        const parsed = JSON.parse(error.message.replace(/^Fetch error \d+: /, ''));
+        message = parsed?.message?.[0] || parsed?.message || message;
+      } catch {
+        message = error.message || message;
+      }
+
+      toast.error('Failed to save speaker', {
+        description: message,
+      });
     } finally {
       setLoading(false);
     }

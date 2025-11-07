@@ -1,15 +1,19 @@
-export interface UserProfile {
+export type UserProfile = {
   id?: string;
   name: string;
   email: string;
   role: string;
   avatar?: string;
-}
-
-export interface UserLoginDto {
+};
+export type AuthResponse = {
+  access_token: string;
+  expires_in: number;
+  user: UserProfile;
+};
+export type UserLoginDto = {
   email: string;
   password: string;
-}
+};
 
 export type SignInData = {
   email: string;
