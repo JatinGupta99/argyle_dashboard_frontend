@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect } from 'react';
-import { fetchSpeakers } from '@/redux/slices/speaker-slice';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
-import { setExportAction, setExportLabel } from '@/redux/slices/toolbar-slice';
+import { fetchSpeakers } from '@/redux/slices/speaker-slice';
+import { setExportLabel } from '@/redux/slices/toolbar-slice';
+import { useEffect } from 'react';
 
 export const useSpeakers = () => {
   const dispatch = useAppDispatch();
@@ -11,7 +11,6 @@ export const useSpeakers = () => {
 
   useEffect(() => {
     dispatch(setExportLabel('Add Speaker'));
-dispatch(setExportAction('addSpeaker'));
     dispatch(fetchSpeakers());
   }, [dispatch]);
 

@@ -1,5 +1,5 @@
 'use client';
-import { redirect } from "next/navigation";
+import { redirect } from 'next/navigation';
 export default function SchedulePage() {
-   redirect('/dashboard/schedule/card');
+  redirect('/dashboard/schedule/card');
 }

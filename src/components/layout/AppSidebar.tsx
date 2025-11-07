@@ -7,13 +7,14 @@ import {
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
-  SidebarMenuItem,
+  SidebarMenuItem
 } from '@/components/ui/sidebar';
-import { Calendar, FileText, LayoutGrid, LogOut, Settings, ChevronDown } from 'lucide-react';
-import Image from 'next/image';
-import { useState } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
 import { cn } from '@/lib/utils';
+import { Calendar, ChevronDown, FileText, LayoutGrid, LogOut, Settings } from 'lucide-react';
+import Image from 'next/image';
+import { usePathname, useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 // ✅ Config-driven sidebar menu
 const mainMenu = [
@@ -46,7 +47,7 @@ export function AppSidebar() {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const router = useRouter();
   const pathname = usePathname();
-
+  const { logout } = useAuth();
   const handleNavigate = (href?: string) => {
     if (href) router.push(href);
   };
@@ -126,28 +127,30 @@ export function AppSidebar() {
         </div>
       </SidebarContent>
 
-      {/* Footer */}
-      <div className="mt-6 mb-2 px-4 text-xs font-semibold text-black">Other</div>
-      {/* <SidebarFooter className="pt-3 pb-8 pl-4">
-        <SidebarMenu>
-          {otherMenu.map((item) => {
-            const Icon = item.icon;
-            return (
-              <SidebarMenuItem key={item.title}>
-                <SidebarMenuButton
-                  className={cn(
-                    'hover:bg-muted/40 flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition',
-                    item.danger && 'text-red-500 hover:bg-red-50'
-                  )}
-                >
-                  <Icon size={16} />
-                  {item.title}
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            );
-          })}
-        </SidebarMenu>
-      </SidebarFooter> */}
+<div className="mt-auto mb-2 px-4 text-xs font-semibold text-black">Other</div>
+<SidebarFooter className="pt-3 pb-8 pl-4">
+  {otherMenu.map((item) => (
+    <SidebarMenuItem key={item.title}>
+      <SidebarMenuButton
+        onClick={async () => {
+          if (item.title === 'Logout') {
+            await logout(); // ✅ use context logout here
+          } else if (item.title === 'Setting') {
+            router.push('/dashboard/settings');
+          }
+        }}
+        className={cn(
+          'hover:bg-muted/40 flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition',
+          item.danger && 'text-red-500 hover:bg-red-50'
+        )}
+      >
+        <item.icon size={16} />
+        {item.title}
+      </SidebarMenuButton>
+    </SidebarMenuItem>
+  ))}
+</SidebarFooter>
+
     </Sidebar>
   );
 }

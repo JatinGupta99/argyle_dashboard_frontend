@@ -1,17 +1,16 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
 import { useAppDispatch } from '@/redux/hooks';
-import { setExportClick, setExportLabel } from '@/redux/slices/toolbar-slice';
+import { setExportLabel } from '@/redux/slices/toolbar-slice';
+import { useEffect, useMemo, useState } from 'react';
 
-import { Header } from '@/components/layout/Header';
 import { DashboardToolbar } from '@/components/dashboard/DashboardToolBar';
 import MonthlyScheduleSummary from '@/components/dashboard/MonthlyScheduleSummary';
+import { Header } from '@/components/layout/Header';
+import { Button } from '@/components/ui/button';
 import { AgendaFormDialog } from './components/AgendaFormDialog';
 import { AgendaTable } from './components/AgendaTable';
-import { Button } from '@/components/ui/button';
 import { useAgendas } from './hooks/useAgenda';
-
 
 export default function AgendaPage() {
   const dispatch = useAppDispatch();
@@ -45,7 +44,6 @@ export default function AgendaPage() {
   // Configure toolbar button
   useEffect(() => {
     dispatch(setExportLabel('Add Agenda'));
-    dispatch(setExportClick(null)); // keep serializable
   }, [dispatch]);
 
   return (
@@ -79,7 +77,11 @@ export default function AgendaPage() {
                   Page <strong>{currentPage}</strong> of {totalPages}
                 </span>
 
-                <Button variant="outline" onClick={handleNextPage} disabled={currentPage === totalPages}>
+                <Button
+                  variant="outline"
+                  onClick={handleNextPage}
+                  disabled={currentPage === totalPages}
+                >
                   &gt;
                 </Button>
               </div>

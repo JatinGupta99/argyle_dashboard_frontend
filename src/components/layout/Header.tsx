@@ -3,34 +3,37 @@
 import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
 
 export function Header() {
-  const [user] = useState({
-    name: 'John Doe',
-    role: 'Staff',
-    avatar: '/images/avatar.png',
-  });
-
+  const { user, loading } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
-  const [notifications, setNotifications] = useState(3);
+  const router = useRouter();
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
   };
 
-  const handleNotificationClick = () => {
-    setNotifications(0);
-  };
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/auth/login');
+    }
+  }, [loading, user, router]);
+
+  if (loading) return null;
+  if (!user) return null;
 
   return (
     <header className="sticky top-0 z-50 flex items-center justify-between border-gray-100 bg-white px-6 py-3">
       <div>
         <h2 className="text-sm font-semibold text-gray-800">
-          Welcome Back, {user.name.split(' ')[0]}!
+          Welcome Back, {user.name ? user.name.split(' ')[0] : user.email}!
         </h2>
         <p className="text-xs text-gray-500">Here’s your schedule today</p>
       </div>
+
       <div className="flex items-center gap-4">
         <div className="relative mr-50">
           <Input
@@ -41,20 +44,22 @@ export function Header() {
           />
           <Search className="absolute top-2.5 right-2.5 h-4 w-4 cursor-pointer text-gray-400" />
         </div>
+
         <button
           type="button"
           className="relative flex h-9 w-9 items-center justify-center rounded-md border border-gray-200 bg-gray-50 transition hover:bg-gray-100"
         >
           <Image
-            src={user.avatar}
-            alt={user.name}
+            src={user.avatar ?? '/images/avatar.png'}
+            alt={user.name || 'User'}
             fill
             className="rounded-md object-cover"
             sizes="36px"
           />
         </button>
+
         <div className="mr-3 text-sm leading-tight">
-          <p className="font-semibold text-gray-800">{user.name}</p>
+          <p className="font-semibold text-gray-800">{user.name || user.email}</p>
           <p className="text-xs text-gray-500">{user.role}</p>
         </div>
       </div>

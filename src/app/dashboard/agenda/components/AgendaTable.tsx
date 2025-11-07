@@ -1,11 +1,12 @@
 'use client';
+
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Pencil } from 'lucide-react'; // Import Lucid pencil icon
+import { Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface AgendaTableProps {
   data: any[];
-  onEdit?: (row: any) => void; // Callback for edit action
+  onEdit?: (row: any) => void;
 }
 
 export function AgendaTable({ data, onEdit }: AgendaTableProps) {
@@ -19,15 +20,14 @@ export function AgendaTable({ data, onEdit }: AgendaTableProps) {
             <th className="p-2">Time & Date</th>
             <th className="p-2">Audience Polls</th>
             <th className="p-2">Speaker</th>
-            <th className="rounded-r-lg p-2">Action</th> {/* Action column */}
+            <th className="rounded-r-lg p-2">Action</th>
           </tr>
         </thead>
-
         <tbody>
-          {(data || []).map((row) => (
+          {data.map((row) => (
             <tr
-              key={row.id || `${row.title}-${Math.random()}`}
-              className="hover:bg-muted/30 border-b transition-colors"
+              key={row.id ?? `${row.title}-${Math.random()}`}
+              className="border-b transition-colors hover:bg-muted/30"
             >
               <td className="p-2 font-semibold text-sky-500">{row.id}</td>
               <td className="p-2">{row.title}</td>
@@ -39,31 +39,32 @@ export function AgendaTable({ data, onEdit }: AgendaTableProps) {
               >
                 {row.audiencePoll ? 'Yes' : 'No'}
               </td>
-
               <td className="p-2">
                 <div className="flex items-center gap-2">
                   <Avatar className="h-8 w-8">
                     <AvatarImage src={row.profileUrl} alt={row.speaker} />
                     <AvatarFallback>
                       {row.speaker
-                        .split(' ')
-                        .map((n:string[]) => n[0])
+                        ?.split(' ')
+                        .map((n: string) => n[0])
                         .join('')}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex flex-col">
-                    <span className="font-medium text-gray-900">{row.speaker}</span>
-                    <span className="text-xs text-gray-500">{row.position}</span>
+                    <span className="font-medium text-gray-900">
+                      {row.speaker}
+                    </span>
+                    <span className="text-xs text-gray-500">
+                      {row.position}
+                    </span>
                   </div>
                 </div>
               </td>
-
-              {/* Action column with Pencil icon */}
               <td className="p-2">
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => onEdit && onEdit(row)}
+                  onClick={() => onEdit?.(row)}
                   className="p-1"
                 >
                   <Pencil className="h-4 w-4 text-sky-500" />
