@@ -14,7 +14,7 @@ import type { Speaker } from '@/lib/types/speaker';
 
 interface SpeakersTableProps {
   speakers: Speaker[];
-  onEdit?: (speaker: Speaker) => void; 
+  onEdit?: (speaker: Speaker) => void;
 }
 
 export function SpeakersTable({ speakers, onEdit }: SpeakersTableProps) {

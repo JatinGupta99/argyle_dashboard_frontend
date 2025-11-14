@@ -1,4 +1,4 @@
-import { getAuthToken } from "@/utils/auth";
+import { getAuthToken } from '@/utils/auth';
 
 export async function fetchApi<T>(
   url: string,
@@ -8,8 +8,8 @@ export async function fetchApi<T>(
 
   const fullUrl = `${process.env.NEXT_PUBLIC_NESTJS_API_BASE_URL}${url}`;
   console.log('➡️ Fetching:', fullUrl);
- const token = getAuthToken()?.access_token;
- console.log(token,'access_tokenclknalscnalcsknaclsknalsck')
+  const token = getAuthToken()?.access_token;
+  console.log(token, 'access_tokenclknalscnalcsknaclsknalsck');
   const res = await fetch(fullUrl, {
     ...options,
     headers: {

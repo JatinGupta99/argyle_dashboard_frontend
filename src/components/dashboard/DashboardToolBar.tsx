@@ -38,8 +38,7 @@ export function DashboardToolbar({
 
   // ✅ Detect schedule pages
   const isSchedulePage =
-    pathname === '/dashboard/schedule/card' ||
-    pathname === '/dashboard/schedule/table';
+    pathname === '/dashboard/schedule/card' || pathname === '/dashboard/schedule/table';
 
   // ✅ Determine whether to show the Card/Table switcher
   const showViewSwitcher = useMemo(() => isSchedulePage, [pathname]);
@@ -63,11 +62,11 @@ export function DashboardToolbar({
 
         {/* ✅ Conditionally render layout based on page */}
         {isSchedulePage ? (
-         <>
-        <div className="flex flex-col leading-tight">
-            <span className="text-base font-semibold">{day}</span>
-            <span className="text-sm font-medium text-sky-500">{date}</span>
-          </div>
+          <>
+            <div className="flex flex-col leading-tight">
+              <span className="text-base font-semibold">{day}</span>
+              <span className="text-sm font-medium text-sky-500">{date}</span>
+            </div>
           </>
         ) : (
           <div className="flex flex-col leading-tight">
@@ -111,14 +110,10 @@ export function DashboardToolbar({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem
-                onClick={() => router.push('/dashboard/schedule/card')}
-              >
+              <DropdownMenuItem onClick={() => router.push('/dashboard/schedule/card')}>
                 Card
               </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => router.push('/dashboard/schedule/table')}
-              >
+              <DropdownMenuItem onClick={() => router.push('/dashboard/schedule/table')}>
                 Table
               </DropdownMenuItem>
             </DropdownMenuContent>

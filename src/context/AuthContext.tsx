@@ -64,27 +64,27 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   // --- ✅ Login Flow ---
 
-const login = async ({ email, password }: UserLoginDto): Promise<AuthResponse> => {
-  const data = await AuthService.login({ email, password });
-  const { access_token, expires_in, user } = data;
-  if (!access_token) throw new Error('No access token returned from API.');
-  
-  setAuthToken({
-    access_token,
-    refresh_token: '',
-    expires_in,
-    refresh_expires_in: 0,
-    token_type: 'Bearer',
-    session_state: '',
-  });
-  const UserProfile=await AuthService.getProfile()
-  console.log(UserProfile,'1221121212121221')
-  setUser(UserProfile);
+  const login = async ({ email, password }: UserLoginDto): Promise<AuthResponse> => {
+    const data = await AuthService.login({ email, password });
+    const { access_token, expires_in, user } = data;
+    if (!access_token) throw new Error('No access token returned from API.');
 
-  router.replace('/dashboard/schedule/card');
+    setAuthToken({
+      access_token,
+      refresh_token: '',
+      expires_in,
+      refresh_expires_in: 0,
+      token_type: 'Bearer',
+      session_state: '',
+    });
+    const UserProfile = await AuthService.getProfile();
+    console.log(UserProfile, '1221121212121221');
+    setUser(UserProfile);
 
-  return data;
-};
+    router.replace('/dashboard/schedule/card');
+
+    return data;
+  };
 
   // --- ✅ Logout Flow ---
   const logout = async () => {
@@ -101,9 +101,7 @@ const login = async ({ email, password }: UserLoginDto): Promise<AuthResponse> =
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
-      {children}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={{ user, loading, login, logout }}>{children}</AuthContext.Provider>
   );
 };
 

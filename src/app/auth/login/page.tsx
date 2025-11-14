@@ -22,10 +22,7 @@ export default function LoginPage() {
     } catch (err: any) {
       console.error('Login failed:', err);
 
-      const message =
-        err?.response?.data?.message ||
-        err?.message ||
-        'Invalid email or password.';
+      const message = err?.response?.data?.message || err?.message || 'Invalid email or password.';
 
       toast.error('Login failed', {
         description: message,
@@ -41,14 +38,14 @@ export default function LoginPage() {
         onSubmit={handleSubmit}
         className="w-80 space-y-4 rounded-lg border border-gray-200 bg-white p-6 shadow-sm"
       >
-        <h1 className="text-xl font-semibold text-gray-800 text-center">Login</h1>
+        <h1 className="text-center text-xl font-semibold text-gray-800">Login</h1>
 
         <input
           type="email"
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full rounded border p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className="w-full rounded border p-2 focus:ring-2 focus:ring-blue-400 focus:outline-none"
           required
         />
 
@@ -57,7 +54,7 @@ export default function LoginPage() {
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full rounded border p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className="w-full rounded border p-2 focus:ring-2 focus:ring-blue-400 focus:outline-none"
           required
         />
 

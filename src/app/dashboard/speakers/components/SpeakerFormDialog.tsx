@@ -70,12 +70,12 @@ export function SpeakerFormDialog({
 
   const handleChange = (field: string, value: string, nested = false) => {
     if (nested) {
-      setFormData((prev:any) => ({
+      setFormData((prev: any) => ({
         ...prev,
         name: { ...prev.name, [field]: value },
       }));
     } else {
-      setFormData((prev:any) => ({ ...prev, [field]: value }));
+      setFormData((prev: any) => ({ ...prev, [field]: value }));
     }
   };
 

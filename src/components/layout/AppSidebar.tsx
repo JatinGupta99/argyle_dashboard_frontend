@@ -7,7 +7,7 @@ import {
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
-  SidebarMenuItem
+  SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { useAuth } from '@/context/AuthContext';
 import { cn } from '@/lib/utils';
@@ -127,30 +127,29 @@ export function AppSidebar() {
         </div>
       </SidebarContent>
 
-<div className="mt-auto mb-2 px-4 text-xs font-semibold text-black">Other</div>
-<SidebarFooter className="pt-3 pb-8 pl-4">
-  {otherMenu.map((item) => (
-    <SidebarMenuItem key={item.title}>
-      <SidebarMenuButton
-        onClick={async () => {
-          if (item.title === 'Logout') {
-            await logout(); // ✅ use context logout here
-          } else if (item.title === 'Setting') {
-            router.push('/dashboard/settings');
-          }
-        }}
-        className={cn(
-          'hover:bg-muted/40 flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition',
-          item.danger && 'text-red-500 hover:bg-red-50'
-        )}
-      >
-        <item.icon size={16} />
-        {item.title}
-      </SidebarMenuButton>
-    </SidebarMenuItem>
-  ))}
-</SidebarFooter>
-
+      <div className="mt-auto mb-2 px-4 text-xs font-semibold text-black">Other</div>
+      <SidebarFooter>
+        {otherMenu.map((item) => (
+          <SidebarMenuItem key={item.title}>
+            <SidebarMenuButton
+              onClick={async () => {
+                if (item.title === 'Logout') {
+                  await logout(); // ✅ use context logout here
+                } else if (item.title === 'Setting') {
+                  router.push('/dashboard/settings');
+                }
+              }}
+              className={cn(
+                'hover:bg-muted/40 flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition',
+                item.danger && 'text-red-500 hover:bg-red-50'
+              )}
+            >
+              <item.icon size={16} />
+              {item.title}
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        ))}
+      </SidebarFooter>
     </Sidebar>
   );
 }

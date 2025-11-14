@@ -27,7 +27,7 @@ export function AgendaTable({ data, onEdit }: AgendaTableProps) {
           {data.map((row) => (
             <tr
               key={row.id ?? `${row.title}-${Math.random()}`}
-              className="border-b transition-colors hover:bg-muted/30"
+              className="hover:bg-muted/30 border-b transition-colors"
             >
               <td className="p-2 font-semibold text-sky-500">{row.id}</td>
               <td className="p-2">{row.title}</td>
@@ -51,22 +51,13 @@ export function AgendaTable({ data, onEdit }: AgendaTableProps) {
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex flex-col">
-                    <span className="font-medium text-gray-900">
-                      {row.speaker}
-                    </span>
-                    <span className="text-xs text-gray-500">
-                      {row.position}
-                    </span>
+                    <span className="font-medium text-gray-900">{row.speaker}</span>
+                    <span className="text-xs text-gray-500">{row.position}</span>
                   </div>
                 </div>
               </td>
               <td className="p-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => onEdit?.(row)}
-                  className="p-1"
-                >
+                <Button variant="ghost" size="sm" onClick={() => onEdit?.(row)} className="p-1">
                   <Pencil className="h-4 w-4 text-sky-500" />
                 </Button>
               </td>
