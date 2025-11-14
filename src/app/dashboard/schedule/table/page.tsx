@@ -8,7 +8,7 @@ import { useAppDispatch } from '@/redux/hooks';
 import { setExportLabel } from '@/redux/slices/toolbar-slice';
 import { useEffect, useMemo, useState } from 'react';
 import { SpeakerFormDialog } from '../../speakers/components/SpeakerFormDialog';
-import { ScheduleTableCardList,  } from '../components/ScheduleTableCardList';
+import { ScheduleTableCardList, } from '../components/ScheduleTableCardList';
 
 const MOCK_SCHEDULE_DATA: ScheduleItem[] = [
   {
@@ -35,7 +35,7 @@ const MOCK_SCHEDULE_DATA: ScheduleItem[] = [
       { profileUrl: '/images/s3.webp', name: 'Maria', designation: 'CTO' },
       { profileUrl: '/images/s4.webp', name: 'Kyle', designation: 'CFO' },
     ],
-    status: 'Upcoming',
+    status: 'Past',
   },
   {
     _id: '3',
@@ -48,7 +48,7 @@ const MOCK_SCHEDULE_DATA: ScheduleItem[] = [
       { profileUrl: '/images/s3.webp', name: 'Maria', designation: 'CTO' },
       { profileUrl: '/images/s4.webp', name: 'Kyle', designation: 'CFO' },
     ],
-    status: 'Upcoming',
+    status: 'Pending',
   },
   {
     _id: '4',
@@ -62,85 +62,7 @@ const MOCK_SCHEDULE_DATA: ScheduleItem[] = [
       { profileUrl: '/images/s4.webp', name: 'Kyle', designation: 'CFO' },
     ],
     status: 'Upcoming',
-  },
-  {
-    _id: '5',
-    title: 'Seminar on infrastructure technology for future life',
-    date: '12-10-2025',
-    time: '08:00 AM - 09:00 AM',
-    speakers: [
-      { profileUrl: '/images/s1.webp', name: 'Agnes', designation: 'CEO' },
-      { profileUrl: '/images/s2.webp', name: 'John', designation: 'Planner' },
-      { profileUrl: '/images/s3.webp', name: 'Maria', designation: 'CTO' },
-      { profileUrl: '/images/s4.webp', name: 'Kyle', designation: 'CFO' },
-    ],
-    status: 'Upcoming',
-  },
-  {
-    _id: '6',
-    title: 'Seminar on infrastructure technology for future life',
-    date: '12-10-2025',
-    time: '08:00 AM - 09:00 AM',
-    speakers: [
-      { profileUrl: '/images/s1.webp', name: 'Agnes', designation: 'CEO' },
-      { profileUrl: '/images/s2.webp', name: 'John', designation: 'Planner' },
-      { profileUrl: '/images/s3.webp', name: 'Maria', designation: 'CTO' },
-      { profileUrl: '/images/s4.webp', name: 'Kyle', designation: 'CFO' },
-    ],
-    status: 'Upcoming',
-  },
-  {
-    _id: '1',
-    title: 'Seminar on infrastructure technology for future life',
-    date: '12-10-2025',
-    time: '08:00 AM - 09:00 AM',
-    speakers: [
-      { profileUrl: '/images/s1.webp', name: 'Agnes', designation: 'CEO' },
-      { profileUrl: '/images/s2.webp', name: 'John', designation: 'Planner' },
-      { profileUrl: '/images/s3.webp', name: 'Maria', designation: 'CTO' },
-      { profileUrl: '/images/s4.webp', name: 'Kyle', designation: 'CFO' },
-    ],
-    status: 'Upcoming',
-  },
-  {
-    _id: '1',
-    title: 'Seminar on infrastructure technology for future life',
-    date: '12-10-2025',
-    time: '08:00 AM - 09:00 AM',
-    speakers: [
-      { profileUrl: '/images/s1.webp', name: 'Agnes', designation: 'CEO' },
-      { profileUrl: '/images/s2.webp', name: 'John', designation: 'Planner' },
-      { profileUrl: '/images/s3.webp', name: 'Maria', designation: 'CTO' },
-      { profileUrl: '/images/s4.webp', name: 'Kyle', designation: 'CFO' },
-    ],
-    status: 'Upcoming',
-  },
-  {
-    _id: '1',
-    title: 'Seminar on infrastructure technology for future life',
-    date: '12-10-2025',
-    time: '08:00 AM - 09:00 AM',
-    speakers: [
-      { profileUrl: '/images/s1.webp', name: 'Agnes', designation: 'CEO' },
-      { profileUrl: '/images/s2.webp', name: 'John', designation: 'Planner' },
-      { profileUrl: '/images/s3.webp', name: 'Maria', designation: 'CTO' },
-      { profileUrl: '/images/s4.webp', name: 'Kyle', designation: 'CFO' },
-    ],
-    status: 'Upcoming',
-  },
-  {
-    _id: '1',
-    title: 'Seminar on infrastructure technology for future life',
-    date: '12-10-2025',
-    time: '08:00 AM - 09:00 AM',
-    speakers: [
-      { profileUrl: '/images/s1.webp', name: 'Agnes', designation: 'CEO' },
-      { profileUrl: '/images/s2.webp', name: 'John', designation: 'Planner' },
-      { profileUrl: '/images/s3.webp', name: 'Maria', designation: 'CTO' },
-      { profileUrl: '/images/s4.webp', name: 'Kyle', designation: 'CFO' },
-    ],
-    status: 'Upcoming',
-  },
+  }
 ];
 
 export default function ScheduleTable() {
