@@ -1,9 +1,9 @@
 'use client';
 
-import { Card } from "@/components/ui/card";
-import { TabLabel } from "@/lib/types/schedule";
-import ScheduleStatusSummary from "./ScheduleStatusSummary";
-import ScheduleTableContent from "./ScheduleTableContent";
+import { Card } from '@/components/ui/card';
+import { TabLabel } from '@/lib/types/schedule';
+import ScheduleStatusSummary from './ScheduleStatusSummary';
+import ScheduleTableContent from './ScheduleTableContent';
 
 interface Props {
   summaryCount: number;
@@ -26,11 +26,10 @@ export function ScheduleTableCardList({
   onTabChange,
   schedules,
   loading,
-  error
+  error,
 }: Props) {
   return (
-    <Card className="w-[98%] mx-auto mt-0 rounded-xl shadow-sm h-[78vh] flex ">
-
+    <Card className="mx-auto mt-0 flex h-[78vh] w-[98%] rounded-xl shadow-sm">
       <ScheduleStatusSummary
         totalSchedules={summaryCount}
         upcomingCount={upcoming}
@@ -41,12 +40,7 @@ export function ScheduleTableCardList({
       />
 
       <div className="flex-1 overflow-y-auto px-4 pb-4">
-
-        <ScheduleTableContent
-          schedules={schedules}
-          loading={loading}
-          error={error}
-        />
+        <ScheduleTableContent schedules={schedules} loading={loading} error={error} />
       </div>
     </Card>
   );

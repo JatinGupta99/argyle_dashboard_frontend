@@ -13,16 +13,15 @@ export interface ScheduleTableContentProps {
 export default function ScheduleTableContent({
   schedules,
   loading,
-  error
+  error,
 }: ScheduleTableContentProps) {
-
   return (
     <div className="w-full">
       {loading && <p className="p-4 text-sm text-gray-600">Loading schedules...</p>}
       {error && <p className="p-4 text-sm text-red-500">{error}</p>}
 
       {!loading && !error && (
-        <div className="relative overflow-y-auto max-h-[60vh] pr-1">
+        <div className="relative max-h-[60vh] overflow-y-auto pr-1">
           <Table className="w-full text-sm">
             <TableBody>
               {schedules.length === 0 ? (

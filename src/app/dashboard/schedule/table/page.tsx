@@ -7,8 +7,8 @@ import { ScheduleItem, TabLabel } from '@/lib/types/schedule';
 import { useAppDispatch } from '@/redux/hooks';
 import { setExportLabel } from '@/redux/slices/toolbar-slice';
 import { useEffect, useMemo, useState } from 'react';
-import { SpeakerFormDialog } from '../../speakers/components/SpeakerFormDialog';
-import { ScheduleTableCardList, } from '../components/ScheduleTableCardList';
+import { SpeakerFormDialog } from '../../events/[eventId]/speakers/components/SpeakerFormDialog';
+import { ScheduleTableCardList } from '../components/ScheduleTableCardList';
 
 const MOCK_SCHEDULE_DATA: ScheduleItem[] = [
   {
@@ -62,7 +62,7 @@ const MOCK_SCHEDULE_DATA: ScheduleItem[] = [
       { profileUrl: '/images/s4.webp', name: 'Kyle', designation: 'CFO' },
     ],
     status: 'Upcoming',
-  }
+  },
 ];
 
 export default function ScheduleTable() {
@@ -132,24 +132,26 @@ export default function ScheduleTable() {
         label={summaryData.label}
       />
 
-     <ScheduleTableCardList
-  summaryCount={summaryData.scheduleCount}
-  upcoming={statusCounts.Upcoming}
-  past={statusCounts.Past}
-  pending={statusCounts.Pending}
-  activeTab={activeTab}
-  onTabChange={setActiveTab}
-  schedules={filteredSchedules}
-  loading={loading}
-  error={error}
-/>
-
+      <ScheduleTableCardList
+        summaryCount={summaryData.scheduleCount}
+        upcoming={statusCounts.Upcoming}
+        past={statusCounts.Past}
+        pending={statusCounts.Pending}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        schedules={filteredSchedules}
+        loading={loading}
+        error={error}
+      />
 
       <SpeakerFormDialog
         open={open}
         onOpenChange={setOpen}
         onSuccess={() => {}}
         editData={null}
+        eventId={filteredSchedules.map((i) => {
+          return i._id;
+        })}
       />
     </div>
   );

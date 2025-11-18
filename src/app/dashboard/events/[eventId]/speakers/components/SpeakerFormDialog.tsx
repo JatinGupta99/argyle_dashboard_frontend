@@ -20,24 +20,27 @@ interface SpeakerFormDialogProps {
   onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;
   editData?: Speaker | null;
+  eventId: string; // ✅ Added eventId
 }
+
+const DEFAULT_FORM: CreateSpeakerDto = {
+  name: { firstName: '', lastName: '' },
+  title: '',
+  email: '',
+  companyName: '',
+  bio: '',
+  pictureUrl: '',
+  linkedInUrl: '',
+};
 
 export function SpeakerFormDialog({
   open,
   onOpenChange,
   onSuccess,
   editData,
+  eventId, // ← received eventId
 }: SpeakerFormDialogProps) {
-  const [formData, setFormData] = useState<CreateSpeakerDto>({
-    name: { firstName: '', lastName: '' },
-    title: '',
-    email: '',
-    companyName: '',
-    bio: '',
-    pictureUrl: '',
-    linkedInUrl: '',
-  });
-
+  const [formData, setFormData] = useState<CreateSpeakerDto>(DEFAULT_FORM);
   const [loading, setLoading] = useState(false);
 
   // Prefill form on edit
@@ -45,71 +48,82 @@ export function SpeakerFormDialog({
     if (editData) {
       setFormData({
         name: {
-          firstName: editData.name.firstName,
-          lastName: editData.name.lastName,
+          firstName: editData.name.firstName.trim(),
+          lastName: editData.name.lastName.trim(),
         },
-        title: editData.title,
-        email: editData.email,
-        companyName: editData.companyName,
+        title: editData.title || '',
+        email: editData.email || '',
+        companyName: editData.companyName || '',
         bio: editData.bio || '',
         pictureUrl: editData.pictureUrl || '',
         linkedInUrl: editData.linkedInUrl || '',
       });
     } else {
-      setFormData({
-        name: { firstName: '', lastName: '' },
-        title: '',
-        email: '',
-        companyName: '',
-        bio: '',
-        pictureUrl: '',
-        linkedInUrl: '',
-      });
+      setFormData(DEFAULT_FORM);
     }
   }, [editData]);
 
   const handleChange = (field: string, value: string, nested = false) => {
-    if (nested) {
-      setFormData((prev: any) => ({
-        ...prev,
-        name: { ...prev.name, [field]: value },
-      }));
-    } else {
-      setFormData((prev: any) => ({ ...prev, [field]: value }));
-    }
+    setFormData((prev) =>
+      nested ? { ...prev, name: { ...prev.name, [field]: value } } : { ...prev, [field]: value }
+    );
+  };
+
+  const validateForm = () => {
+    if (!formData.name.firstName.trim()) return 'First name is required.';
+    if (!formData.name.lastName.trim()) return 'Last name is required.';
+    if (!formData.email.trim()) return 'Email is required.';
+    return null;
   };
 
   const handleSubmit = async () => {
+    const error = validateForm();
+    if (error) {
+      toast.error(error);
+      return;
+    }
+
     setLoading(true);
     try {
+      const trimmedData = {
+        ...formData,
+        name: {
+          firstName: formData.name.firstName.trim(),
+          lastName: formData.name.lastName.trim(),
+        },
+        title: formData.title.trim(),
+        email: formData.email.trim(),
+        companyName: formData.companyName.trim(),
+        bio: formData?.bio.trim(),
+        pictureUrl: formData?.pictureUrl.trim(),
+        linkedInUrl: formData?.linkedInUrl.trim(),
+      };
+
       if (editData) {
-        await SpeakerService.update(editData._id, formData);
-        toast.success('Speaker updated successfully', {
-          description: `${formData.name.firstName || 'The speaker'} has been updated.`,
-        });
+        // UPDATE
+        await SpeakerService.update(editData._id, trimmedData);
+        toast.success('Speaker updated successfully');
       } else {
-        await SpeakerService.create(formData);
-        toast.success('Speaker added successfully', {
-          description: `${formData.name.firstName || 'New speaker'} has been created.`,
-        });
+        // CREATE (requires eventId)
+        await SpeakerService.create(eventId, trimmedData);
+        toast.success('Speaker added successfully');
       }
 
       onSuccess?.();
       onOpenChange(false);
+      setFormData(DEFAULT_FORM);
     } catch (error: any) {
       console.error('Failed to save speaker:', error);
 
       let message = 'Something went wrong.';
       try {
-        const parsed = JSON.parse(error.message.replace(/^Fetch error \d+: /, ''));
+        const parsed = JSON.parse(error?.message?.replace(/^Fetch error \d+: /, '') ?? '');
         message = parsed?.message?.[0] || parsed?.message || message;
       } catch {
-        message = error.message || message;
+        message = error?.message || message;
       }
 
-      toast.error('Failed to save speaker', {
-        description: message,
-      });
+      toast.error('Failed to save speaker', { description: message });
     } finally {
       setLoading(false);
     }

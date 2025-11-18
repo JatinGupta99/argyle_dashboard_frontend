@@ -18,9 +18,8 @@ export default function ScheduleStatusSummary({
   pastCount,
   pendingCount,
   activeTab,
-  onTabChange
+  onTabChange,
 }: ScheduleStatusSummaryProps) {
-
   const items: { label: TabLabel; count: number }[] = [
     { label: 'All', count: totalSchedules },
     { label: 'Pending', count: pendingCount },
@@ -29,45 +28,39 @@ export default function ScheduleStatusSummary({
   ];
 
   return (
-    <div className="px-4 border-b border-gray-200">
+    <div className="border-b border-gray-200 px-4">
+      <div className="flex items-center gap-3 py-2 text-sm">
+        {items.map((item) => (
+          <button
+            key={item.label}
+            onClick={() => onTabChange(item.label)}
+            className={`flex items-center gap-1 rounded-md px-3 py-1.5 transition-colors duration-150 ${
+              activeTab === item.label
+                ? 'bg-sky-100 font-semibold text-black'
+                : 'text-gray-700 hover:bg-gray-200'
+            } `}
+          >
+            {item.label}
 
-    <div className="flex items-center gap-3 text-sm py-2">
+            <span
+              className={`ml-1 rounded-md px-2 py-0.5 text-xs ${
+                activeTab === item.label ? 'bg-white text-black' : 'bg-gray-200 text-gray-700'
+              } `}
+            >
+              {item.count}
+            </span>
+          </button>
+        ))}
+        <div className="ml-auto flex cursor-pointer items-center gap-2 text-sky-600 hover:text-sky-700">
+          <span className="font-medium">Export</span>
 
-  {items.map((item) => (
-    <button
-      key={item.label}
-      onClick={() => onTabChange(item.label)}
-      className={`px-3 py-1.5 rounded-md flex items-center gap-1 transition-colors duration-150
-        ${activeTab === item.label
-          ? 'bg-sky-100 text-black font-semibold'
-          : 'text-gray-700 hover:bg-gray-200'}
-      `}
-    >
-      {item.label}
+          <Download className="h-4 w-4" />
+        </div>
+      </div>
 
-      <span
-        className={`ml-1 px-2 py-0.5 rounded-md text-xs
-          ${activeTab === item.label
-            ? 'bg-white text-black'
-            : 'bg-gray-200 text-gray-700'}
-        `}
-      >
-        {item.count}
-      </span>
-    </button>
-  ))}
-  <div className="flex items-center gap-2 ml-auto text-sky-600 cursor-pointer hover:text-sky-700">
-    <span className="font-medium">Export</span>
-
-    <Download className="h-4 w-4" />
-  </div>
-</div>
-
-
-  <div className="mt-2 bg-sky-50 rounded-md overflow-hidden">
-  <ScheduleHeader />
-</div>
-
+      <div className="mt-2 overflow-hidden rounded-md bg-sky-50">
+        <ScheduleHeader />
+      </div>
     </div>
   );
 }

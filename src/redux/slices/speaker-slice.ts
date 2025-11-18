@@ -1,7 +1,10 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { SpeakerService } from '@/services/speaker.service';
+import { PresignedUrlResponse, SpeakerService } from '@/services/speaker.service';
 import type { Speaker, CreateSpeakerDto, UpdateSpeakerDto } from '@/lib/types/speaker';
 
+/* ────────────────────────────────────────────────────────────────
+   EXISTING THUNKS — unchanged
+────────────────────────────────────────────────────────────────── */
 export const fetchSpeakers = createAsyncThunk('speakers/fetchAll', async (_, thunkAPI) => {
   try {
     return await SpeakerService.getAll();
@@ -41,6 +44,33 @@ export const deleteSpeaker = createAsyncThunk('speakers/delete', async (id: stri
   }
 });
 
+export const uploadSpeakerImage = createAsyncThunk(
+  'speakers/uploadImage',
+  async ({ file, eventId }: { file: File; eventId: string }, thunkAPI) => {
+    try {
+      // 1. Request presigned URL
+      const presign: PresignedUrlResponse = await SpeakerService.getUploadUrl({
+        eventId,
+        entityType: 'speakers',
+        entityId: 'temp',
+        fileType: file.type,
+      });
+
+      // 2. Upload to S3
+      await fetch(presign?.data?.url, {
+        method: 'PUT',
+        body: file,
+      });
+
+      return presign.data.url;
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error.response?.data || 'Failed to upload image');
+    }
+  }
+);
+
+/* ──────────────────────────────────────────────────────────────── */
+
 interface SpeakerState {
   list: Speaker[];
   loading: boolean;
@@ -59,6 +89,7 @@ const speakerSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+      /* EXISTING LOGIC — unchanged */
       .addCase(fetchSpeakers.pending, (state) => {
         state.loading = true;
       })
@@ -74,7 +105,17 @@ const speakerSlice = createSlice({
         state.list.push(action.payload);
       })
       .addCase(deleteSpeaker.fulfilled, (state, action) => {
-        state.list = state.list.filter((s) => s.id !== action.payload);
+        state.list = state.list.filter((s) => s._id !== action.payload);
+      })
+      .addCase(uploadSpeakerImage.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(uploadSpeakerImage.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(uploadSpeakerImage.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
       });
   },
 });
