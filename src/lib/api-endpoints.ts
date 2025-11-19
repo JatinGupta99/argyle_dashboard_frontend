@@ -5,6 +5,13 @@ export const ENDPOINTS = {
     UPLOAD_URL: (eventId: string, speakerId: string) =>
       `/events/${eventId}/speakers/${speakerId}/upload-url`,
   },
+  SPONSORS: {
+    ROOT: (eventId: string) => `/events/${eventId}/sponsors`,
+    BY_ID: (eventId: string, sponsorId: string) =>
+      `/events/${eventId}/sponsors/${sponsorId}`,
+    UPLOAD_URL: (eventId: string, sponsorId: string) =>
+      `/events/${eventId}/sponsors/${sponsorId}/upload-url`,
+  },
  AGENDAS: {
     ROOT: (eventId: string) => `/events/${eventId}/agendas`,
     BY_ID: (eventId: string, agendaId: string) =>

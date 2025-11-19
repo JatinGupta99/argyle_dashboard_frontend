@@ -1,214 +1,260 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import { cn } from '@/lib/utils';
+import { useAppDispatch } from "@/redux/hooks";
+import { useEffect, useState } from "react";
 
-interface Agenda {
-  id?: string;
-  title: string;
-  date: string;
-  timeStart: string;
-  timeStartPeriod: 'AM' | 'PM';
-  timeEnd: string;
-  timeEndPeriod: 'AM' | 'PM';
-  description: string;
-  speaker: string;
-  audiencePoll?: boolean;
-  profileUrl?: string;
-  position?: string;
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+import { toast } from "sonner";
+
+import { Agenda, CreateAgendaDto } from "@/lib/types/agenda";
+import { addAgenda, updateAgenda } from "@/redux/slices/agenda-thunks";
+
+interface SpeakerItem {
+  id: string;
+  name: string;
 }
 
 interface AgendaFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (agenda: Agenda) => void;
-  editData?: Partial<Agenda>;
-  speakerOptions?: string[];
+  editData?: Agenda;
+  eventId: string;
+  onSubmit: () => void;
 }
 
-const defaultForm: Agenda = {
-  title: '',
-  date: '',
-  timeStart: '',
-  timeStartPeriod: 'AM',
-  timeEnd: '',
-  timeEndPeriod: 'AM',
-  description: '',
-  speaker: 'Audience Polls',
-  audiencePoll: false,
+const DEFAULT_FORM = {
+  title: "",
+  date: "",
+  startTime: "",
+  endTime: "",
+  description: "",
+  speakers: [] as string[],
+  hasPoll: false,
 };
 
 export function AgendaFormDialog({
   open,
   onOpenChange,
-  onSubmit,
   editData,
-  speakerOptions = ['Audience Polls'],
+  eventId,
+  onSubmit,
 }: AgendaFormDialogProps) {
-  const [form, setForm] = useState<Agenda>(defaultForm);
+  const dispatch = useAppDispatch();
 
-  // Prefill for edit mode
-  useEffect(() => {
-    if (editData) {
-      setForm({
-        ...defaultForm,
-        ...editData,
-      });
-    } else {
-      setForm(defaultForm);
-    }
-  }, [editData, open]);
+  const availableSpeakers: SpeakerItem[] = [
+    { id: "67b0c7a35d12a92c9b077777", name: "Speaker A" },
+    { id: "67b0c7a35d12a92c9b078888", name: "Speaker B" },
+  ];
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+  const [formData, setFormData] = useState(DEFAULT_FORM);
+
+useEffect(() => {
+  if (!editData) {
+    setFormData(DEFAULT_FORM);
+    return;
+  }
+
+  const start = editData.startDateTime ? new Date(editData.startDateTime) : null;
+  const end = editData.endDateTime ? new Date(editData.endDateTime) : null;
+
+  setFormData({
+    title: editData.title ?? "",
+    date: start ? start.toISOString().split("T")[0] : "",
+    startTime: start ? start.toISOString().slice(11, 16) : "",
+    endTime: end ? end.toISOString().slice(11, 16) : "",
+    description: editData.description ?? "",
+    speakers: Array.from(new Set(editData.speakers ?? [])),
+    hasPoll: Boolean(editData.hasPoll),
+  });
+}, [editData]);
+
+  const updateField = (key: string, value: any) => {
+    setFormData((prev) => ({ ...prev, [key]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSubmit(form);
-    setForm(defaultForm);
-    onOpenChange(false);
+  const addSpeaker = (id: string) => {
+    updateField("speakers", Array.from(new Set([...formData.speakers, id])));
+  };
+
+  const removeSpeaker = (id: string) => {
+    updateField(
+      "speakers",
+      formData.speakers.filter((s) => s !== id)
+    );
+  };
+
+  const handleSave = async () => {
+    const payload: CreateAgendaDto = {
+      title: formData.title,
+      date: formData.date,
+      startTime: formData.startTime,
+      endTime: formData.endTime,
+      description: formData.description,
+      speakers: formData.speakers,
+      hasPoll: formData.hasPoll,
+    };
+
+    try {
+      if (editData) {
+        await dispatch(
+          updateAgenda({
+            eventId,
+            agendaId: editData._id,
+            payload,
+          })
+        ).unwrap();
+
+        toast.success("Agenda updated successfully");
+      } else {
+        await dispatch(addAgenda({ eventId, payload })).unwrap();
+        toast.success("Agenda added successfully");
+      }
+
+      onSubmit();
+      onOpenChange(false);
+    } catch (err: any) {
+      const message =
+        err?.message ||
+        err?.response?.data?.message ||
+        "Something went wrong";
+
+      toast.error(message);
+    }
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg">
-        <DialogHeader>
-          <DialogTitle>{editData ? 'Edit Agenda' : 'Add Agenda'}</DialogTitle>
+      <DialogContent className="sm:max-w-[480px] p-0">
+        <DialogHeader className="px-6 pt-6 pb-4 flex justify-between">
+          <DialogTitle className="text-lg font-semibold">
+            {editData ? "Edit Agenda" : "Add Agenda"}
+          </DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Title */}
+        <div className="px-6 pb-6 space-y-4">
           <div>
-            <Label htmlFor="title">Title</Label>
+            <Label>Title</Label>
             <Input
-              id="title"
-              name="title"
-              placeholder="Enter title"
-              value={form.title}
-              onChange={handleChange}
-              required
+              value={formData.title}
+              onChange={(e) => updateField("title", e.target.value)}
             />
           </div>
 
-          {/* Date */}
           <div>
-            <Label htmlFor="date">Date</Label>
+            <Label>Date</Label>
             <Input
-              id="date"
-              name="date"
               type="date"
-              value={form.date}
-              onChange={handleChange}
-              required
+              value={formData.date}
+              onChange={(e) => updateField("date", e.target.value)}
             />
           </div>
 
-          {/* Time Fields */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
+          <div className="flex gap-3">
+            <div className="flex-1">
               <Label>Start Time</Label>
-              <div className="flex gap-2">
-                <Input
-                  name="timeStart"
-                  type="time"
-                  value={form.timeStart}
-                  onChange={handleChange}
-                  required
-                />
-                <select
-                  name="timeStartPeriod"
-                  value={form.timeStartPeriod}
-                  onChange={handleChange}
-                  className="rounded-md border px-2 py-1 text-sm"
-                >
-                  <option value="AM">AM</option>
-                  <option value="PM">PM</option>
-                </select>
-              </div>
+              <Input
+                type="time"
+                value={formData.startTime}
+                onChange={(e) => updateField("startTime", e.target.value)}
+              />
             </div>
 
-            <div>
+            <div className="flex-1">
               <Label>End Time</Label>
-              <div className="flex gap-2">
-                <Input
-                  name="timeEnd"
-                  type="time"
-                  value={form.timeEnd}
-                  onChange={handleChange}
-                  required
-                />
-                <select
-                  name="timeEndPeriod"
-                  value={form.timeEndPeriod}
-                  onChange={handleChange}
-                  className="rounded-md border px-2 py-1 text-sm"
-                >
-                  <option value="AM">AM</option>
-                  <option value="PM">PM</option>
-                </select>
-              </div>
+              <Input
+                type="time"
+                value={formData.endTime}
+                onChange={(e) => updateField("endTime", e.target.value)}
+              />
             </div>
           </div>
 
-          {/* Description */}
           <div>
-            <Label htmlFor="description">Description</Label>
+            <Label>Description</Label>
             <Textarea
-              id="description"
-              name="description"
-              placeholder="Enter description"
-              value={form.description}
-              onChange={handleChange}
-              required
+              value={formData.description}
+              onChange={(e) => updateField("description", e.target.value)}
             />
           </div>
 
-          {/* Speaker */}
           <div>
-            <Label htmlFor="speaker">Speaker</Label>
-            <select
-              id="speaker"
-              name="speaker"
-              value={form.speaker}
-              onChange={handleChange}
-              className="w-full rounded-md border px-3 py-2 text-sm"
-            >
-              {speakerOptions.map((option, i) => (
-                <option key={i} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
+            <Label>Speakers</Label>
+
+            <Select value="" onValueChange={addSpeaker}>
+              <SelectTrigger>
+                <SelectValue placeholder="Add a speaker" />
+              </SelectTrigger>
+              <SelectContent>
+                {availableSpeakers.map((sp) => (
+                  <SelectItem key={sp.id} value={sp.id}>
+                    {sp.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <div className="mt-3 space-y-2">
+              {formData.speakers.map((id) => {
+                const speaker = availableSpeakers.find((s) => s.id === id);
+
+                return (
+                  <div
+                    key={id}
+                    className="flex items-center justify-between bg-gray-100 rounded px-3 py-2"
+                  >
+                    <span>{speaker?.name ?? id}</span>
+                    <Button variant="ghost" onClick={() => removeSpeaker(id)}>
+                      Remove
+                    </Button>
+                  </div>
+                );
+              })}
+            </div>
           </div>
 
-          {/* ✅ Audience Poll Toggle */}
-          <div className="flex items-center justify-between rounded-md border px-3 py-2">
-            <Label htmlFor="audiencePoll" className="text-sm font-medium">
-              Enable Audience Poll
-            </Label>
-            <Switch
-              id="audiencePoll"
-              checked={form.audiencePoll}
-              onCheckedChange={(checked) => setForm((prev) => ({ ...prev, audiencePoll: checked }))}
-              className={cn('data-[state=checked]:bg-blue-500 data-[state=unchecked]:bg-gray-300')}
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={formData.hasPoll}
+              onChange={(e) => updateField("hasPoll", e.target.checked)}
             />
+            <Label>Enable Poll</Label>
           </div>
 
-          {/* Submit Button */}
-          <div className="flex justify-end pt-2">
-            <Button type="submit">{editData ? 'Update Agenda' : 'Add Agenda'}</Button>
+          <div className="flex gap-3 pt-2">
+            <Button
+              variant="outline"
+              className="flex-1"
+              onClick={() => onOpenChange(false)}
+            >
+              Cancel
+            </Button>
+
+            <Button
+              className="flex-1 bg-blue-500 hover:bg-blue-600"
+              onClick={handleSave}
+            >
+              {editData ? "Save Changes" : "Add Agenda +"}
+            </Button>
           </div>
-        </form>
+        </div>
       </DialogContent>
     </Dialog>
   );

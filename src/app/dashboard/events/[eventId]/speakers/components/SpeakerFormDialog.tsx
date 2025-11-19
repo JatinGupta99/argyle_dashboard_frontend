@@ -1,36 +1,38 @@
-'use client';
+"use client";
 
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import type { CreateSpeakerDto, Speaker } from '@/lib/types/speaker';
-import { SpeakerService } from '@/services/speaker.service';
-import { useEffect, useState } from 'react';
-import { toast } from 'sonner';
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Upload } from "lucide-react";
+import type { CreateSpeakerDto, Speaker } from "@/lib/types/speaker";
+import { SpeakerService } from "@/services/speaker.service";
 
-interface SpeakerFormDialogProps {
+import { useEffect, useState, DragEvent } from "react";
+import { toast } from "sonner";
+import { FormField } from "@/components/form/FormField";
+
+interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;
   editData?: Speaker | null;
-  eventId: string
+  eventId: string;
 }
 
 const DEFAULT_FORM: CreateSpeakerDto = {
-  name: { firstName: '', lastName: '' },
-  title: '',
-  email: '',
-  companyName: '',
-  bio: '',
-  pictureUrl: '',
-  linkedInUrl: '',
+  name: { firstName: "", lastName: "" },
+  companyName: "",
+  title: "",
+  email: "",
+  bio: "",
+  linkedInUrl: "",
+  pictureUrl: "",
 };
 
 export function SpeakerFormDialog({
@@ -38,188 +40,210 @@ export function SpeakerFormDialog({
   onOpenChange,
   onSuccess,
   editData,
-  eventId, // ← received eventId
-}: SpeakerFormDialogProps) {
-  const [formData, setFormData] = useState<CreateSpeakerDto>(DEFAULT_FORM);
+  eventId,
+}: Props) {
+  const [formData, setFormData] = useState(DEFAULT_FORM);
   const [loading, setLoading] = useState(false);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [dragging, setDragging] = useState(false);
 
-  // Prefill form on edit
+  /* --- Prefill on edit --- */
   useEffect(() => {
     if (editData) {
       setFormData({
-        name: {
-          firstName: editData.name.firstName.trim(),
-          lastName: editData.name.lastName.trim(),
-        },
-        title: editData.title || '',
-        email: editData.email || '',
-        companyName: editData.companyName || '',
-        bio: editData.bio || '',
-        pictureUrl: editData.pictureUrl || '',
-        linkedInUrl: editData.linkedInUrl || '',
+        name: editData.name,
+        companyName: editData.companyName ?? "",
+        title: editData.title ?? "",
+        email: editData.email ?? "",
+        bio: editData.bio ?? "",
+        linkedInUrl: editData.linkedInUrl ?? "",
+        pictureUrl: editData.pictureUrl ?? "",
       });
     } else {
       setFormData(DEFAULT_FORM);
+      setPhotoFile(null);
     }
   }, [editData]);
 
-  const handleChange = (field: string, value: string, nested = false) => {
+  /* --- Helpers --- */
+  const updateField = (key: string, value: string, nested = false) => {
     setFormData((prev) =>
-      nested ? { ...prev, name: { ...prev.name, [field]: value } } : { ...prev, [field]: value }
+      nested
+        ? { ...prev, name: { ...prev.name, [key]: value } }
+        : { ...prev, [key]: value }
     );
   };
 
-  const validateForm = () => {
-    if (!formData.name.firstName.trim()) return 'First name is required.';
-    if (!formData.name.lastName.trim()) return 'Last name is required.';
-    if (!formData.email.trim()) return 'Email is required.';
+  const validate = () => {
+    if (!formData.name.firstName.trim()) return "First name is required";
+    if (!formData.name.lastName.trim()) return "Last name is required";
+    if (!formData.companyName.trim()) return "Company is required";
+    if (!formData.email.trim()) return "Email is required";
     return null;
   };
 
+  /* --- Drag & Drop --- */
+  const handleDrop = (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setDragging(false);
+
+    const file = e.dataTransfer.files?.[0];
+    if (!file) return;
+
+    setPhotoFile(file);
+    setFormData((prev) => ({
+      ...prev,
+      pictureUrl: URL.createObjectURL(file),
+    }));
+  };
+
+  /* --- Submit --- */
   const handleSubmit = async () => {
-    const error = validateForm();
-    if (error) {
-      toast.error(error);
-      return;
-    }
+    const error = validate();
+    if (error) return toast.error(error);
 
     setLoading(true);
     try {
-      const trimmedData = {
+      const payload = {
         ...formData,
         name: {
           firstName: formData.name.firstName.trim(),
           lastName: formData.name.lastName.trim(),
         },
-        title: formData.title.trim(),
-        email: formData.email.trim(),
-        companyName: formData.companyName.trim(),
-        bio: formData?.bio?.trim(),
-        pictureUrl: formData?.pictureUrl?.trim(),
-        linkedInUrl: formData?.linkedInUrl?.trim(),
       };
 
       if (editData) {
-        // UPDATE
-        await SpeakerService.update(eventId,editData._id, trimmedData);
-        toast.success('Speaker updated successfully');
+        await SpeakerService.update(eventId, editData._id, payload);
+        toast.success("Speaker updated");
       } else {
-        // CREATE (requires eventId)
-        await SpeakerService.create(eventId, trimmedData);
-        toast.success('Speaker added successfully');
+        await SpeakerService.create(eventId, payload);
+        toast.success("Speaker added");
       }
 
       onSuccess?.();
       onOpenChange(false);
       setFormData(DEFAULT_FORM);
-    } catch (error: any) {
-      console.error('Failed to save speaker:', error);
-
-      let message = 'Something went wrong.';
-      try {
-        const parsed = JSON.parse(error?.message?.replace(/^Fetch error \d+: /, '') ?? '');
-        message = parsed?.message?.[0] || parsed?.message || message;
-      } catch {
-        message = error?.message || message;
-      }
-
-      toast.error('Failed to save speaker', { description: message });
+      setPhotoFile(null);
+    } catch {
+      toast.error("Failed to save speaker");
     } finally {
       setLoading(false);
     }
   };
 
+  /* --------------- UI --------------- */
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md p-4">
+      <DialogContent className="max-w-lg w-[90%] max-h-[85vh] overflow-y-auto rounded-lg p-4">
         <DialogHeader>
-          <DialogTitle>{editData ? 'Edit Speaker' : 'Add Speaker'}</DialogTitle>
+          <DialogTitle>{editData ? "Edit Speaker" : "Add Speaker"}</DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-1">
-          <div className="flex gap-3">
-            <div className="flex-1">
-              <Label>First Name</Label>
+        <div className="space-y-4">
+          <div className="flex gap-4">
+            <FormField label="First Name" className="flex-1">
               <Input
                 value={formData.name.firstName}
-                onChange={(e) => handleChange('firstName', e.target.value, true)}
+                onChange={(e) =>
+                  updateField("firstName", e.target.value, true)
+                }
                 placeholder="John"
               />
-            </div>
-            <div className="flex-1">
-              <Label>Last Name</Label>
+            </FormField>
+
+            <FormField label="Last Name" className="flex-1">
               <Input
                 value={formData.name.lastName}
-                onChange={(e) => handleChange('lastName', e.target.value, true)}
+                onChange={(e) =>
+                  updateField("lastName", e.target.value, true)
+                }
                 placeholder="Doe"
               />
-            </div>
+            </FormField>
           </div>
 
-          <div>
-            <Label>Email</Label>
+          <div className="flex gap-4">
+            <FormField label="Company" className="flex-1">
+            <Input
+              value={formData.companyName}
+              onChange={(e) => updateField("companyName", e.target.value)}
+              placeholder="Google"
+            />
+          </FormField>
+
+          <FormField label="Title in Company" className=" flex-1">
+            <Input
+              value={formData.title}
+              onChange={(e) => updateField("title", e.target.value)}
+              placeholder="Senior Engineer"
+            />
+          </FormField>
+          </div>
+
+          <FormField label="Email">
             <Input
               type="email"
               value={formData.email}
-              onChange={(e) => handleChange('email', e.target.value)}
+              onChange={(e) => updateField("email", e.target.value)}
               placeholder="john@example.com"
             />
-          </div>
+          </FormField>
 
-          <div>
-            <Label>Title</Label>
-            <Input
-              value={formData.title}
-              onChange={(e) => handleChange('title', e.target.value)}
-              placeholder="Software Engineer"
-            />
-          </div>
-
-          <div>
-            <Label>Company Name</Label>
-            <Input
-              value={formData.companyName}
-              onChange={(e) => handleChange('companyName', e.target.value)}
-              placeholder="TechCorp"
-            />
-          </div>
-
-          <div>
-            <Label>LinkedIn URL</Label>
+          <FormField label="LinkedIn Link">
             <Input
               value={formData.linkedInUrl}
-              onChange={(e) => handleChange('linkedInUrl', e.target.value)}
-              placeholder="https://linkedin.com/in/john-doe"
+              onChange={(e) => updateField("linkedInUrl", e.target.value)}
+              placeholder="https://linkedin.com/in/john"
             />
-          </div>
+          </FormField>
 
-          <div>
-            <Label>Picture URL</Label>
-            <Input
-              value={formData.pictureUrl}
-              onChange={(e) => handleChange('pictureUrl', e.target.value)}
-              placeholder="https://example.com/john.jpg"
-            />
-          </div>
+          <FormField label="Upload Photo">
+            <div
+              onDrop={handleDrop}
+              onDragOver={(e) => {
+                e.preventDefault();
+                setDragging(true);
+              }}
+              onDragLeave={() => setDragging(false)}
+              className={`border-2 border-dashed rounded-md p-6 text-center transition ${
+                dragging ? "border-blue-500 bg-blue-50" : "border-gray-300"
+              }`}
+            >
+              {!photoFile ? (
+                <div className="flex flex-col items-center text-sm text-muted-foreground">
+                  <Upload className="h-6 w-6 mb-2" />
+                  Drag & Drop photo here
+                </div>
+              ) : (
+                <p className="text-sm">{photoFile.name}</p>
+              )}
+            </div>
 
-          <div>
-            <Label>Bio</Label>
+            {formData.pictureUrl && (
+              <img
+                src={formData.pictureUrl}
+                alt="Preview"
+                className="mt-2 h-20 w-20 rounded-md object-cover border"
+              />
+            )}
+          </FormField>
+
+          <FormField label="Bio">
             <textarea
               value={formData.bio}
-              onChange={(e) => handleChange('bio', e.target.value)}
-              className="w-full rounded-md border border-gray-300 p-2"
+              onChange={(e) => updateField("bio", e.target.value)}
+              className="w-full border rounded-md p-2"
               rows={3}
-              placeholder="Short description..."
             />
-          </div>
+          </FormField>
         </div>
 
-        <DialogFooter className="mt-6">
-          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={loading}>
+        <DialogFooter className="mt-4">
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
           <Button onClick={handleSubmit} disabled={loading}>
-            {loading ? 'Saving...' : editData ? 'Update' : 'Add'}
+            {loading ? "Saving…" : editData ? "Update" : "Add Speaker"}
           </Button>
         </DialogFooter>
       </DialogContent>

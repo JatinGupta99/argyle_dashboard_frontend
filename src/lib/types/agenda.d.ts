@@ -2,8 +2,11 @@ export interface Agenda {
   _id: string;
   title: string;
   description: string;
-  startDateTime: string; // ISO Date String (e.g., "2025-12-10T09:00:00.000Z")
-  endDateTime: string; // ISO Date String
+  date: string; // ISO Date String (e.g., "2025-12-10T09:00:00.000Z")
+  startDateTime?: string; // ISO Date String (e.g., "2025-12-10T09:00:00.000Z")
+  startTime?: string; // ISO Date String (e.g., "2025-12-10T09:00:00.000Z")
+  endTime?: string; // ISO Date String (e.g., "2025-12-10T09:00:00.000Z")
+  endDateTime?: string; // ISO Date String
   /** Array of Speaker IDs */
   speakers: string[];
   hasPoll: boolean;

@@ -4,40 +4,48 @@ import { useEffect, useState, useMemo } from 'react';
 import { useParams } from 'next/navigation';
 import { useAppDispatch } from '@/redux/hooks';
 import { setExportLabel } from '@/redux/slices/toolbar-slice';
+import { toast } from 'sonner';
+
 import { DashboardToolbar } from '@/components/dashboard/DashboardToolBar';
 import { Header } from '@/components/layout/Header';
 import MonthlyScheduleSummary from '@/components/dashboard/MonthlyScheduleSummary';
+
 import { SpeakersTable } from './components/SpeakersTable';
 import { SpeakerFormDialog } from './components/SpeakerFormDialog';
+
+
 import { SpeakerService } from '@/services/speaker.service';
 import type { Speaker } from '@/lib/types/speaker';
+import { DeleteConfirmDialog } from '@/components/form/DeleteConfirmDialog';
 
 export default function SpeakersPage() {
-  const { eventId } = useParams(); 
-  console.log('SpeakersPage eventId:', eventId);
+  const { eventId } = useParams();
   const dispatch = useAppDispatch();
+
   const [speakers, setSpeakers] = useState<Speaker[]>([]);
   const [open, setOpen] = useState(false);
   const [editData, setEditData] = useState<Speaker | null>(null);
 
-  // 🧠 Load speakers for THIS eventId
-const loadSpeakers = async () => {
-  if (!eventId) return;
-  try {
-    console.log('Loading speakers for eventId:', eventId);
-    const res = await SpeakerService.getAll(String(eventId)); 
-    setSpeakers(res.data);
-  } catch (err) {
-    console.error('Failed to load speakers', err);
-  }
-};
+  const [deleteTarget, setDeleteTarget] = useState<Speaker | null>(null);
 
+  // Load speakers
+  const loadSpeakers = async () => {
+    if (!eventId) return;
+    try {
+      const res = await SpeakerService.getAll(String(eventId));
+      setSpeakers(res.data ?? []);
+    } catch (err) {
+      console.error('Failed to load speakers', err);
+      toast.error("Failed to load speakers");
+    }
+  };
 
   useEffect(() => {
     loadSpeakers();
     dispatch(setExportLabel('Add Speaker'));
   }, [dispatch, eventId]);
 
+  // Add / Edit Speaker
   const handleAddSpeaker = () => {
     setEditData(null);
     setOpen(true);
@@ -48,6 +56,27 @@ const loadSpeakers = async () => {
     setOpen(true);
   };
 
+  // Delete Speaker
+  const handleDeleteSpeaker = (speaker: Speaker) => {
+    setDeleteTarget(speaker);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteTarget || !eventId) return;
+
+    try {
+      await SpeakerService.remove(String(eventId), deleteTarget._id);
+      toast.success("Speaker deleted");
+      await loadSpeakers();
+    } catch (err) {
+      console.error('Failed to delete speaker', err);
+      toast.error("Failed to delete speaker");
+    } finally {
+      setDeleteTarget(null);
+    }
+  };
+
+  // Summary
   const summaryData = useMemo(
     () => ({
       month: new Date().toLocaleString('default', { month: 'long' }),
@@ -61,7 +90,10 @@ const loadSpeakers = async () => {
     <div className="flex h-screen flex-col bg-gray-50">
       <Header />
 
-      <DashboardToolbar customLabel="Add Speaker" onPrimaryClick={handleAddSpeaker} />
+      <DashboardToolbar
+        customLabel="Add Speaker"
+        onPrimaryClick={handleAddSpeaker}
+      />
 
       <MonthlyScheduleSummary
         month={summaryData.month}
@@ -71,17 +103,28 @@ const loadSpeakers = async () => {
 
       <main className="flex flex-1 flex-col p-2 pb-10">
         <section className="flex-1 overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-sm">
-          <SpeakersTable speakers={speakers} onEdit={handleEditSpeaker} />
+          <SpeakersTable
+            speakers={speakers}
+            onEdit={handleEditSpeaker}
+            onDelete={handleDeleteSpeaker}
+          />
         </section>
       </main>
 
-      {/* Pass eventId to the dialog too */}
       <SpeakerFormDialog
         open={open}
         onOpenChange={setOpen}
         editData={editData}
         onSuccess={loadSpeakers}
         eventId={String(eventId)}
+      />
+
+      <DeleteConfirmDialog
+        open={!!deleteTarget}
+        title="Delete Speaker"
+        message={`Are you sure you want to delete "${deleteTarget?.name.firstName} ${deleteTarget?.name.lastName}"?`}
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteTarget(null)}
       />
     </div>
   );

@@ -1,23 +1,34 @@
 'use client';
 
+import { useEffect, useMemo, useState } from 'react';
+import { useParams } from 'next/navigation';
 import { useAppDispatch } from '@/redux/hooks';
 import { setExportLabel } from '@/redux/slices/toolbar-slice';
-import { useEffect, useMemo, useState } from 'react';
+import { toast } from 'sonner';
 
 import { DashboardToolbar } from '@/components/dashboard/DashboardToolBar';
 import MonthlyScheduleSummary from '@/components/dashboard/MonthlyScheduleSummary';
 import { Header } from '@/components/layout/Header';
 import { Button } from '@/components/ui/button';
-import { AgendaFormDialog } from './components/AgendaFormDialog';
+
 import { AgendaTable } from './components/AgendaTable';
-import { useAgendas } from '../../../../../hooks/useAgenda';
+import { AgendaFormDialog } from './components/AgendaFormDialog';
+
+import { useAgendas } from '@/hooks/useAgenda';
+import { AgendaService } from '@/services/agenda.service';
+import { DeleteConfirmDialog } from '@/components/form/DeleteConfirmDialog';
 
 export default function AgendaPage() {
   const dispatch = useAppDispatch();
-  const { agendas, loading, error, fetchAgendas } = useAgendas();
+  const params = useParams();
+  const eventId = params.eventId as string;
+
+  const { agendas, loading, error, refresh } = useAgendas(eventId);
 
   const [open, setOpen] = useState(false);
   const [editData, setEditData] = useState<any>(null);
+
+  const [deleteTarget, setDeleteTarget] = useState<any>(null);
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -41,19 +52,47 @@ export default function AgendaPage() {
     [agendas.length]
   );
 
-  // Configure toolbar button
   useEffect(() => {
     dispatch(setExportLabel('Add Agenda'));
   }, [dispatch]);
 
+  // Delete Agenda
+  const handleDeleteAgenda = (agenda: any) => {
+    setDeleteTarget(agenda);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+
+    try {
+      await AgendaService.remove(eventId, deleteTarget._id);
+      toast.success("Agenda deleted");
+      refresh();
+    } catch (err) {
+      console.error('Failed to delete agenda', err);
+      toast.error("Failed to delete agenda");
+    } finally {
+      setDeleteTarget(null);
+    }
+  };
+
   return (
     <div className="flex h-screen flex-col overflow-hidden bg-gray-50">
       <Header />
-      <DashboardToolbar />
+
+      <DashboardToolbar
+        customLabel="Add Agenda"
+        onPrimaryClick={() => {
+          setEditData(null);
+          setOpen(true);
+        }}
+      />
+
       <MonthlyScheduleSummary {...scheduleData} />
 
       <main className="flex-1 overflow-auto p-6 pb-10">
         <section className="mb-6 min-h-[70vh] overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-sm">
+
           {loading ? (
             <p className="p-4 text-gray-500">Loading agendas...</p>
           ) : error ? (
@@ -66,6 +105,7 @@ export default function AgendaPage() {
                   setEditData(row);
                   setOpen(true);
                 }}
+                onDelete={handleDeleteAgenda} // Added delete handler
               />
 
               <div className="flex items-center justify-between border-t border-gray-100 px-4 py-3">
@@ -90,11 +130,25 @@ export default function AgendaPage() {
         </section>
       </main>
 
+      {/* Agenda Form Dialog */}
       <AgendaFormDialog
         open={open}
         onOpenChange={setOpen}
-        onSubmit={fetchAgendas} // refresh agendas after add/edit
         editData={editData}
+        eventId={eventId}
+        onSubmit={() => {
+          refresh();
+          setEditData(null);
+        }}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <DeleteConfirmDialog
+        open={!!deleteTarget}
+        title="Delete Agenda"
+        message={`Are you sure you want to delete "${deleteTarget?.title}"?`}
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteTarget(null)}
       />
     </div>
   );

@@ -16,26 +16,12 @@ import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 
-// ✅ Config-driven sidebar menu
 const mainMenu = [
   {
     title: 'Event Schedule',
     icon: Calendar,
     href: '/dashboard/schedule',
-  },
-  {
-    title: 'Event Content',
-    icon: LayoutGrid,
-    children: [
-      { title: 'Agenda', href: '/dashboard/agenda' },
-      { title: 'Speaker', href: '/dashboard/speakers' },
-    ],
-  },
-  {
-    title: 'Post Event Analytic',
-    icon: FileText,
-    href: '/dashboard/analytics',
-  },
+  }
 ];
 
 const otherMenu = [
@@ -79,28 +65,12 @@ export function AppSidebar() {
               return (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
-                    onClick={() =>
-                      item.children
-                        ? setOpenDropdown(isOpen ? null : item.title)
-                        : handleNavigate(item.href)
-                    }
-                    className={cn(
-                      'flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition',
-                      'hover:bg-muted/40',
-                      isActive && 'bg-blue-50 font-semibold text-blue-600'
-                    )}
                   >
                     <Icon size={16} />
                     {item.title}
-                    {item.children && (
-                      <ChevronDown
-                        size={16}
-                        className={cn('ml-auto transition-transform', isOpen && 'rotate-180')}
-                      />
-                    )}
                   </SidebarMenuButton>
 
-                  {/* Dropdown (for Event Content) */}
+                  {/* Dropdown (for Event Content)
                   {item.children && isOpen && (
                     <div className="text-muted-foreground mt-1 ml-8 space-y-1 text-sm">
                       {item.children.map((child) => {
@@ -119,7 +89,7 @@ export function AppSidebar() {
                         );
                       })}
                     </div>
-                  )}
+                  )} */}
                 </SidebarMenuItem>
               );
             })}

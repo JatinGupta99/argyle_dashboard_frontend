@@ -1,66 +1,100 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import { useAppDispatch } from '@/redux/hooks';
 import { setExportLabel } from '@/redux/slices/toolbar-slice';
+import { toast } from 'sonner';
+
 import { DashboardToolbar } from '@/components/dashboard/DashboardToolBar';
 import { Header } from '@/components/layout/Header';
 import MonthlyScheduleSummary from '@/components/dashboard/MonthlyScheduleSummary';
-import { SpeakersTable } from './components/SpeakersTable';
-import { SpeakerFormDialog } from './components/SpeakerFormDialog';
-import { SpeakerService } from '@/services/speaker.service';
-import type { Speaker } from '@/lib/types/speaker';
+import { useEventContext } from '@/components/providers/EventContextProvider';
 
-export default function SpeakersPage() {
+import { SponsorFormDialog } from '../sponsors/components/SponsorFormDialog';
+import { SponsorsTable } from '../sponsors/components/SponsorsTable';
+import { SponsorService } from '@/services/sponsors.service';
+
+import type { Sponsor } from '@/lib/types/sponsor';
+import { DeleteConfirmDialog } from '@/components/form/DeleteConfirmDialog';
+
+export default function SponsorsPage() {
   const dispatch = useAppDispatch();
+  const event = useEventContext();
+  const eventId = event?._id || '';
 
-  const [speakers, setSpeakers] = useState<Speaker[]>([]);
+  const [sponsors, setSponsors] = useState<Sponsor[]>([]);
   const [open, setOpen] = useState(false);
-  const [editData, setEditData] = useState<Speaker | null>(null);
+  const [editData, setEditData] = useState<Sponsor | null>(null);
 
-  // 🧠 Load all speakers
-  const loadSpeakers = async () => {
+  const [deleteTarget, setDeleteTarget] = useState<Sponsor | null>(null);
+
+  /* ---------- Load Sponsors ---------- */
+  const loadSponsors = useCallback(async () => {
+    if (!eventId) return;
+
     try {
-      const data = await SpeakerService.getAll();
-      setSpeakers(data);
+      const res = await SponsorService.getAll(eventId);
+      setSponsors(res ?? []); // make sure it's an array
     } catch (err) {
-      console.error('Failed to load speakers', err);
+      console.error('Failed to load sponsors', err);
+      toast.error("Failed to load sponsors");
+    }
+  }, [eventId]);
+
+  useEffect(() => {
+    loadSponsors();
+    dispatch(setExportLabel('Add Sponsor'));
+  }, [loadSponsors, dispatch]);
+
+  /* ---------- Add / Edit ---------- */
+  const handleAddSponsor = () => {
+    setEditData(null);
+    setOpen(true);
+  };
+
+  const handleEditSponsor = (sponsor: Sponsor) => {
+    setEditData(sponsor);
+    setOpen(true);
+  };
+
+  /* ---------- Delete ---------- */
+  const handleDeleteSponsor = (sponsor: Sponsor) => {
+    setDeleteTarget(sponsor);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+
+    try {
+      await SponsorService.remove(eventId, deleteTarget._id);
+      toast.success("Sponsor deleted");
+      loadSponsors();
+    } catch (err) {
+      console.error("Delete failed", err);
+      toast.error("Failed to delete sponsor");
+    } finally {
+      setDeleteTarget(null);
     }
   };
 
-  useEffect(() => {
-    loadSpeakers();
-    dispatch(setExportLabel('Add Speaker'));
-  }, [dispatch]);
-
-  // 🧩 Add speaker
-  const handleAddSpeaker = () => {
-    setEditData(null); // clear existing data
-    setOpen(true); // open in add mode
-  };
-
-  // 🧩 Edit speaker
-  const handleEditSpeaker = (speaker: Speaker) => {
-    setEditData(speaker); // pass selected speaker
-    setOpen(true); // open dialog in edit mode
-  };
-
-  // 🧩 For summary display
+  /* ---------- Summary widget ---------- */
   const summaryData = useMemo(
     () => ({
       month: new Date().toLocaleString('default', { month: 'long' }),
-      scheduleCount: speakers.length,
-      label: 'Speakers',
+      scheduleCount: sponsors.length,
+      label: 'Sponsors',
     }),
-    [speakers.length]
+    [sponsors.length]
   );
 
   return (
     <div className="flex h-screen flex-col bg-gray-50">
       <Header />
 
-      {/* Toolbar → Add Speaker */}
-      <DashboardToolbar customLabel="Add Speaker" onPrimaryClick={handleAddSpeaker} />
+      <DashboardToolbar
+        customLabel="Add Sponsor"
+        onPrimaryClick={handleAddSponsor}
+      />
 
       <MonthlyScheduleSummary
         month={summaryData.month}
@@ -70,17 +104,28 @@ export default function SpeakersPage() {
 
       <main className="flex flex-1 flex-col p-2 pb-10">
         <section className="flex-1 overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-sm">
-          <SpeakersTable
-            speakers={speakers}
-            onEdit={handleEditSpeaker} // ✅ connect edit handler
+          <SponsorsTable
+            sponsors={sponsors}
+            onEdit={handleEditSponsor}
+            onDelete={handleDeleteSponsor}
           />
         </section>
       </main>
-      <SpeakerFormDialog
+
+      <SponsorFormDialog
+        eventId={eventId}
         open={open}
         onOpenChange={setOpen}
         editData={editData}
-        onSuccess={loadSpeakers}
+        onSuccess={loadSponsors}
+      />
+
+      <DeleteConfirmDialog
+        open={!!deleteTarget}
+        title="Delete Sponsor"
+        message={`Are you sure you want to delete "${deleteTarget?.name}"?`}
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteTarget(null)}
       />
     </div>
   );

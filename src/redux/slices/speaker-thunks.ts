@@ -3,68 +3,70 @@ import {
   SpeakerService,
   PresignedUrlResponse,
 } from '@/services/speaker.service';
-import type { Speaker, CreateSpeakerDto, UpdateSpeakerDto } from '@/lib/types/speaker';
+import type { CreateSpeakerDto, UpdateSpeakerDto } from '@/lib/types/speaker';
 import { HTTP_METHODS } from 'next/dist/server/web/http';
 
-interface ThunkApiConfig {
-  rejectValue: string;
-}
-
-export const fetchSpeakers = createAsyncThunk<
-  Speaker[],
-  string,
-  ThunkApiConfig
->(
+/* ───────────────────────────────────────────────
+   Fetch All Speakers (requires eventId)
+─────────────────────────────────────────────── */
+export const fetchSpeakers = createAsyncThunk(
   'speakers/fetchAll',
-  async (eventId, thunkAPI) => {
+  async (eventId: string, thunkAPI) => {
     try {
-      const result = await SpeakerService.getAll(eventId);
-      return result.data as Speaker[];
+      const result= await SpeakerService.getAll(eventId);
+      return result.data;
     } catch (error: any) {
       return thunkAPI.rejectWithValue('Failed to fetch speakers');
     }
   }
 );
 
-export const createSpeaker = createAsyncThunk<
-  Speaker,
-  { eventId: string; payload: CreateSpeakerDto },
-  ThunkApiConfig
->(
+/* ───────────────────────────────────────────────
+   Create Speaker
+─────────────────────────────────────────────── */
+export const createSpeaker = createAsyncThunk(
   'speakers/create',
-  async ({ eventId, payload }, thunkAPI) => {
+  async (
+    { eventId, payload }: { eventId: string; payload: CreateSpeakerDto },
+    thunkAPI
+  ) => {
     try {
-      const result = await SpeakerService.create(eventId, payload);
-      return result.data as Speaker;
+      const result= await SpeakerService.create(eventId, payload);
+      return result.data;
     } catch (error: any) {
       return thunkAPI.rejectWithValue('Failed to create speaker');
     }
   }
 );
 
-export const updateSpeaker = createAsyncThunk<
-  Speaker,
-  { eventId: string; id: string; payload: UpdateSpeakerDto },
-  ThunkApiConfig
->(
+/* ───────────────────────────────────────────────
+   Update Speaker
+─────────────────────────────────────────────── */
+export const updateSpeaker = createAsyncThunk(
   'speakers/update',
-  async ({ eventId, id, payload }, thunkAPI) => {
+  async (
+    {
+      eventId,
+      id,
+      payload,
+    }: { eventId: string; id: string; payload: UpdateSpeakerDto },
+    thunkAPI
+  ) => {
     try {
-      const result = await SpeakerService.update(eventId, id, payload);
-      return result.data as Speaker;
+      const result= await SpeakerService.update(eventId, id, payload);
+      return result.data;
     } catch (error: any) {
       return thunkAPI.rejectWithValue('Failed to update speaker');
     }
   }
 );
 
-export const deleteSpeaker = createAsyncThunk<
-  string,
-  { eventId: string; id: string },
-  ThunkApiConfig
->(
+/* ───────────────────────────────────────────────
+   Delete Speaker
+─────────────────────────────────────────────── */
+export const deleteSpeaker = createAsyncThunk(
   'speakers/delete',
-  async ({ eventId, id }, thunkAPI) => {
+  async ({ eventId, id }: { eventId: string; id: string }, thunkAPI) => {
     try {
       await SpeakerService.remove(eventId, id);
       return id;
@@ -74,18 +76,25 @@ export const deleteSpeaker = createAsyncThunk<
   }
 );
 
-export const uploadSpeakerImage = createAsyncThunk<
-  string,
-  { file: File; eventId: string; speakerId: string },
-  ThunkApiConfig
->(
+/* ───────────────────────────────────────────────
+   Upload Speaker Image (Presigned URL)
+─────────────────────────────────────────────── */
+export const uploadSpeakerImage = createAsyncThunk(
   'speakers/uploadImage',
-  async ({ file, eventId, speakerId }, thunkAPI) => {
+  async (
+    {
+      file,
+      eventId,
+      speakerId,
+    }: { file: File; eventId: string; speakerId: string },
+    thunkAPI
+  ) => {
     try {
-      const presign: PresignedUrlResponse = await SpeakerService.getUploadUrl({
-        eventId,
-        speakerId,
-        contentType: file.type,
+      const presign: PresignedUrlResponse =
+      await SpeakerService.getUploadUrl({
+          eventId,
+          speakerId,
+          contentType: file.type,
       });
 
       await fetch(presign.data.url, {
