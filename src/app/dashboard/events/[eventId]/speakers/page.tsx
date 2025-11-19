@@ -13,13 +13,13 @@ import MonthlyScheduleSummary from '@/components/dashboard/MonthlyScheduleSummar
 import { SpeakersTable } from './components/SpeakersTable';
 import { SpeakerFormDialog } from './components/SpeakerFormDialog';
 
-
 import { SpeakerService } from '@/services/speaker.service';
 import type { Speaker } from '@/lib/types/speaker';
 import { DeleteConfirmDialog } from '@/components/form/DeleteConfirmDialog';
 
 export default function SpeakersPage() {
-  const { eventId } = useParams();
+  const params = useParams();
+  const eventId = params.eventId as string;
   const dispatch = useAppDispatch();
 
   const [speakers, setSpeakers] = useState<Speaker[]>([]);
@@ -36,7 +36,7 @@ export default function SpeakersPage() {
       setSpeakers(res.data ?? []);
     } catch (err) {
       console.error('Failed to load speakers', err);
-      toast.error("Failed to load speakers");
+      toast.error('Failed to load speakers');
     }
   };
 
@@ -66,11 +66,11 @@ export default function SpeakersPage() {
 
     try {
       await SpeakerService.remove(String(eventId), deleteTarget._id);
-      toast.success("Speaker deleted");
+      toast.success('Speaker deleted');
       await loadSpeakers();
     } catch (err) {
       console.error('Failed to delete speaker', err);
-      toast.error("Failed to delete speaker");
+      toast.error('Failed to delete speaker');
     } finally {
       setDeleteTarget(null);
     }
@@ -90,10 +90,7 @@ export default function SpeakersPage() {
     <div className="flex h-screen flex-col bg-gray-50">
       <Header />
 
-      <DashboardToolbar
-        customLabel="Add Speaker"
-        onPrimaryClick={handleAddSpeaker}
-      />
+      <DashboardToolbar customLabel="Add Speaker" onPrimaryClick={handleAddSpeaker} />
 
       <MonthlyScheduleSummary
         month={summaryData.month}
@@ -115,8 +112,8 @@ export default function SpeakersPage() {
         open={open}
         onOpenChange={setOpen}
         editData={editData}
+        eventId={eventId}
         onSuccess={loadSpeakers}
-        eventId={String(eventId)}
       />
 
       <DeleteConfirmDialog

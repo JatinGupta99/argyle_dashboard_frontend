@@ -10,7 +10,7 @@ export const fetchAgendas = createAsyncThunk(
   async (eventId: string, thunkAPI) => {
     try {
       const result = await AgendaService.getAll(eventId);
-      return result.data; 
+      return result.data;
     } catch (error: any) {
       return thunkAPI.rejectWithValue('Failed to fetch agendas');
     }
@@ -22,10 +22,7 @@ export const fetchAgendas = createAsyncThunk(
 ─────────────────────────────────────────────── */
 export const addAgenda = createAsyncThunk(
   'agendas/create',
-  async (
-    { eventId, payload }: { eventId: string; payload: CreateAgendaDto },
-    thunkAPI
-  ) => {
+  async ({ eventId, payload }: { eventId: string; payload: CreateAgendaDto }, thunkAPI) => {
     try {
       const result = await AgendaService.create(eventId, payload);
       return result.data;
@@ -41,11 +38,7 @@ export const addAgenda = createAsyncThunk(
 export const updateAgenda = createAsyncThunk(
   'agendas/update',
   async (
-    {
-      eventId,
-      agendaId,
-      payload,
-    }: { eventId: string; agendaId: string; payload: UpdateAgendaDto },
+    { eventId, agendaId, payload }: { eventId: string; agendaId: string; payload: UpdateAgendaDto },
     thunkAPI
   ) => {
     try {
@@ -62,10 +55,7 @@ export const updateAgenda = createAsyncThunk(
 ─────────────────────────────────────────────── */
 export const removeAgenda = createAsyncThunk(
   'agendas/delete',
-  async (
-    { eventId, agendaId }: { eventId: string; agendaId: string },
-    thunkAPI
-  ) => {
+  async ({ eventId, agendaId }: { eventId: string; agendaId: string }, thunkAPI) => {
     try {
       await AgendaService.remove(eventId, agendaId);
       return agendaId; // used in reducer for filtering

@@ -1,8 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import {
-  SpeakerService,
-  PresignedUrlResponse,
-} from '@/services/speaker.service';
+import { SpeakerService, PresignedUrlResponse } from '@/services/speaker.service';
 import type { CreateSpeakerDto, UpdateSpeakerDto } from '@/lib/types/speaker';
 import { HTTP_METHODS } from 'next/dist/server/web/http';
 
@@ -13,7 +10,7 @@ export const fetchSpeakers = createAsyncThunk(
   'speakers/fetchAll',
   async (eventId: string, thunkAPI) => {
     try {
-      const result= await SpeakerService.getAll(eventId);
+      const result = await SpeakerService.getAll(eventId);
       return result.data;
     } catch (error: any) {
       return thunkAPI.rejectWithValue('Failed to fetch speakers');
@@ -26,12 +23,9 @@ export const fetchSpeakers = createAsyncThunk(
 ─────────────────────────────────────────────── */
 export const createSpeaker = createAsyncThunk(
   'speakers/create',
-  async (
-    { eventId, payload }: { eventId: string; payload: CreateSpeakerDto },
-    thunkAPI
-  ) => {
+  async ({ eventId, payload }: { eventId: string; payload: CreateSpeakerDto }, thunkAPI) => {
     try {
-      const result= await SpeakerService.create(eventId, payload);
+      const result = await SpeakerService.create(eventId, payload);
       return result.data;
     } catch (error: any) {
       return thunkAPI.rejectWithValue('Failed to create speaker');
@@ -45,15 +39,11 @@ export const createSpeaker = createAsyncThunk(
 export const updateSpeaker = createAsyncThunk(
   'speakers/update',
   async (
-    {
-      eventId,
-      id,
-      payload,
-    }: { eventId: string; id: string; payload: UpdateSpeakerDto },
+    { eventId, id, payload }: { eventId: string; id: string; payload: UpdateSpeakerDto },
     thunkAPI
   ) => {
     try {
-      const result= await SpeakerService.update(eventId, id, payload);
+      const result = await SpeakerService.update(eventId, id, payload);
       return result.data;
     } catch (error: any) {
       return thunkAPI.rejectWithValue('Failed to update speaker');
@@ -82,19 +72,14 @@ export const deleteSpeaker = createAsyncThunk(
 export const uploadSpeakerImage = createAsyncThunk(
   'speakers/uploadImage',
   async (
-    {
-      file,
-      eventId,
-      speakerId,
-    }: { file: File; eventId: string; speakerId: string },
+    { file, eventId, speakerId }: { file: File; eventId: string; speakerId: string },
     thunkAPI
   ) => {
     try {
-      const presign: PresignedUrlResponse =
-      await SpeakerService.getUploadUrl({
-          eventId,
-          speakerId,
-          contentType: file.type,
+      const presign: PresignedUrlResponse = await SpeakerService.getUploadUrl({
+        eventId,
+        speakerId,
+        contentType: file.type,
       });
 
       await fetch(presign.data.url, {

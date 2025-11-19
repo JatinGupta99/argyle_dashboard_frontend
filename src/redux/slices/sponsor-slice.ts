@@ -40,9 +40,7 @@ const sponsorSlice = createSlice({
       })
       .addCase(updateSponsor.fulfilled, (state, action) => {
         state.loading = false;
-        state.list = state.list.map((s) =>
-          s._id === action.payload._id ? action.payload : s
-        );
+        state.list = state.list.map((s) => (s._id === action.payload._id ? action.payload : s));
       })
       .addCase(deleteSponsor.fulfilled, (state, action) => {
         state.loading = false;
@@ -63,7 +61,7 @@ const sponsorSlice = createSlice({
         (action) => action.type.endsWith('/rejected'),
         (state, action) => {
           state.loading = false;
-          state.error = (action.payload) || 'An unknown error occurred.';
+          state.error = action.payload || 'An unknown error occurred.';
         }
       );
   },

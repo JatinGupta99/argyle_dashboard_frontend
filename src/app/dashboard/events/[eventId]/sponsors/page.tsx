@@ -37,7 +37,7 @@ export default function SponsorsPage() {
       setSponsors(res ?? []); // make sure it's an array
     } catch (err) {
       console.error('Failed to load sponsors', err);
-      toast.error("Failed to load sponsors");
+      toast.error('Failed to load sponsors');
     }
   }, [eventId]);
 
@@ -67,11 +67,11 @@ export default function SponsorsPage() {
 
     try {
       await SponsorService.remove(eventId, deleteTarget._id);
-      toast.success("Sponsor deleted");
+      toast.success('Sponsor deleted');
       loadSponsors();
     } catch (err) {
-      console.error("Delete failed", err);
-      toast.error("Failed to delete sponsor");
+      console.error('Delete failed', err);
+      toast.error('Failed to delete sponsor');
     } finally {
       setDeleteTarget(null);
     }
@@ -91,10 +91,7 @@ export default function SponsorsPage() {
     <div className="flex h-screen flex-col bg-gray-50">
       <Header />
 
-      <DashboardToolbar
-        customLabel="Add Sponsor"
-        onPrimaryClick={handleAddSponsor}
-      />
+      <DashboardToolbar customLabel="Add Sponsor" onPrimaryClick={handleAddSponsor} />
 
       <MonthlyScheduleSummary
         month={summaryData.month}
@@ -120,13 +117,23 @@ export default function SponsorsPage() {
         onSuccess={loadSponsors}
       />
 
-      <DeleteConfirmDialog
-        open={!!deleteTarget}
-        title="Delete Sponsor"
-        message={`Are you sure you want to delete "${deleteTarget?.name}"?`}
-        onConfirm={confirmDelete}
-        onCancel={() => setDeleteTarget(null)}
+      <SponsorFormDialog
+        eventId={eventId}
+        open={open}
+        onOpenChange={setOpen}
+        editData={editData}
+        onSuccess={loadSponsors}
       />
+
+      {deleteTarget && (
+        <DeleteConfirmDialog
+          open={true}
+          title="Delete Sponsor"
+          message={`Are you sure you want to delete "${deleteTarget.name}"?`}
+          onConfirm={confirmDelete}
+          onCancel={() => setDeleteTarget(null)}
+        />
+      )}
     </div>
   );
 }

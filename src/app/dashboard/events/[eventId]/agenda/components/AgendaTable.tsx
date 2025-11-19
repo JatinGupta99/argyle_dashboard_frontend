@@ -1,17 +1,26 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { Pencil, Trash2 } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Agenda } from '@/lib/types/agenda';
+import { MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
+import { EmptyState } from '@/components/ui/empty-state';
 
-interface AgendaTableProps {
-  data: any[];
+export interface AgendaTableProps {
+  data: Agenda[];
   onEdit?: (row: any) => void;
-  onDelete?: (row: any) => void; // <-- added
+  onDelete?: (row: any) => void;
 }
 
 function formatAgendaTime(start: string, end: string) {
   const s = new Date(start);
   const e = new Date(end);
+
+  if (isNaN(s.getTime()) || isNaN(e.getTime())) return '—';
 
   const date = s.toLocaleDateString();
   const startTime = s.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -21,6 +30,8 @@ function formatAgendaTime(start: string, end: string) {
 }
 
 export function AgendaTable({ data, onEdit, onDelete }: AgendaTableProps) {
+  const isEmpty = data.length === 0;
+
   return (
     <div className="rounded-xl bg-white p-4 shadow">
       <table className="w-full border-collapse text-sm">
@@ -30,66 +41,73 @@ export function AgendaTable({ data, onEdit, onDelete }: AgendaTableProps) {
             <th className="p-2">Time</th>
             <th className="p-2">Audience Polls</th>
             <th className="p-2">Speaker</th>
-            <th className="rounded-r-lg p-2">Action</th>
+            <th className="w-20 rounded-r-lg p-2 text-center">Action</th>
           </tr>
         </thead>
 
         <tbody>
-          {data.map((row) => (
-            <tr
-              key={row._id}
-              className="hover:bg-muted/30 border-b transition-colors"
-            >
-              {/* Title */}
-              <td className="p-2 font-medium">{row.title}</td>
-
-              {/* Time */}
-              <td className="p-2">
-                {formatAgendaTime(row.startDateTime, row.endDateTime)}
-              </td>
-
-              {/* Poll */}
-              <td
-                className={`p-2 font-semibold ${
-                  row.hasPoll ? 'text-green-600' : 'text-red-500'
-                }`}
-              >
-                {row.hasPoll ? 'Yes' : 'No'}
-              </td>
-
-              {/* Speaker */}
-              <td className="p-2">
-                {row.speakers?.length ? (
-                  <span>{row.speakers.length} speaker(s)</span>
-                ) : (
-                  <span className="text-gray-400">No speaker</span>
-                )}
-              </td>
-
-              {/* Actions */}
-              <td className="p-2 flex gap-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => onEdit?.(row)}
-                  className="p-1"
-                >
-                  <Pencil className="h-4 w-4 text-sky-500" />
-                </Button>
-
-                {onDelete && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => onDelete(row)}
-                    className="p-1"
-                  >
-                    <Trash2 className="h-4 w-4 text-red-500" />
-                  </Button>
-                )}
+          {isEmpty ? (
+            <tr>
+              <td colSpan={5}>
+                <EmptyState message="No agenda found for this event" />
               </td>
             </tr>
-          ))}
+          ) : (
+            data.map((row: Agenda) => {
+              const speakerCount = row.speakers?.length ?? 0;
+
+              return (
+                <tr key={row._id} className="hover:bg-muted/30 border-b transition-colors">
+                  <td className="p-2 font-medium">{row.title}</td>
+
+                  <td className="p-2">{formatAgendaTime(row.startTime, row.endTime)}</td>
+
+                  <td
+                    className={`p-2 font-semibold ${
+                      row.hasPoll ? 'text-green-600' : 'text-red-500'
+                    }`}
+                  >
+                    {row.hasPoll ? 'Yes' : 'No'}
+                  </td>
+
+                  <td className="p-2">
+                    {speakerCount ? (
+                      `${speakerCount} speaker(s)`
+                    ) : (
+                      <span className="text-gray-400">No speaker</span>
+                    )}
+                  </td>
+
+                  <td className="p-2 text-center">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger className="rounded-md p-2 hover:bg-gray-100">
+                        <MoreHorizontal className="h-5 w-5 text-gray-600" />
+                      </DropdownMenuTrigger>
+
+                      <DropdownMenuContent align="end" className="w-32">
+                        {onEdit && (
+                          <DropdownMenuItem onClick={() => onEdit(row)}>
+                            <Pencil className="mr-2 h-4 w-4 text-sky-500" />
+                            Modify
+                          </DropdownMenuItem>
+                        )}
+
+                        {onDelete && (
+                          <DropdownMenuItem
+                            onClick={() => onDelete(row)}
+                            className="text-red-600 focus:text-red-600"
+                          >
+                            <Trash2 className="mr-2 h-4 w-4 text-red-600" />
+                            Delete
+                          </DropdownMenuItem>
+                        )}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </td>
+                </tr>
+              );
+            })
+          )}
         </tbody>
       </table>
     </div>

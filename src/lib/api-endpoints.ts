@@ -7,15 +7,13 @@ export const ENDPOINTS = {
   },
   SPONSORS: {
     ROOT: (eventId: string) => `/events/${eventId}/sponsors`,
-    BY_ID: (eventId: string, sponsorId: string) =>
-      `/events/${eventId}/sponsors/${sponsorId}`,
+    BY_ID: (eventId: string, sponsorId: string) => `/events/${eventId}/sponsors/${sponsorId}`,
     UPLOAD_URL: (eventId: string, sponsorId: string) =>
       `/events/${eventId}/sponsors/${sponsorId}/upload-url`,
   },
- AGENDAS: {
+  AGENDAS: {
     ROOT: (eventId: string) => `/events/${eventId}/agendas`,
-    BY_ID: (eventId: string, agendaId: string) =>
-      `/events/${eventId}/agendas/${agendaId}`,
+    BY_ID: (eventId: string, agendaId: string) => `/events/${eventId}/agendas/${agendaId}`,
   },
   AUTH: {
     LOGIN: '/auth/login',
@@ -24,7 +22,7 @@ export const ENDPOINTS = {
   USER: {
     GET_PROFILE: '/company-user/profile',
   },
-  Event:{
+  Event: {
     FETCH_BY_ID: (eventId: string) => `events/${eventId}`,
-  }
+  },
 };

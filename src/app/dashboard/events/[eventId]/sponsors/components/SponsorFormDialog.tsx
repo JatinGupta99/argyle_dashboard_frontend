@@ -1,15 +1,21 @@
-"use client";
+'use client';
 
-import { useEffect, useState, DragEvent } from "react";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Upload } from "lucide-react";
-import { toast } from "sonner";
+import { useEffect, useState, DragEvent } from 'react';
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Upload } from 'lucide-react';
+import { toast } from 'sonner';
 
-import type { CreateSponsorDto, Sponsor } from "@/lib/types/sponsor";
-import { FormField } from "@/components/form/FormField";
-import { SponsorService } from "@/services/sponsors.service";
+import type { CreateSponsorDto, Sponsor } from '@/lib/types/sponsor';
+import { FormField } from '@/components/form/FormField';
+import { SponsorService } from '@/services/sponsors.service';
 
 interface Props {
   open: boolean;
@@ -20,23 +26,17 @@ interface Props {
 }
 
 const DEFAULT_FORM: CreateSponsorDto = {
-  name: "",
-  logoKey: "",
-  websiteUrl: "",
-  facebookUrl: "",
-  twitterUrl: "",
-  instagramUrl: "",
-  linkedInUrl: "",
-  description: "",
+  name: '',
+  logoKey: '',
+  websiteUrl: '',
+  facebookUrl: '',
+  twitterUrl: '',
+  instagramUrl: '',
+  linkedInUrl: '',
+  description: '',
 };
 
-export function SponsorFormDialog({
-  open,
-  onOpenChange,
-  onSuccess,
-  editData,
-  eventId,
-}: Props) {
+export function SponsorFormDialog({ open, onOpenChange, onSuccess, editData, eventId }: Props) {
   const [formData, setFormData] = useState(DEFAULT_FORM);
   const [loading, setLoading] = useState(false);
 
@@ -54,12 +54,12 @@ export function SponsorFormDialog({
       setFormData({
         name: editData.name,
         logoKey: editData.logoKey,
-        websiteUrl: editData.websiteUrl ?? "",
-        facebookUrl: editData.facebookUrl ?? "",
-        twitterUrl: editData.twitterUrl ?? "",
-        instagramUrl: editData.instagramUrl ?? "",
-        linkedInUrl: editData.linkedInUrl ?? "",
-        description: editData.description ?? "",
+        websiteUrl: editData.websiteUrl ?? '',
+        facebookUrl: editData.facebookUrl ?? '',
+        twitterUrl: editData.twitterUrl ?? '',
+        instagramUrl: editData.instagramUrl ?? '',
+        linkedInUrl: editData.linkedInUrl ?? '',
+        description: editData.description ?? '',
       });
       setLogoPreview(editData.logoKey);
     } else {
@@ -76,7 +76,7 @@ export function SponsorFormDialog({
   };
 
   const validate = () => {
-    if (!formData.name.trim()) return "Sponsor name is required";
+    if (!formData.name.trim()) return 'Sponsor name is required';
     return null;
   };
 
@@ -109,12 +109,12 @@ export function SponsorFormDialog({
 
     const presign = await SponsorService.getUploadUrl({
       eventId,
-      sponsorId: editData?._id ?? "new",
+      sponsorId: editData?._id ?? 'new',
       contentType: logoFile.type,
     });
 
     await fetch(presign.data.url, {
-      method: "PUT",
+      method: 'PUT',
       body: logoFile,
     });
 
@@ -134,16 +134,16 @@ export function SponsorFormDialog({
 
       if (editData) {
         await SponsorService.update(eventId, editData._id, payload);
-        toast.success("Sponsor updated");
+        toast.success('Sponsor updated');
       } else {
         await SponsorService.create(eventId, payload);
-        toast.success("Sponsor added");
+        toast.success('Sponsor added');
       }
 
       onSuccess?.();
       onOpenChange(false);
     } catch (err) {
-      toast.error("Failed to save sponsor");
+      toast.error('Failed to save sponsor');
     } finally {
       setLoading(false);
     }
@@ -152,13 +152,13 @@ export function SponsorFormDialog({
   /* ------------ UI -------------- */
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg w-[90%] max-h-[85vh] overflow-y-auto rounded-lg p-4">
+      <DialogContent className="max-h-[85vh] w-[90%] max-w-lg overflow-y-auto rounded-lg p-4">
         <DialogHeader>
-          <DialogTitle>{editData ? "Edit Sponsor" : "Add Sponsor"}</DialogTitle>
+          <DialogTitle>{editData ? 'Edit Sponsor' : 'Add Sponsor'}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
-           {/* Document Upload */}
+          {/* Document Upload */}
           <FormField label="Upload Document (PDF, DOC, PNG, JPEG)">
             <div
               onDrop={handleDocDrop}
@@ -167,13 +167,13 @@ export function SponsorFormDialog({
                 setDraggingDoc(true);
               }}
               onDragLeave={() => setDraggingDoc(false)}
-              className={`border-2 border-dashed rounded-md p-6 text-center transition ${
-                draggingDoc ? "border-blue-500 bg-blue-50" : "border-gray-300"
+              className={`rounded-md border-2 border-dashed p-6 text-center transition ${
+                draggingDoc ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
               }`}
             >
               {!documentFile ? (
-                <div className="flex flex-col items-center text-sm text-muted-foreground">
-                  <Upload className="h-6 w-6 mb-2" />
+                <div className="text-muted-foreground flex flex-col items-center text-sm">
+                  <Upload className="mb-2 h-6 w-6" />
                   Click to upload or drag document here
                 </div>
               ) : (
@@ -184,50 +184,48 @@ export function SponsorFormDialog({
           <FormField label="Name">
             <Input
               value={formData.name}
-              onChange={(e) => updateField("name", e.target.value)}
+              onChange={(e) => updateField('name', e.target.value)}
               placeholder="Company Name"
             />
           </FormField>
 
-         <FormField label="Website">
-              <Input
-                value={formData.websiteUrl ?? ""}
-                onChange={(e) => updateField("websiteUrl", e.target.value)}
-                placeholder="URL"
-              />
-            </FormField>
+          <FormField label="Website">
+            <Input
+              value={formData.websiteUrl ?? ''}
+              onChange={(e) => updateField('websiteUrl', e.target.value)}
+              placeholder="URL"
+            />
+          </FormField>
 
           <div className="grid grid-cols-2 gap-4">
-          
-
             <FormField label="Facebook">
               <Input
-                value={formData.facebookUrl ?? ""}
-                onChange={(e) => updateField("facebookUrl", e.target.value)}
+                value={formData.facebookUrl ?? ''}
+                onChange={(e) => updateField('facebookUrl', e.target.value)}
                 placeholder="URL"
               />
             </FormField>
 
             <FormField label="Twitter">
               <Input
-                value={formData.twitterUrl ?? ""}
-                onChange={(e) => updateField("twitterUrl", e.target.value)}
+                value={formData.twitterUrl ?? ''}
+                onChange={(e) => updateField('twitterUrl', e.target.value)}
                 placeholder="URL"
               />
             </FormField>
 
             <FormField label="Instagram">
               <Input
-                value={formData.instagramUrl ?? ""}
-                onChange={(e) => updateField("instagramUrl", e.target.value)}
+                value={formData.instagramUrl ?? ''}
+                onChange={(e) => updateField('instagramUrl', e.target.value)}
                 placeholder="URL"
               />
             </FormField>
 
             <FormField label="LinkedIn">
               <Input
-                value={formData.linkedInUrl ?? ""}
-                onChange={(e) => updateField("linkedInUrl", e.target.value)}
+                value={formData.linkedInUrl ?? ''}
+                onChange={(e) => updateField('linkedInUrl', e.target.value)}
                 placeholder="URL"
               />
             </FormField>
@@ -235,9 +233,9 @@ export function SponsorFormDialog({
 
           <FormField label="Description">
             <textarea
-              value={formData.description ?? ""}
-              onChange={(e) => updateField("description", e.target.value)}
-              className="w-full border rounded-md p-2"
+              value={formData.description ?? ''}
+              onChange={(e) => updateField('description', e.target.value)}
+              className="w-full rounded-md border p-2"
               rows={3}
               placeholder="Type your description..."
             />
@@ -252,13 +250,13 @@ export function SponsorFormDialog({
                 setDraggingLogo(true);
               }}
               onDragLeave={() => setDraggingLogo(false)}
-              className={`border-2 border-dashed rounded-md p-6 text-center transition ${
-                draggingLogo ? "border-blue-500 bg-blue-50" : "border-gray-300"
+              className={`rounded-md border-2 border-dashed p-6 text-center transition ${
+                draggingLogo ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
               }`}
             >
               {!logoFile ? (
-                <div className="flex flex-col items-center text-sm text-muted-foreground">
-                  <Upload className="h-6 w-6 mb-2" />
+                <div className="text-muted-foreground flex flex-col items-center text-sm">
+                  <Upload className="mb-2 h-6 w-6" />
                   Click to upload logo or drag here
                 </div>
               ) : (
@@ -269,13 +267,11 @@ export function SponsorFormDialog({
             {logoPreview && (
               <img
                 src={logoPreview}
-                className="mt-2 h-20 w-20 rounded-md object-cover border"
+                className="mt-2 h-20 w-20 rounded-md border object-cover"
                 alt="Logo preview"
               />
             )}
           </FormField>
-
-         
         </div>
 
         <DialogFooter className="mt-4">
@@ -283,7 +279,7 @@ export function SponsorFormDialog({
             Cancel
           </Button>
           <Button onClick={handleSubmit} disabled={loading}>
-            {loading ? "Saving…" : editData ? "Update" : "Add Sponsor"}
+            {loading ? 'Saving…' : editData ? 'Update' : 'Add Sponsor'}
           </Button>
         </DialogFooter>
       </DialogContent>

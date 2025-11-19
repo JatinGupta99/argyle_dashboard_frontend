@@ -1,10 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import {
-  fetchSpeakers,
-  createSpeaker,
-  updateSpeaker,
-  deleteSpeaker,
-} from './speaker-thunks';
+import { fetchSpeakers, createSpeaker, updateSpeaker, deleteSpeaker } from './speaker-thunks';
 
 import type { Speaker } from '@/lib/types/speaker';
 
@@ -26,7 +21,7 @@ const speakerSlice = createSlice({
   reducers: {
     clearSpeakerError: (state) => {
       state.error = null;
-    }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -40,9 +35,7 @@ const speakerSlice = createSlice({
       })
       .addCase(updateSpeaker.fulfilled, (state, action) => {
         state.loading = false;
-        state.list = state.list.map((s) =>
-          s._id === action.payload._id ? action.payload : s
-        );
+        state.list = state.list.map((s) => (s._id === action.payload._id ? action.payload : s));
       })
       .addCase(deleteSpeaker.fulfilled, (state, action) => {
         state.loading = false;
@@ -59,7 +52,7 @@ const speakerSlice = createSlice({
         (action) => action.type.endsWith('/rejected'),
         (state, action) => {
           state.loading = false;
-          state.error = (action.payload as string) || 'An unknown error occurred.'; 
+          state.error = (action.payload as string) || 'An unknown error occurred.';
         }
       );
   },

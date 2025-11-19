@@ -1,6 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 import toolbarReducer from '@/redux//slices/toolbar-slice';
-import dialogReducer from '@/redux//slices/dialog-slice'; 
+import dialogReducer from '@/redux//slices/dialog-slice';
 import speakerReducer from '@/redux//slices/speaker-slice';
 import agendaReducer from '@/redux/slices/agenda-slice';
 

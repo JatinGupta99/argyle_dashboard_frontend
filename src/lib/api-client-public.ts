@@ -15,8 +15,8 @@ export const publicApiClient = {
 
   async post(endpoint: string, data: any) {
     const res = await fetch(buildUrl(endpoint), {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     });
     if (!res.ok) throw new Error(`POST failed: ${res.status}`);

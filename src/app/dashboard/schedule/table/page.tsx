@@ -69,8 +69,8 @@ const MOCK_SCHEDULE_DATA: ScheduleItem[] = [
 
 export default function ScheduleTable() {
   const dispatch = useAppDispatch();
-  const event=useParams();
-  const eventId=event.eventId;
+  const event = useParams();
+  const eventId = event.eventId;
   const [schedules, setSchedules] = useState<ScheduleItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

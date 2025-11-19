@@ -21,7 +21,7 @@ const mainMenu = [
     title: 'Event Schedule',
     icon: Calendar,
     href: '/dashboard/schedule',
-  }
+  },
 ];
 
 const otherMenu = [
@@ -64,8 +64,7 @@ export function AppSidebar() {
 
               return (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                  >
+                  <SidebarMenuButton>
                     <Icon size={16} />
                     {item.title}
                   </SidebarMenuButton>

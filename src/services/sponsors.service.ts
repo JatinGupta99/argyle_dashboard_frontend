@@ -17,7 +17,7 @@ export interface PresignedUrlResponse {
 
 export const SponsorService = {
   getAll: async (eventId: string) => {
-    const data= fetchApi<{results:Sponsor[]}>(ENDPOINTS.SPONSORS.ROOT(eventId), {
+    const data = fetchApi<{ results: Sponsor[] }>(ENDPOINTS.SPONSORS.ROOT(eventId), {
       method: HTTP_METHODS[0],
     });
     return (await data).data.results;
@@ -36,11 +36,7 @@ export const SponsorService = {
     });
   },
 
-  update: async (
-    eventId: string,
-    sponsorId: string,
-    payload: UpdateSponsorDto
-  ) => {
+  update: async (eventId: string, sponsorId: string, payload: UpdateSponsorDto) => {
     return fetchApi(ENDPOINTS.SPONSORS.BY_ID(eventId, sponsorId), {
       method: HTTP_METHODS[6],
       body: JSON.stringify(payload),

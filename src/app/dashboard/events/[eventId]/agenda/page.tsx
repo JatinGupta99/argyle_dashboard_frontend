@@ -1,148 +1,119 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useParams } from 'next/navigation';
 import { useAppDispatch } from '@/redux/hooks';
 import { setExportLabel } from '@/redux/slices/toolbar-slice';
 import { toast } from 'sonner';
 
 import { DashboardToolbar } from '@/components/dashboard/DashboardToolBar';
-import MonthlyScheduleSummary from '@/components/dashboard/MonthlyScheduleSummary';
 import { Header } from '@/components/layout/Header';
-import { Button } from '@/components/ui/button';
+import MonthlyScheduleSummary from '@/components/dashboard/MonthlyScheduleSummary';
 
-import { AgendaTable } from './components/AgendaTable';
-import { AgendaFormDialog } from './components/AgendaFormDialog';
-
-import { useAgendas } from '@/hooks/useAgenda';
 import { AgendaService } from '@/services/agenda.service';
+import type { Agenda } from '@/lib/types/agenda';
+
+import { AgendaFormDialog } from './components/AgendaFormDialog';
 import { DeleteConfirmDialog } from '@/components/form/DeleteConfirmDialog';
+import { AgendaTable, AgendaRow } from './components/AgendaTable';
+import { mapAgendaToRow } from '@/utils/agenda.mapper';
 
 export default function AgendaPage() {
-  const dispatch = useAppDispatch();
   const params = useParams();
   const eventId = params.eventId as string;
+  const dispatch = useAppDispatch();
 
-  const { agendas, loading, error, refresh } = useAgendas(eventId);
-
+  const [agendas, setAgendas] = useState<Agenda[]>([]);
   const [open, setOpen] = useState(false);
-  const [editData, setEditData] = useState<any>(null);
+  const [editData, setEditData] = useState<Agenda | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Agenda | null>(null);
 
-  const [deleteTarget, setDeleteTarget] = useState<any>(null);
-
-  // Pagination
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
-  const totalPages = Math.ceil(agendas.length / itemsPerPage);
-
-  const paginatedAgendas = useMemo(() => {
-    const start = (currentPage - 1) * itemsPerPage;
-    return agendas.slice(start, start + itemsPerPage);
-  }, [agendas, currentPage]);
-
-  const handlePrevPage = () => setCurrentPage((prev) => Math.max(prev - 1, 1));
-  const handleNextPage = () => setCurrentPage((prev) => Math.min(prev + 1, totalPages));
-
-  const scheduleData = useMemo(
-    () => ({
-      month: new Date().toLocaleString('default', { month: 'long' }),
-      scheduleCount: agendas.length,
-      label: 'Agenda',
-    }),
-    [agendas.length]
-  );
+  const loadAgendas = async () => {
+    if (!eventId) return;
+    try {
+      const res = await AgendaService.getAll(eventId);
+      setAgendas(res.data ?? []);
+    } catch {
+      toast.error('Failed to load agendas');
+    }
+  };
 
   useEffect(() => {
+    loadAgendas();
     dispatch(setExportLabel('Add Agenda'));
-  }, [dispatch]);
+  }, [dispatch, eventId]);
 
-  // Delete Agenda
-  const handleDeleteAgenda = (agenda: any) => {
-    setDeleteTarget(agenda);
+  const handleAddAgenda = () => {
+    setEditData(null);
+    setOpen(true);
+  };
+
+  const findAgenda = (row: AgendaRow) => agendas.find((a) => a._id === row._id) ?? null;
+
+  const handleEditAgenda = (row: AgendaRow) => {
+    const original = findAgenda(row);
+    if (original) {
+      setEditData(original);
+      setOpen(true);
+    }
+  };
+
+  const handleDeleteAgenda = (row: AgendaRow) => {
+    const original = findAgenda(row);
+    if (original) setDeleteTarget(original);
   };
 
   const confirmDelete = async () => {
-    if (!deleteTarget) return;
+    if (!deleteTarget || !eventId) return;
 
     try {
       await AgendaService.remove(eventId, deleteTarget._id);
-      toast.success("Agenda deleted");
-      refresh();
-    } catch (err) {
-      console.error('Failed to delete agenda', err);
-      toast.error("Failed to delete agenda");
+      toast.success('Agenda deleted');
+      loadAgendas();
+    } catch {
+      toast.error('Failed to delete agenda');
     } finally {
       setDeleteTarget(null);
     }
   };
 
+  const summaryData = useMemo(
+    () => ({
+      month: new Date().toLocaleString('default', { month: 'long' }),
+      scheduleCount: agendas.length,
+      label: 'Agendas',
+    }),
+    [agendas.length]
+  );
+
+  const tableData: AgendaRow[] = useMemo(() => agendas.map(mapAgendaToRow), [agendas]);
+
   return (
-    <div className="flex h-screen flex-col overflow-hidden bg-gray-50">
+    <div className="flex h-screen flex-col bg-gray-50">
       <Header />
 
-      <DashboardToolbar
-        customLabel="Add Agenda"
-        onPrimaryClick={() => {
-          setEditData(null);
-          setOpen(true);
-        }}
+      <DashboardToolbar customLabel="Add Agenda" onPrimaryClick={handleAddAgenda} />
+
+      <MonthlyScheduleSummary
+        month={summaryData.month}
+        scheduleCount={summaryData.scheduleCount}
+        label={summaryData.label}
       />
 
-      <MonthlyScheduleSummary {...scheduleData} />
-
-      <main className="flex-1 overflow-auto p-6 pb-10">
-        <section className="mb-6 min-h-[70vh] overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-sm">
-
-          {loading ? (
-            <p className="p-4 text-gray-500">Loading agendas...</p>
-          ) : error ? (
-            <p className="p-4 text-red-500">{error}</p>
-          ) : (
-            <>
-              <AgendaTable
-                data={paginatedAgendas}
-                onEdit={(row) => {
-                  setEditData(row);
-                  setOpen(true);
-                }}
-                onDelete={handleDeleteAgenda} // Added delete handler
-              />
-
-              <div className="flex items-center justify-between border-t border-gray-100 px-4 py-3">
-                <Button variant="outline" onClick={handlePrevPage} disabled={currentPage === 1}>
-                  &lt;
-                </Button>
-
-                <span className="text-sm text-gray-600">
-                  Page <strong>{currentPage}</strong> of {totalPages}
-                </span>
-
-                <Button
-                  variant="outline"
-                  onClick={handleNextPage}
-                  disabled={currentPage === totalPages}
-                >
-                  &gt;
-                </Button>
-              </div>
-            </>
-          )}
+      <main className="flex flex-1 flex-col p-2 pb-10">
+        <section className="flex-1 overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-sm">
+          <AgendaTable data={tableData} onEdit={handleEditAgenda} onDelete={handleDeleteAgenda} />
         </section>
       </main>
 
-      {/* Agenda Form Dialog */}
       <AgendaFormDialog
         open={open}
         onOpenChange={setOpen}
         editData={editData}
         eventId={eventId}
-        onSubmit={() => {
-          refresh();
-          setEditData(null);
-        }}
+        onSuccess={loadAgendas}
       />
 
-      {/* Delete Confirmation Dialog */}
       <DeleteConfirmDialog
         open={!!deleteTarget}
         title="Delete Agenda"

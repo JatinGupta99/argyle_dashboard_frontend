@@ -20,7 +20,7 @@ export const AuthService = {
 
   getProfile: async (): Promise<UserProfile> => {
     const { data } = await fetchApi<UserProfile>(ENDPOINTS.USER.GET_PROFILE, {
-        method: HTTP_METHODS[0],
+      method: HTTP_METHODS[0],
     });
     return data;
   },

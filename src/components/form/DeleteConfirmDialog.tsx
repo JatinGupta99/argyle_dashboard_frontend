@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import {
   AlertDialog,
@@ -9,7 +9,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+} from '@/components/ui/alert-dialog';
 
 interface Props {
   open: boolean;
@@ -21,8 +21,8 @@ interface Props {
 
 export function DeleteConfirmDialog({
   open,
-  title = "Delete Item",
-  message = "Are you sure you want to delete this item? This action cannot be undone.",
+  title = 'Delete Item',
+  message = 'Are you sure you want to delete this item? This action cannot be undone.',
   onConfirm,
   onCancel,
 }: Props) {
@@ -31,17 +31,12 @@ export function DeleteConfirmDialog({
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>{title}</AlertDialogTitle>
-          <AlertDialogDescription>
-            {message}
-          </AlertDialogDescription>
+          <AlertDialogDescription>{message}</AlertDialogDescription>
         </AlertDialogHeader>
 
         <AlertDialogFooter>
           <AlertDialogCancel onClick={onCancel}>Cancel</AlertDialogCancel>
-          <AlertDialogAction
-            onClick={onConfirm}
-            className="bg-red-600 hover:bg-red-700"
-          >
+          <AlertDialogAction onClick={onConfirm} className="bg-red-600 hover:bg-red-700">
             Delete
           </AlertDialogAction>
         </AlertDialogFooter>

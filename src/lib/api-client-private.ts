@@ -1,4 +1,4 @@
-import { getAuthToken } from "@/utils/auth";
+import { getAuthToken } from '@/utils/auth';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
 
@@ -17,7 +17,6 @@ function authHeaders(): HeadersInit {
   return {};
 }
 
-
 export const privateApiClient = {
   async get(endpoint: string) {
     const res = await fetch(buildUrl(endpoint), {
@@ -32,9 +31,9 @@ export const privateApiClient = {
 
   async post(endpoint: string, data: any) {
     const res = await fetch(buildUrl(endpoint), {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
         ...authHeaders(),
       },
       body: JSON.stringify(data),
@@ -46,9 +45,9 @@ export const privateApiClient = {
 
   async put(endpoint: string, data: any) {
     const res = await fetch(buildUrl(endpoint), {
-      method: "PUT",
+      method: 'PUT',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
         ...authHeaders(),
       },
       body: JSON.stringify(data),
@@ -60,7 +59,7 @@ export const privateApiClient = {
 
   async delete(endpoint: string) {
     const res = await fetch(buildUrl(endpoint), {
-      method: "DELETE",
+      method: 'DELETE',
       headers: {
         ...authHeaders(),
       },

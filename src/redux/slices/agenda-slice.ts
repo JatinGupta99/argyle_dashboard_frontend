@@ -1,10 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import {
-  fetchAgendas,
-  addAgenda,
-  updateAgenda,
-  removeAgenda,
-} from './agenda-thunks';
+import { fetchAgendas, addAgenda, updateAgenda, removeAgenda } from './agenda-thunks';
 
 import type { Agenda } from '@/lib/types/agenda';
 
@@ -26,7 +21,7 @@ const agendaSlice = createSlice({
   reducers: {
     clearAgendaError: (state) => {
       state.error = null;
-    }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -35,15 +30,13 @@ const agendaSlice = createSlice({
         state.list = action.payload as Agenda[];
       })
       .addCase(addAgenda.fulfilled, (state, action) => {
-        state.loading = false; 
+        state.loading = false;
         state.list.push(action.payload as Agenda);
       })
       .addCase(updateAgenda.fulfilled, (state, action) => {
-        state.loading = false; 
+        state.loading = false;
         const updatedAgenda = action.payload as Agenda;
-        state.list = state.list.map((a) =>
-          a._id === updatedAgenda._id ? updatedAgenda : a
-        );
+        state.list = state.list.map((a) => (a._id === updatedAgenda._id ? updatedAgenda : a));
       })
       .addCase(removeAgenda.fulfilled, (state, action) => {
         state.loading = false;
@@ -61,7 +54,7 @@ const agendaSlice = createSlice({
         (action) => action.type.endsWith('/rejected'),
         (state, action) => {
           state.loading = false;
-          state.error = (action.payload as string) || 'An unknown error occurred.'; 
+          state.error = (action.payload as string) || 'An unknown error occurred.';
         }
       );
   },

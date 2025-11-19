@@ -1,21 +1,21 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Upload } from "lucide-react";
-import type { CreateSpeakerDto, Speaker } from "@/lib/types/speaker";
-import { SpeakerService } from "@/services/speaker.service";
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Upload } from 'lucide-react';
+import type { CreateSpeakerDto, Speaker } from '@/lib/types/speaker';
+import { SpeakerService } from '@/services/speaker.service';
 
-import { useEffect, useState, DragEvent } from "react";
-import { toast } from "sonner";
-import { FormField } from "@/components/form/FormField";
+import { useEffect, useState, DragEvent } from 'react';
+import { toast } from 'sonner';
+import { FormField } from '@/components/form/FormField';
 
 interface Props {
   open: boolean;
@@ -26,22 +26,16 @@ interface Props {
 }
 
 const DEFAULT_FORM: CreateSpeakerDto = {
-  name: { firstName: "", lastName: "" },
-  companyName: "",
-  title: "",
-  email: "",
-  bio: "",
-  linkedInUrl: "",
-  pictureUrl: "",
+  name: { firstName: '', lastName: '' },
+  companyName: '',
+  title: '',
+  email: '',
+  bio: '',
+  linkedInUrl: '',
+  pictureUrl: '',
 };
 
-export function SpeakerFormDialog({
-  open,
-  onOpenChange,
-  onSuccess,
-  editData,
-  eventId,
-}: Props) {
+export function SpeakerFormDialog({ open, onOpenChange, onSuccess, editData, eventId }: Props) {
   const [formData, setFormData] = useState(DEFAULT_FORM);
   const [loading, setLoading] = useState(false);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
@@ -52,12 +46,12 @@ export function SpeakerFormDialog({
     if (editData) {
       setFormData({
         name: editData.name,
-        companyName: editData.companyName ?? "",
-        title: editData.title ?? "",
-        email: editData.email ?? "",
-        bio: editData.bio ?? "",
-        linkedInUrl: editData.linkedInUrl ?? "",
-        pictureUrl: editData.pictureUrl ?? "",
+        companyName: editData.companyName ?? '',
+        title: editData.title ?? '',
+        email: editData.email ?? '',
+        bio: editData.bio ?? '',
+        linkedInUrl: editData.linkedInUrl ?? '',
+        pictureUrl: editData.pictureUrl ?? '',
       });
     } else {
       setFormData(DEFAULT_FORM);
@@ -68,17 +62,15 @@ export function SpeakerFormDialog({
   /* --- Helpers --- */
   const updateField = (key: string, value: string, nested = false) => {
     setFormData((prev) =>
-      nested
-        ? { ...prev, name: { ...prev.name, [key]: value } }
-        : { ...prev, [key]: value }
+      nested ? { ...prev, name: { ...prev.name, [key]: value } } : { ...prev, [key]: value }
     );
   };
 
   const validate = () => {
-    if (!formData.name.firstName.trim()) return "First name is required";
-    if (!formData.name.lastName.trim()) return "Last name is required";
-    if (!formData.companyName.trim()) return "Company is required";
-    if (!formData.email.trim()) return "Email is required";
+    if (!formData.name.firstName.trim()) return 'First name is required';
+    if (!formData.name.lastName.trim()) return 'Last name is required';
+    if (!formData.companyName.trim()) return 'Company is required';
+    if (!formData.email.trim()) return 'Email is required';
     return null;
   };
 
@@ -114,10 +106,10 @@ export function SpeakerFormDialog({
 
       if (editData) {
         await SpeakerService.update(eventId, editData._id, payload);
-        toast.success("Speaker updated");
+        toast.success('Speaker updated');
       } else {
         await SpeakerService.create(eventId, payload);
-        toast.success("Speaker added");
+        toast.success('Speaker added');
       }
 
       onSuccess?.();
@@ -125,7 +117,7 @@ export function SpeakerFormDialog({
       setFormData(DEFAULT_FORM);
       setPhotoFile(null);
     } catch {
-      toast.error("Failed to save speaker");
+      toast.error('Failed to save speaker');
     } finally {
       setLoading(false);
     }
@@ -134,9 +126,9 @@ export function SpeakerFormDialog({
   /* --------------- UI --------------- */
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg w-[90%] max-h-[85vh] overflow-y-auto rounded-lg p-4">
+      <DialogContent className="max-h-[85vh] w-[90%] max-w-lg overflow-y-auto rounded-lg p-4">
         <DialogHeader>
-          <DialogTitle>{editData ? "Edit Speaker" : "Add Speaker"}</DialogTitle>
+          <DialogTitle>{editData ? 'Edit Speaker' : 'Add Speaker'}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
@@ -144,9 +136,7 @@ export function SpeakerFormDialog({
             <FormField label="First Name" className="flex-1">
               <Input
                 value={formData.name.firstName}
-                onChange={(e) =>
-                  updateField("firstName", e.target.value, true)
-                }
+                onChange={(e) => updateField('firstName', e.target.value, true)}
                 placeholder="John"
               />
             </FormField>
@@ -154,9 +144,7 @@ export function SpeakerFormDialog({
             <FormField label="Last Name" className="flex-1">
               <Input
                 value={formData.name.lastName}
-                onChange={(e) =>
-                  updateField("lastName", e.target.value, true)
-                }
+                onChange={(e) => updateField('lastName', e.target.value, true)}
                 placeholder="Doe"
               />
             </FormField>
@@ -164,27 +152,27 @@ export function SpeakerFormDialog({
 
           <div className="flex gap-4">
             <FormField label="Company" className="flex-1">
-            <Input
-              value={formData.companyName}
-              onChange={(e) => updateField("companyName", e.target.value)}
-              placeholder="Google"
-            />
-          </FormField>
+              <Input
+                value={formData.companyName}
+                onChange={(e) => updateField('companyName', e.target.value)}
+                placeholder="Google"
+              />
+            </FormField>
 
-          <FormField label="Title in Company" className=" flex-1">
-            <Input
-              value={formData.title}
-              onChange={(e) => updateField("title", e.target.value)}
-              placeholder="Senior Engineer"
-            />
-          </FormField>
+            <FormField label="Title in Company" className="flex-1">
+              <Input
+                value={formData.title}
+                onChange={(e) => updateField('title', e.target.value)}
+                placeholder="Senior Engineer"
+              />
+            </FormField>
           </div>
 
           <FormField label="Email">
             <Input
               type="email"
               value={formData.email}
-              onChange={(e) => updateField("email", e.target.value)}
+              onChange={(e) => updateField('email', e.target.value)}
               placeholder="john@example.com"
             />
           </FormField>
@@ -192,7 +180,7 @@ export function SpeakerFormDialog({
           <FormField label="LinkedIn Link">
             <Input
               value={formData.linkedInUrl}
-              onChange={(e) => updateField("linkedInUrl", e.target.value)}
+              onChange={(e) => updateField('linkedInUrl', e.target.value)}
               placeholder="https://linkedin.com/in/john"
             />
           </FormField>
@@ -205,13 +193,13 @@ export function SpeakerFormDialog({
                 setDragging(true);
               }}
               onDragLeave={() => setDragging(false)}
-              className={`border-2 border-dashed rounded-md p-6 text-center transition ${
-                dragging ? "border-blue-500 bg-blue-50" : "border-gray-300"
+              className={`rounded-md border-2 border-dashed p-6 text-center transition ${
+                dragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
               }`}
             >
               {!photoFile ? (
-                <div className="flex flex-col items-center text-sm text-muted-foreground">
-                  <Upload className="h-6 w-6 mb-2" />
+                <div className="text-muted-foreground flex flex-col items-center text-sm">
+                  <Upload className="mb-2 h-6 w-6" />
                   Drag & Drop photo here
                 </div>
               ) : (
@@ -223,7 +211,7 @@ export function SpeakerFormDialog({
               <img
                 src={formData.pictureUrl}
                 alt="Preview"
-                className="mt-2 h-20 w-20 rounded-md object-cover border"
+                className="mt-2 h-20 w-20 rounded-md border object-cover"
               />
             )}
           </FormField>
@@ -231,8 +219,8 @@ export function SpeakerFormDialog({
           <FormField label="Bio">
             <textarea
               value={formData.bio}
-              onChange={(e) => updateField("bio", e.target.value)}
-              className="w-full border rounded-md p-2"
+              onChange={(e) => updateField('bio', e.target.value)}
+              className="w-full rounded-md border p-2"
               rows={3}
             />
           </FormField>
@@ -243,7 +231,7 @@ export function SpeakerFormDialog({
             Cancel
           </Button>
           <Button onClick={handleSubmit} disabled={loading}>
-            {loading ? "Saving…" : editData ? "Update" : "Add Speaker"}
+            {loading ? 'Saving…' : editData ? 'Update' : 'Add Speaker'}
           </Button>
         </DialogFooter>
       </DialogContent>

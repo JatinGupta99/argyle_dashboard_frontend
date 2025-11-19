@@ -13,18 +13,17 @@ interface ThunkApiConfig {
 /* ───────────────────────────────────────────────
    Fetch Sponsors
 ─────────────────────────────────────────────── */
-export const fetchSponsors = createAsyncThunk<
-  Sponsor[],
-  string,
-  ThunkApiConfig
->('sponsors/fetchAll', async (eventId, thunkAPI) => {
-  try {
-    const result = await SponsorService.getAll(eventId);
-    return result.data as Sponsor[];
-  } catch (error) {
-    return thunkAPI.rejectWithValue('Failed to fetch sponsors');
+export const fetchSponsors = createAsyncThunk<Sponsor[], string, ThunkApiConfig>(
+  'sponsors/fetchAll',
+  async (eventId, thunkAPI) => {
+    try {
+      const result = await SponsorService.getAll(eventId);
+      return result.data as Sponsor[];
+    } catch (error) {
+      return thunkAPI.rejectWithValue('Failed to fetch sponsors');
+    }
   }
-});
+);
 
 /* ───────────────────────────────────────────────
    Create Sponsor
