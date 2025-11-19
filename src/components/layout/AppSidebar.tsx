@@ -110,7 +110,7 @@ export function AppSidebar() {
               }}
               className={cn(
                 'hover:bg-muted/40 flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition',
-                item.danger && 'text-red-500 hover:bg-red-50'
+                item.danger && 'text-red-500 hover:bg-red-50',
               )}
             >
               <item.icon size={16} />

@@ -53,7 +53,7 @@ const sponsorSlice = createSlice({
         (state) => {
           state.loading = true;
           state.error = null;
-        }
+        },
       )
 
       /* Rejected matcher */
@@ -62,7 +62,7 @@ const sponsorSlice = createSlice({
         (state, action) => {
           state.loading = false;
           state.error = action.payload || 'An unknown error occurred.';
-        }
+        },
       );
   },
 });

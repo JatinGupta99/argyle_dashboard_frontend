@@ -24,5 +24,6 @@ export const ENDPOINTS = {
   },
   Event: {
     FETCH_BY_ID: (eventId: string) => `events/${eventId}`,
+    FETCH_ALL: `events`,
   },
 };

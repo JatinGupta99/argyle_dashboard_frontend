@@ -9,6 +9,8 @@
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
+# Lefthook
+.lefthook/
 
 # testing
 /coverage

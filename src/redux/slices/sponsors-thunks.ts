@@ -22,7 +22,7 @@ export const fetchSponsors = createAsyncThunk<Sponsor[], string, ThunkApiConfig>
     } catch (error) {
       return thunkAPI.rejectWithValue('Failed to fetch sponsors');
     }
-  }
+  },
 );
 
 /* ───────────────────────────────────────────────

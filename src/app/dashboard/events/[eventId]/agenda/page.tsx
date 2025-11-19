@@ -83,7 +83,7 @@ export default function AgendaPage() {
       scheduleCount: agendas.length,
       label: 'Agendas',
     }),
-    [agendas.length]
+    [agendas.length],
   );
 
   const tableData: AgendaRow[] = useMemo(() => agendas.map(mapAgendaToRow), [agendas]);

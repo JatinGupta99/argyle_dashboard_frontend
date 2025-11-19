@@ -1,6 +1,7 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
+  reactStrictMode: false,
   images: {
     remotePatterns: [
       {
@@ -10,6 +11,22 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'picjumbo.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.facebook.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'example.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.gettyimages.in',
+      },
+      {
+        protocol: 'https',
+        hostname: 'i.pinimg.com',
       },
     ],
   },

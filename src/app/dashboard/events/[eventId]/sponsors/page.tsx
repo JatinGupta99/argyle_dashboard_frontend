@@ -84,7 +84,7 @@ export default function SponsorsPage() {
       scheduleCount: sponsors.length,
       label: 'Sponsors',
     }),
-    [sponsors.length]
+    [sponsors.length],
   );
 
   return (

@@ -1,11 +1,10 @@
 'use client';
-import { CardContent } from '@/components/ui/card';
 import { Table, TableBody } from '@/components/ui/table';
+import { Event } from '@/lib/types/components';
 import ScheduleRow from './ScheduleRow';
-import { ScheduleItem } from '@/lib/types/schedule';
 
 export interface ScheduleTableContentProps {
-  schedules: ScheduleItem[];
+  schedules: Event[];
   loading: boolean;
   error: string | null;
 }
@@ -18,10 +17,12 @@ export default function ScheduleTableContent({
   return (
     <div className="w-full">
       {loading && <p className="p-4 text-sm text-gray-600">Loading schedules...</p>}
+
       {error && <p className="p-4 text-sm text-red-500">{error}</p>}
 
       {!loading && !error && (
-        <div className="relative max-h-[60vh] overflow-y-auto pr-1">
+        // ⬇ Only inner table area scrolls
+        <div className="max-h-[55vh] overflow-y-auto pr-1">
           <Table className="w-full text-sm">
             <TableBody>
               {schedules.length === 0 ? (
@@ -31,7 +32,7 @@ export default function ScheduleTableContent({
                   </td>
                 </tr>
               ) : (
-                schedules.map((item) => <ScheduleRow key={item._id} item={item} />)
+                schedules.map((item: Event) => <ScheduleRow key={item._id} item={item} />)
               )}
             </TableBody>
           </Table>

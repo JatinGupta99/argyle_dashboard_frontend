@@ -16,7 +16,6 @@ export default function EventLayout({ children }: { children: React.ReactNode })
       </div>
     );
   }
-  console.log('✅ Event loaded:', event);
   if (error || !event) {
     console.error('❌ Failed to load event:', error);
     return (

@@ -14,7 +14,7 @@ export const fetchAgendas = createAsyncThunk(
     } catch (error: any) {
       return thunkAPI.rejectWithValue('Failed to fetch agendas');
     }
-  }
+  },
 );
 
 /* ───────────────────────────────────────────────
@@ -29,7 +29,7 @@ export const addAgenda = createAsyncThunk(
     } catch (error: any) {
       return thunkAPI.rejectWithValue('Failed to create agenda');
     }
-  }
+  },
 );
 
 /* ───────────────────────────────────────────────
@@ -39,7 +39,7 @@ export const updateAgenda = createAsyncThunk(
   'agendas/update',
   async (
     { eventId, agendaId, payload }: { eventId: string; agendaId: string; payload: UpdateAgendaDto },
-    thunkAPI
+    thunkAPI,
   ) => {
     try {
       const result = await AgendaService.update(eventId, agendaId, payload);
@@ -47,7 +47,7 @@ export const updateAgenda = createAsyncThunk(
     } catch (error: any) {
       return thunkAPI.rejectWithValue('Failed to update agenda');
     }
-  }
+  },
 );
 
 /* ───────────────────────────────────────────────
@@ -62,5 +62,5 @@ export const removeAgenda = createAsyncThunk(
     } catch (error: any) {
       return thunkAPI.rejectWithValue('Failed to delete agenda');
     }
-  }
+  },
 );

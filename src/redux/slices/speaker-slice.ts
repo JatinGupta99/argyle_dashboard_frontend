@@ -46,14 +46,14 @@ const speakerSlice = createSlice({
         (state) => {
           state.loading = true;
           state.error = null;
-        }
+        },
       )
       .addMatcher(
         (action) => action.type.endsWith('/rejected'),
         (state, action) => {
           state.loading = false;
           state.error = (action.payload as string) || 'An unknown error occurred.';
-        }
+        },
       );
   },
 });

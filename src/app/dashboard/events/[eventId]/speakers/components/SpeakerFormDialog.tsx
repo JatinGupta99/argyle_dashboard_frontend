@@ -62,7 +62,7 @@ export function SpeakerFormDialog({ open, onOpenChange, onSuccess, editData, eve
   /* --- Helpers --- */
   const updateField = (key: string, value: string, nested = false) => {
     setFormData((prev) =>
-      nested ? { ...prev, name: { ...prev.name, [key]: value } } : { ...prev, [key]: value }
+      nested ? { ...prev, name: { ...prev.name, [key]: value } } : { ...prev, [key]: value },
     );
   };
 

@@ -2,7 +2,7 @@ import { getAuthToken } from '@/utils/auth';
 
 export async function fetchApi<T>(
   url: string,
-  options?: RequestInit
+  options?: RequestInit,
 ): Promise<{ statusCode: number; data: T }> {
   console.log('🌍 API Base URL:', process.env.NEXT_PUBLIC_NESTJS_API_BASE_URL); // <-- debug
 

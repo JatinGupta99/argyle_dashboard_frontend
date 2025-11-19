@@ -1,8 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { Calendar, Users, Mic, List, Plus } from 'lucide-react';
+import { Calendar, List, Plus, Users } from 'lucide-react';
+import { useEffect } from 'react';
 
 import { Header } from '@/components/layout/Header';
 import { Button } from '@/components/ui/button';
@@ -12,238 +11,185 @@ import { useEventContext } from '@/components/providers/EventContextProvider';
 import { useAppDispatch } from '@/redux/hooks';
 import { setExportLabel } from '@/redux/slices/toolbar-slice';
 
-import { SpeakerService } from '@/services/speaker.service';
 import { Speaker } from '@/lib/types/speaker';
+import { SpeakerService } from '@/services/speaker.service';
+import { SpeakerFormDialog } from './speakers/components/SpeakerFormDialog';
 import { SpeakersTable } from './speakers/components/SpeakersTable';
 
-interface Sponsor {
-  id: string;
-  name: string;
-  tier: string;
-}
+import { Sponsor } from '@/lib/types/sponsor';
+import { SponsorService } from '@/services/sponsors.service';
+import { SponsorFormDialog } from './sponsors/components/SponsorFormDialog';
+import { SponsorsTable } from './sponsors/components/SponsorsTable';
 
-// Mock sponsor service (replace with real API)
-const SponsorService = {
-  getAll: async (eventId: string): Promise<{ data: Sponsor[] }> => {
-    console.log(`Mock: Fetching sponsors for event: ${eventId}`);
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          data: [
-            { id: 's1', name: 'MegaCorp', tier: 'Diamond' },
-            { id: 's2', name: 'TechStart', tier: 'Gold' },
-            { id: 's3', name: 'LocalShop', tier: 'Silver' },
-            { id: 's4', name: 'GlobalInc', tier: 'Bronze' },
-          ],
-        });
-      }, 500);
-    });
-  },
-};
+import { Agenda } from '@/lib/types/agenda';
+import { AgendaService } from '@/services/agenda.service';
+import { mapAgendaToRow } from '@/utils/agenda.mapper';
+import { AgendaFormDialog } from './agenda/components/AgendaFormDialog';
+import { AgendaTable } from './agenda/components/AgendaTable';
 
-// Simple Sponsor Dialog Placeholder
-const SponsorFormDialog = ({ open, onOpenChange, editData }: any) => {
-  if (!open) return null;
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="rounded-lg bg-white p-6 shadow-xl">
-        <h2 className="text-xl font-bold">{editData ? 'Edit Sponsor' : 'Add New Sponsor'}</h2>
-        <button onClick={() => onOpenChange(false)} className="mt-4 text-sm text-blue-600">
-          Close
-        </button>
-      </div>
-    </div>
-  );
-};
+import { DeleteConfirmDialog } from '@/components/form/DeleteConfirmDialog';
+import { useCrud } from './sponsors/hooks/useCrud';
 
-const SponsorsTable = ({
-  sponsors,
-  onEdit,
-}: {
-  sponsors: Sponsor[];
-  onEdit: (s: Sponsor) => void;
-}) => (
-  <div className="space-y-3 p-4">
-    <h3 className="border-b pb-2 text-lg font-semibold">All Sponsors</h3>
-
-    {sponsors.length > 0 ? (
-      sponsors.map((s, index) => (
-        <div key={s.id} className="flex items-center justify-between border-b pb-2 last:border-b-0">
-          <span className="font-medium">
-            {index + 1}. {s.name}
-          </span>
-          <span className="text-sm text-gray-600">{s.tier}</span>
-          <Button variant="link" size="sm" onClick={() => onEdit(s)}>
-            Edit
-          </Button>
-        </div>
-      ))
-    ) : (
-      <p className="text-sm text-gray-500">No sponsors added.</p>
-    )}
-  </div>
-);
-
-// Speaker Dialog Placeholder
-const SpeakerFormDialog = ({ open }: any) => {
-  if (!open) return null;
-  return <></>;
-};
-
-// ========================================
-// MAIN COMPONENT
-// ========================================
 export default function EventOverviewPage() {
   const event = useEventContext();
-  const eventId = event?._id;
+  const eventId = event?._id || '';
   const dispatch = useAppDispatch();
 
-  // ------------ Speakers ------------
-  const [speakers, setSpeakers] = useState<Speaker[]>([]);
-  const [openSpeakerDialog, setOpenSpeakerDialog] = useState(false);
-  const [editSpeakerData, setEditSpeakerData] = useState<Speaker | null>(null);
+  const speakers = useCrud<Speaker>(eventId, SpeakerService);
+  const sponsors = useCrud<Sponsor>(eventId, SponsorService);
+  const agendas = useCrud<Agenda>(eventId, AgendaService);
 
-  const loadSpeakers = async () => {
-    if (!eventId) return;
-    try {
-      const res = await SpeakerService.getAll(String(eventId));
-      setSpeakers(res.data);
-    } catch (err) {
-      console.error('Failed to load speakers', err);
-    }
-  };
-
-  const handleAddSpeaker = () => {
-    setEditSpeakerData(null);
-    setOpenSpeakerDialog(true);
-  };
-
-  const handleEditSpeaker = (speaker: Speaker) => {
-    setEditSpeakerData(speaker);
-    setOpenSpeakerDialog(true);
-  };
-
-  // ------------ Sponsors ------------
-  const [sponsors, setSponsors] = useState<Sponsor[]>([]);
-  const [openSponsorDialog, setOpenSponsorDialog] = useState(false);
-  const [editSponsorData, setEditSponsorData] = useState<Sponsor | null>(null);
-
-  const loadSponsors = async () => {
-    if (!eventId) return;
-    try {
-      const res = await SponsorService.getAll(String(eventId));
-      setSponsors(res.data);
-    } catch (err) {
-      console.error('Failed to load sponsors', err);
-    }
-  };
-
-  const handleEditSponsor = (s: Sponsor) => {
-    setEditSponsorData(s);
-    setOpenSponsorDialog(true);
-  };
-
-  // ------------ Initial Load ------------
   useEffect(() => {
-    if (eventId) {
-      loadSpeakers();
-      loadSponsors();
-    }
+    if (!eventId) return;
+    speakers.loadItems();
+    sponsors.loadItems();
+    agendas.loadItems();
     dispatch(setExportLabel('Add Speaker'));
-  }, [eventId, dispatch]);
+  }, [eventId]);
 
-  // ========================================
-  // RENDER
-  // ========================================
   return (
     <>
       <Header />
 
       <div className="flex w-full flex-col gap-6 bg-gray-50 px-6 py-6">
-        {/* EVENT SUMMARY */}
         <Card className="rounded-2xl shadow-sm">
           <CardContent className="space-y-4 p-6">
+            <div className="flex items-center gap-2">
+              <span className="font-medium text-black">Event</span>
+              <span className="inline-block h-2 w-2 rounded-full bg-blue-500" />
+              <h1 className="font-semibold text-blue-500">{event?._id}</h1>
+            </div>
+
             <h1 className="text-2xl font-semibold">{event?.title}</h1>
-            <p className="text-gray-600">{event?.eventDetails}</p>
+
+            <p className="text-gray-600">
+              {event?.eventDetails ||
+                'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur vel sapien vitae velit placerat viverra quis sed era.'}
+            </p>
 
             <div className="flex items-center gap-8 text-gray-600">
-              <div className="flex items-center gap-2">
-                <Calendar size={18} /> {event?.EventDate}
-              </div>
-              <div className="flex items-center gap-2">
-                <Users size={18} /> {event?.attendees ?? 0} attendees
+              <div className="flex flex-col">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-md bg-sky-50">
+                    <Calendar size={30} className="text-blue-500" />
+                  </div>
+
+                  <div className="flex flex-col leading-tight">
+                    <span className="text-xs font-bold text-gray-500">Date</span>
+                    <span className="font-medium text-gray-700">{event?.EventDate}</span>
+                  </div>
+                </div>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* 3-COLUMN CARDS */}
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-          {/* Agenda */}
           <Card className="rounded-xl shadow-sm md:col-span-2">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <List size={20} /> Agenda
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-3">
-              <p className="text-sm text-gray-600">Manage all agenda items for this event.</p>
-              <Link
-                href={`/events/${eventId}/agenda`}
-                className="text-sm font-medium text-blue-600 underline"
-              >
-                Go to Agenda →
-              </Link>
-            </CardContent>
-          </Card>
-
-          {/* Speakers */}
-          <Card className="rounded-xl border border-gray-200 shadow-sm">
-            <CardHeader className="flex items-center justify-between rounded-t-xl border-b bg-gray-50/60 px-6 py-4">
-              <CardTitle className="flex items-center gap-2 text-lg font-semibold">
-                Speakers
-              </CardTitle>
+            <CardHeader className="flex items-center justify-between border-b bg-gray-50/60 px-6 py-4">
+              <CardTitle className="flex items-center gap-2">Agenda</CardTitle>
 
               <Button
                 size="sm"
-                onClick={handleAddSpeaker}
-                // Used 'gap-1' for spacing between icon and text, and used blue for consistency
+                onClick={agendas.addItem}
                 className="gap-1 bg-blue-600 text-white hover:bg-blue-700"
               >
                 <Plus size={16} /> Add New
               </Button>
             </CardHeader>
 
-            {/* FIX: Changed p-1 to p-0 to remove external gaps/padding */}
             <CardContent className="p-0">
-              {/* Added classes to hide table overflow and ensure smooth bottom corners */}
-              <section className="overflow-hidden rounded-b-xl">
-                <SpeakersTable speakers={speakers} onEdit={handleEditSpeaker} />
-              </section>
+              <AgendaTable
+                data={agendas.items.map(mapAgendaToRow)}
+                onEdit={agendas.editExisting}
+                onDelete={agendas.deleteItem}
+              />
+            </CardContent>
+          </Card>
+
+          <Card className="rounded-xl border shadow-sm">
+            <CardHeader className="flex items-center justify-between border-b bg-gray-50/60 px-6 py-4">
+              <CardTitle className="flex items-center gap-2">Speakers</CardTitle>
+
+              <Button size="sm" onClick={speakers.addItem} className="bg-blue-600 text-white">
+                <Plus size={16} /> Add New
+              </Button>
+            </CardHeader>
+
+            <CardContent className="p-0">
+              <SpeakersTable
+                speakers={speakers.items}
+                onEdit={speakers.editExisting}
+                onDelete={speakers.deleteItem}
+              />
             </CardContent>
           </Card>
         </div>
 
-        {/* FULL-WIDTH SPONSORS */}
         <section className="rounded-lg border bg-white p-2 shadow-sm">
-          <SponsorsTable sponsors={sponsors} onEdit={handleEditSponsor} />
+          <div className="flex items-center justify-between px-4 pb-2">
+            <h3 className="text-lg font-semibold">Sponsors</h3>
+
+            <Button size="sm" onClick={sponsors.addItem} className="bg-blue-600 text-white">
+              <Plus size={14} /> Add Sponsor
+            </Button>
+          </div>
+
+          <SponsorsTable
+            sponsors={sponsors.items}
+            onEdit={sponsors.editExisting}
+            onDelete={sponsors.deleteItem}
+          />
         </section>
 
-        {/* Dialogs */}
         <SpeakerFormDialog
-          open={openSpeakerDialog}
-          onOpenChange={setOpenSpeakerDialog}
-          editData={editSpeakerData}
-          onSuccess={loadSpeakers}
-          eventId={String(eventId)}
+          open={speakers.openDialog}
+          onOpenChange={speakers.setOpenDialog}
+          editData={speakers.editItem}
+          eventId={eventId}
+          onSuccess={speakers.loadItems}
         />
 
         <SponsorFormDialog
-          open={openSponsorDialog}
-          onOpenChange={setOpenSponsorDialog}
-          editData={editSponsorData}
-          onSuccess={loadSponsors}
-          eventId={String(eventId)}
+          open={sponsors.openDialog}
+          onOpenChange={sponsors.setOpenDialog}
+          editData={sponsors.editItem}
+          eventId={eventId}
+          onSuccess={sponsors.loadItems}
+        />
+
+        <AgendaFormDialog
+          open={agendas.openDialog}
+          onOpenChange={agendas.setOpenDialog}
+          editData={agendas.editItem}
+          eventId={eventId}
+          onSuccess={agendas.loadItems}
+        />
+
+        <DeleteConfirmDialog
+          open={!!speakers.deleteTarget}
+          title="Delete Speaker"
+          message={`Delete "${speakers.deleteTarget?.name.firstName ?? ''} ${
+            speakers.deleteTarget?.name.lastName ?? ''
+          }"?`}
+          onConfirm={speakers.confirmDelete}
+          onCancel={() => speakers.deleteItem(null as any)}
+        />
+
+        <DeleteConfirmDialog
+          open={!!sponsors.deleteTarget}
+          title="Delete Sponsor"
+          message={`Delete "${sponsors.deleteTarget?.name}"?`}
+          onConfirm={sponsors.confirmDelete}
+          onCancel={() => sponsors.deleteItem(null as any)}
+        />
+
+        <DeleteConfirmDialog
+          open={!!agendas.deleteTarget}
+          title="Delete Agenda"
+          message={`Delete "${agendas.deleteTarget?.title}"?`}
+          onConfirm={agendas.confirmDelete}
+          onCancel={() => agendas.deleteItem(null as any)}
         />
       </div>
     </>

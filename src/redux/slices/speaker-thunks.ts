@@ -15,7 +15,7 @@ export const fetchSpeakers = createAsyncThunk(
     } catch (error: any) {
       return thunkAPI.rejectWithValue('Failed to fetch speakers');
     }
-  }
+  },
 );
 
 /* ───────────────────────────────────────────────
@@ -30,7 +30,7 @@ export const createSpeaker = createAsyncThunk(
     } catch (error: any) {
       return thunkAPI.rejectWithValue('Failed to create speaker');
     }
-  }
+  },
 );
 
 /* ───────────────────────────────────────────────
@@ -40,7 +40,7 @@ export const updateSpeaker = createAsyncThunk(
   'speakers/update',
   async (
     { eventId, id, payload }: { eventId: string; id: string; payload: UpdateSpeakerDto },
-    thunkAPI
+    thunkAPI,
   ) => {
     try {
       const result = await SpeakerService.update(eventId, id, payload);
@@ -48,7 +48,7 @@ export const updateSpeaker = createAsyncThunk(
     } catch (error: any) {
       return thunkAPI.rejectWithValue('Failed to update speaker');
     }
-  }
+  },
 );
 
 /* ───────────────────────────────────────────────
@@ -63,7 +63,7 @@ export const deleteSpeaker = createAsyncThunk(
     } catch (error: any) {
       return thunkAPI.rejectWithValue('Failed to delete speaker');
     }
-  }
+  },
 );
 
 /* ───────────────────────────────────────────────
@@ -73,7 +73,7 @@ export const uploadSpeakerImage = createAsyncThunk(
   'speakers/uploadImage',
   async (
     { file, eventId, speakerId }: { file: File; eventId: string; speakerId: string },
-    thunkAPI
+    thunkAPI,
   ) => {
     try {
       const presign: PresignedUrlResponse = await SpeakerService.getUploadUrl({
@@ -91,5 +91,5 @@ export const uploadSpeakerImage = createAsyncThunk(
     } catch (error: any) {
       return thunkAPI.rejectWithValue('Failed to upload image');
     }
-  }
+  },
 );

@@ -1,47 +1,26 @@
 'use client';
 
-import { Card } from '@/components/ui/card';
-import { TabLabel } from '@/lib/types/schedule';
-import ScheduleStatusSummary from './ScheduleStatusSummary';
-import ScheduleTableContent from './ScheduleTableContent';
+import { useState } from 'react';
+import { Event } from '@/lib/types/components';
+import { ScheduleCardWrapper } from './ScheduleCardWrapper';
 
-interface Props {
-  summaryCount: number;
-  upcoming: number;
-  past: number;
-  pending: number;
-  activeTab: TabLabel;
-  onTabChange: (label: TabLabel) => void;
-  schedules: any[];
-  loading: boolean;
-  error: string | null;
-}
+export function ScheduleTableCardList({ events }: { events: Event[] }) {
+  const [selectedId, setSelectedId] = useState<string | null>(null);
 
-export function ScheduleTableCardList({
-  summaryCount,
-  upcoming,
-  past,
-  pending,
-  activeTab,
-  onTabChange,
-  schedules,
-  loading,
-  error,
-}: Props) {
+  if (!events || events.length === 0) {
+    return <div className="py-10 text-center text-gray-500">No schedules found.</div>;
+  }
+
   return (
-    <Card className="mx-auto mt-0 flex h-[78vh] w-[98%] rounded-xl shadow-sm">
-      <ScheduleStatusSummary
-        totalSchedules={summaryCount}
-        upcomingCount={upcoming}
-        pastCount={past}
-        pendingCount={pending}
-        activeTab={activeTab}
-        onTabChange={onTabChange}
-      />
-
-      <div className="flex-1 overflow-y-auto px-4 pb-4">
-        <ScheduleTableContent schedules={schedules} loading={loading} error={error} />
-      </div>
-    </Card>
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+      {events.map((event) => (
+        <ScheduleCardWrapper
+          key={event._id}
+          event={event}
+          selected={selectedId === event._id}
+          onSelect={() => setSelectedId(event._id)}
+        />
+      ))}
+    </div>
   );
 }

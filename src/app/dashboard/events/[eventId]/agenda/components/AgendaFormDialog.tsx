@@ -97,7 +97,7 @@ export function AgendaFormDialog({
   const removeSpeaker = (id: string) => {
     updateField(
       'speakers',
-      formData.speakers.filter((s) => s !== id)
+      formData.speakers.filter((s) => s !== id),
     );
   };
 
@@ -120,7 +120,7 @@ export function AgendaFormDialog({
             eventId,
             agendaId: editData._id,
             payload,
-          })
+          }),
         ).unwrap();
 
         toast.success('Agenda updated successfully');

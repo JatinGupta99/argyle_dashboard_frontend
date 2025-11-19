@@ -1,3 +1,5 @@
+import { Speaker } from './speaker';
+
 // --- Main Event Interface ---
 export interface EventSchedule {
   startTime: Date; // ISO 8601 Date string, e.g., "2025-11-11T08:41:00.000Z"
@@ -26,6 +28,8 @@ export interface Event {
   createdAt: string; // ISO 8601 Date string
   updatedAt: string; // ISO 8601 Date string
   __v: number;
+
+  speakers?: Speaker[];
 }
 
 export interface EventAnalytics {

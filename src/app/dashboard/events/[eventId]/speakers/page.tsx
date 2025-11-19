@@ -17,9 +17,7 @@ import { SpeakerService } from '@/services/speaker.service';
 import type { Speaker } from '@/lib/types/speaker';
 import { DeleteConfirmDialog } from '@/components/form/DeleteConfirmDialog';
 
-export default function SpeakersPage() {
-  const params = useParams();
-  const eventId = params.eventId as string;
+export default function SpeakersPage(eventId: string) {
   const dispatch = useAppDispatch();
 
   const [speakers, setSpeakers] = useState<Speaker[]>([]);
@@ -83,21 +81,11 @@ export default function SpeakersPage() {
       scheduleCount: speakers.length,
       label: 'Speakers',
     }),
-    [speakers.length]
+    [speakers.length],
   );
 
   return (
     <div className="flex h-screen flex-col bg-gray-50">
-      <Header />
-
-      <DashboardToolbar customLabel="Add Speaker" onPrimaryClick={handleAddSpeaker} />
-
-      <MonthlyScheduleSummary
-        month={summaryData.month}
-        scheduleCount={summaryData.scheduleCount}
-        label={summaryData.label}
-      />
-
       <main className="flex flex-1 flex-col p-2 pb-10">
         <section className="flex-1 overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-sm">
           <SpeakersTable

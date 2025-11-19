@@ -3,46 +3,67 @@
 import { DashboardToolbar } from '@/components/dashboard/DashboardToolBar';
 import MonthlyScheduleSummary from '@/components/dashboard/MonthlyScheduleSummary';
 import { Header } from '@/components/layout/Header';
-import { useAppDispatch } from '@/redux/hooks';
-import { setExportClick, setExportLabel } from '@/redux/slices/toolbar-slice';
+import { useEventsContext } from '@/components/providers/EventsContextProvider';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import { setExportLabel } from '@/redux/slices/toolbar-slice';
 import { useEffect, useMemo } from 'react';
-import { ScheduleTabs } from '../components/ScheduleTabs';
 import { toast } from 'sonner';
+import { ScheduleTabs } from '../components/ScheduleTabs';
 
 export default function SchedulePage() {
   const dispatch = useAppDispatch();
+  const events = useEventsContext();
+
+  // Read export flag from Redux
+  const exportRequested = useAppSelector((state) => state.toolbar.exportRequested);
 
   useEffect(() => {
     dispatch(setExportLabel('Export'));
-
-    dispatch(
-      setExportClick(() => {
-        toast.info('Data export started...', {
-          description: 'Please wait while your data is being exported.',
-        });
-
-        setTimeout(() => {
-          toast.success('Export completed successfully', {
-            description: `Finished at ${new Date().toLocaleTimeString()}`,
-          });
-        }, 2000);
-      })
-    );
   }, [dispatch]);
+
+  useEffect(() => {
+    if (!exportRequested) return;
+
+    toast.info('Data export started...', {
+      description: 'Please wait while your data is being exported.',
+    });
+
+    setTimeout(() => {
+      toast.success('Export completed successfully', {
+        description: `Finished at ${new Date().toLocaleTimeString()}`,
+      });
+    }, 2000);
+  }, [exportRequested]);
+
+  // Filter events for the current month
+  const monthlyEvents = useMemo(() => {
+    const now = new Date();
+
+    return events.filter((event) => {
+      if (!event.EventDate) return false;
+
+      const eventDate = new Date(event.EventDate);
+
+      return (
+        eventDate.getMonth() === now.getMonth() && eventDate.getFullYear() === now.getFullYear()
+      );
+    });
+  }, [events]);
 
   const scheduleData = useMemo(
     () => ({
       month: new Date().toLocaleString('default', { month: 'long' }),
-      scheduleCount: 25,
+      scheduleCount: monthlyEvents.length,
       label: 'Schedules',
     }),
-    []
+    [monthlyEvents],
   );
 
   return (
     <div className="flex h-screen flex-col overflow-hidden bg-gray-50">
       <Header />
       <DashboardToolbar />
+
       <MonthlyScheduleSummary
         month={scheduleData.month}
         scheduleCount={scheduleData.scheduleCount}
