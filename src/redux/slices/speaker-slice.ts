@@ -1,83 +1,20 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { PresignedUrlResponse, SpeakerService } from '@/services/speaker.service';
-import type { Speaker, CreateSpeakerDto, UpdateSpeakerDto } from '@/lib/types/speaker';
+import { createSlice } from '@reduxjs/toolkit';
+import {
+  fetchSpeakers,
+  createSpeaker,
+  updateSpeaker,
+  deleteSpeaker,
+} from './speaker-thunks';
 
-/* ────────────────────────────────────────────────────────────────
-   EXISTING THUNKS — unchanged
-────────────────────────────────────────────────────────────────── */
-export const fetchSpeakers = createAsyncThunk('speakers/fetchAll', async (_, thunkAPI) => {
-  try {
-    return await SpeakerService.getAll();
-  } catch (error: any) {
-    return thunkAPI.rejectWithValue(error.response?.data || 'Failed to fetch speakers');
-  }
-});
+import type { Speaker } from '@/lib/types/speaker';
 
-export const createSpeaker = createAsyncThunk(
-  'speakers/create',
-  async (payload: CreateSpeakerDto, thunkAPI) => {
-    try {
-      return await SpeakerService.create(payload);
-    } catch (error: any) {
-      return thunkAPI.rejectWithValue(error.response?.data || 'Failed to create speaker');
-    }
-  }
-);
-
-export const updateSpeaker = createAsyncThunk(
-  'speakers/update',
-  async ({ id, payload }: { id: string; payload: UpdateSpeakerDto }, thunkAPI) => {
-    try {
-      return await SpeakerService.update(id, payload);
-    } catch (error: any) {
-      return thunkAPI.rejectWithValue(error.response?.data || 'Failed to update speaker');
-    }
-  }
-);
-
-export const deleteSpeaker = createAsyncThunk('speakers/delete', async (id: string, thunkAPI) => {
-  try {
-    await SpeakerService.remove(id);
-    return id;
-  } catch (error: any) {
-    return thunkAPI.rejectWithValue(error.response?.data || 'Failed to delete speaker');
-  }
-});
-
-export const uploadSpeakerImage = createAsyncThunk(
-  'speakers/uploadImage',
-  async ({ file, eventId }: { file: File; eventId: string }, thunkAPI) => {
-    try {
-      // 1. Request presigned URL
-      const presign: PresignedUrlResponse = await SpeakerService.getUploadUrl({
-        eventId,
-        entityType: 'speakers',
-        entityId: 'temp',
-        fileType: file.type,
-      });
-
-      // 2. Upload to S3
-      await fetch(presign?.data?.url, {
-        method: 'PUT',
-        body: file,
-      });
-
-      return presign.data.url;
-    } catch (error: any) {
-      return thunkAPI.rejectWithValue(error.response?.data || 'Failed to upload image');
-    }
-  }
-);
-
-/* ──────────────────────────────────────────────────────────────── */
-
-interface SpeakerState {
+interface State {
   list: Speaker[];
   loading: boolean;
   error: string | null;
 }
 
-const initialState: SpeakerState = {
+const initialState: State = {
   list: [],
   loading: false,
   error: null,
@@ -86,38 +23,48 @@ const initialState: SpeakerState = {
 const speakerSlice = createSlice({
   name: 'speakers',
   initialState,
-  reducers: {},
+  reducers: {
+    clearSpeakerError: (state) => {
+      state.error = null;
+    }
+  },
   extraReducers: (builder) => {
     builder
-      /* EXISTING LOGIC — unchanged */
-      .addCase(fetchSpeakers.pending, (state) => {
-        state.loading = true;
-      })
       .addCase(fetchSpeakers.fulfilled, (state, action) => {
         state.loading = false;
         state.list = action.payload;
       })
-      .addCase(fetchSpeakers.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload as string;
-      })
       .addCase(createSpeaker.fulfilled, (state, action) => {
+        state.loading = false;
         state.list.push(action.payload);
       })
+      .addCase(updateSpeaker.fulfilled, (state, action) => {
+        state.loading = false;
+        state.list = state.list.map((s) =>
+          s._id === action.payload._id ? action.payload : s
+        );
+      })
       .addCase(deleteSpeaker.fulfilled, (state, action) => {
+        state.loading = false;
         state.list = state.list.filter((s) => s._id !== action.payload);
       })
-      .addCase(uploadSpeakerImage.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(uploadSpeakerImage.fulfilled, (state) => {
-        state.loading = false;
-      })
-      .addCase(uploadSpeakerImage.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload as string;
-      });
+      .addMatcher(
+        (action) => action.type.endsWith('/pending'),
+        (state) => {
+          state.loading = true;
+          state.error = null;
+        }
+      )
+      .addMatcher(
+        (action) => action.type.endsWith('/rejected'),
+        (state, action) => {
+          state.loading = false;
+          state.error = (action.payload as string) || 'An unknown error occurred.'; 
+        }
+      );
   },
 });
+
+export const { clearSpeakerError } = speakerSlice.actions;
 
 export default speakerSlice.reducer;

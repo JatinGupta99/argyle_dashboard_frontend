@@ -13,23 +13,25 @@ import { SpeakerService } from '@/services/speaker.service';
 import type { Speaker } from '@/lib/types/speaker';
 
 export default function SpeakersPage() {
-  const { eventId } = useParams(); // ✅ get eventId from URL
-
+  const { eventId } = useParams(); 
+  console.log('SpeakersPage eventId:', eventId);
   const dispatch = useAppDispatch();
   const [speakers, setSpeakers] = useState<Speaker[]>([]);
   const [open, setOpen] = useState(false);
   const [editData, setEditData] = useState<Speaker | null>(null);
 
   // 🧠 Load speakers for THIS eventId
-  const loadSpeakers = async () => {
-    if (!eventId) return;
-    try {
-      const data = await SpeakerService.getAllByEvent(String(eventId)); // ✅ eventId passed
-      setSpeakers(data);
-    } catch (err) {
-      console.error('Failed to load speakers', err);
-    }
-  };
+const loadSpeakers = async () => {
+  if (!eventId) return;
+  try {
+    console.log('Loading speakers for eventId:', eventId);
+    const res = await SpeakerService.getAll(String(eventId)); 
+    setSpeakers(res.data);
+  } catch (err) {
+    console.error('Failed to load speakers', err);
+  }
+};
+
 
   useEffect(() => {
     loadSpeakers();

@@ -20,7 +20,7 @@ interface SpeakerFormDialogProps {
   onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;
   editData?: Speaker | null;
-  eventId: string; // ✅ Added eventId
+  eventId: string
 }
 
 const DEFAULT_FORM: CreateSpeakerDto = {
@@ -94,14 +94,14 @@ export function SpeakerFormDialog({
         title: formData.title.trim(),
         email: formData.email.trim(),
         companyName: formData.companyName.trim(),
-        bio: formData?.bio.trim(),
-        pictureUrl: formData?.pictureUrl.trim(),
-        linkedInUrl: formData?.linkedInUrl.trim(),
+        bio: formData?.bio?.trim(),
+        pictureUrl: formData?.pictureUrl?.trim(),
+        linkedInUrl: formData?.linkedInUrl?.trim(),
       };
 
       if (editData) {
         // UPDATE
-        await SpeakerService.update(editData._id, trimmedData);
+        await SpeakerService.update(eventId,editData._id, trimmedData);
         toast.success('Speaker updated successfully');
       } else {
         // CREATE (requires eventId)

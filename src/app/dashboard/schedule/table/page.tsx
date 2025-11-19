@@ -1,130 +1,62 @@
 'use client';
 
-import { DashboardToolbar } from '@/components/dashboard/DashboardToolBar';
-import MonthlyScheduleSummary from '@/components/dashboard/MonthlyScheduleSummary';
-import { Header } from '@/components/layout/Header';
-import { ScheduleItem, TabLabel } from '@/lib/types/schedule';
-import { useAppDispatch } from '@/redux/hooks';
+import { useEffect, useState, useMemo } from 'react';
+import { useParams } from 'next/navigation';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import {
+  fetchSpeakers,
+  createSpeaker,
+  updateSpeaker,
+  deleteSpeaker,
+  uploadSpeakerImage,
+} from '@/redux/slices/speaker-thunks';
+
 import { setExportLabel } from '@/redux/slices/toolbar-slice';
-import { useEffect, useMemo, useState } from 'react';
+import { DashboardToolbar } from '@/components/dashboard/DashboardToolBar';
+import { Header } from '@/components/layout/Header';
+import MonthlyScheduleSummary from '@/components/dashboard/MonthlyScheduleSummary';
+import { SpeakersTable } from '../../events/[eventId]/sponsors/components/SpeakersTable';
 import { SpeakerFormDialog } from '../../events/[eventId]/speakers/components/SpeakerFormDialog';
-import { ScheduleTableCardList } from '../components/ScheduleTableCardList';
 
-const MOCK_SCHEDULE_DATA: ScheduleItem[] = [
-  {
-    _id: '1',
-    title: 'Seminar on infrastructure technology for future life',
-    date: '12-10-2025',
-    time: '08:00 AM - 09:00 AM',
-    speakers: [
-      { profileUrl: '/images/s1.webp', name: 'Agnes', designation: 'CEO' },
-      { profileUrl: '/images/s2.webp', name: 'John', designation: 'Planner' },
-      { profileUrl: '/images/s3.webp', name: 'Maria', designation: 'CTO' },
-      { profileUrl: '/images/s4.webp', name: 'Kyle', designation: 'CFO' },
-    ],
-    status: 'Upcoming',
-  },
-  {
-    _id: '2',
-    title: 'Seminar on infrastructure technology for future life',
-    date: '12-10-2025',
-    time: '08:00 AM - 09:00 AM',
-    speakers: [
-      { profileUrl: '/images/s1.webp', name: 'Agnes', designation: 'CEO' },
-      { profileUrl: '/images/s2.webp', name: 'John', designation: 'Planner' },
-      { profileUrl: '/images/s3.webp', name: 'Maria', designation: 'CTO' },
-      { profileUrl: '/images/s4.webp', name: 'Kyle', designation: 'CFO' },
-    ],
-    status: 'Past',
-  },
-  {
-    _id: '3',
-    title: 'Seminar on infrastructure technology for future life',
-    date: '12-10-2025',
-    time: '08:00 AM - 09:00 AM',
-    speakers: [
-      { profileUrl: '/images/s1.webp', name: 'Agnes', designation: 'CEO' },
-      { profileUrl: '/images/s2.webp', name: 'John', designation: 'Planner' },
-      { profileUrl: '/images/s3.webp', name: 'Maria', designation: 'CTO' },
-      { profileUrl: '/images/s4.webp', name: 'Kyle', designation: 'CFO' },
-    ],
-    status: 'Pending',
-  },
-  {
-    _id: '4',
-    title: 'Seminar on infrastructure technology for future life',
-    date: '12-10-2025',
-    time: '08:00 AM - 09:00 AM',
-    speakers: [
-      { profileUrl: '/images/s1.webp', name: 'Agnes', designation: 'CEO' },
-      { profileUrl: '/images/s2.webp', name: 'John', designation: 'Planner' },
-      { profileUrl: '/images/s3.webp', name: 'Maria', designation: 'CTO' },
-      { profileUrl: '/images/s4.webp', name: 'Kyle', designation: 'CFO' },
-    ],
-    status: 'Upcoming',
-  },
-];
-
-export default function ScheduleTable() {
+export default function SpeakersPage() {
+  const { eventId } = useParams();
   const dispatch = useAppDispatch();
+  const speakers = useAppSelector((state) => state.speakers.list);
 
-  const [schedules, setSchedules] = useState<ScheduleItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
-
-  const [activeTab, setActiveTab] = useState<TabLabel>('All');
+  const [editData, setEditData] = useState(null);
 
   useEffect(() => {
-    let mounted = true;
+    if (eventId) {
+      dispatch(fetchSpeakers(String(eventId)));
+      dispatch(setExportLabel('Add Speaker'));
+    }
+  }, [eventId, dispatch]);
 
-    dispatch(setExportLabel('Add Event'));
+  const handleAddSpeaker = () => {
+    setOpen(true);
+    setEditData(null);
+  };
 
-    const loadSchedules = async () => {
-      try {
-        await new Promise((resolve) => setTimeout(resolve, 500));
-        if (mounted) setSchedules(MOCK_SCHEDULE_DATA);
-      } catch (err: any) {
-        if (mounted) setError(err.message || 'Something went wrong');
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    };
-
-    loadSchedules();
-
-    return () => {
-      mounted = false;
-    };
-  }, [dispatch]);
+  const handleEditSpeaker = (speaker) => {
+    setEditData(speaker);
+    setOpen(true);
+  };
 
   const summaryData = useMemo(
     () => ({
       month: new Date().toLocaleString('default', { month: 'long' }),
-      scheduleCount: schedules.length,
-      label: 'Schedules',
+      scheduleCount: speakers.length,
+      label: 'Speakers',
     }),
-    [schedules.length]
+    [speakers.length]
   );
 
-  // Count totals
-  const statusCounts = useMemo(() => {
-    const counts = { Upcoming: 0, Past: 0, Pending: 0 };
-    schedules.forEach((s) => {
-      if (s.status in counts) counts[s.status]++;
-    });
-    return counts;
-  }, [schedules]);
-
-  const filteredSchedules = useMemo(() => {
-    if (activeTab === 'All') return schedules;
-    return schedules.filter((s) => s.status === activeTab);
-  }, [activeTab, schedules]);
-
   return (
-    <div className="flex h-screen flex-col overflow-hidden bg-gray-50">
+    <div className="flex h-screen flex-col bg-gray-50">
       <Header />
-      <DashboardToolbar />
+
+      <DashboardToolbar customLabel="Add Speaker" onPrimaryClick={handleAddSpeaker} />
 
       <MonthlyScheduleSummary
         month={summaryData.month}
@@ -132,26 +64,17 @@ export default function ScheduleTable() {
         label={summaryData.label}
       />
 
-      <ScheduleTableCardList
-        summaryCount={summaryData.scheduleCount}
-        upcoming={statusCounts.Upcoming}
-        past={statusCounts.Past}
-        pending={statusCounts.Pending}
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-        schedules={filteredSchedules}
-        loading={loading}
-        error={error}
-      />
+      <main className="flex flex-1 flex-col p-2 pb-10">
+        <section className="flex-1 overflow-y-auto rounded-lg border bg-white shadow-sm">
+          <SpeakersTable speakers={speakers} onEdit={handleEditSpeaker} />
+        </section>
+      </main>
 
       <SpeakerFormDialog
         open={open}
         onOpenChange={setOpen}
-        onSuccess={() => {}}
-        editData={null}
-        eventId={filteredSchedules.map((i) => {
-          return i._id;
-        })}
+        editData={editData}
+        eventId={String(eventId)}
       />
     </div>
   );

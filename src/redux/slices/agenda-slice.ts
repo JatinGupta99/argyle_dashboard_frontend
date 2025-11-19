@@ -1,133 +1,72 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import type { Agenda, CreateAgendaDto, UpdateAgendaDto } from '@/lib/types/agenda';
-import { AgendaService } from '@/services/agenda.service';
+import { createSlice } from '@reduxjs/toolkit';
+import {
+  fetchAgendas,
+  addAgenda,
+  updateAgenda,
+  removeAgenda,
+} from './agenda-thunks';
 
-// Define the shape of the state
-interface AgendasState {
+import type { Agenda } from '@/lib/types/agenda';
+
+interface State {
   list: Agenda[];
-  status: 'idle' | 'loading' | 'succeeded' | 'failed';
+  loading: boolean;
   error: string | null;
 }
 
-const initialState: AgendasState = {
+const initialState: State = {
   list: [],
-  status: 'idle',
+  loading: false,
   error: null,
 };
 
-// --- Async Thunks ---
-
-/**
- * Fetches all agendas for a specific event.
- * Requires the eventId to be passed when dispatching this thunk.
- */
-export const fetchAgendas = createAsyncThunk(
-  'agendas/fetchAgendas',
-  async (eventId: string, { rejectWithValue }) => {
-    try {
-      // Use the AgendaService.getAll method
-      const response = await AgendaService.getAll(eventId);
-      return response;
-    } catch (error: any) {
-      return rejectWithValue(error.message || 'Failed to fetch agendas');
-    }
-  }
-);
-
-/**
- * Adds a new agenda.
- * Payload should include eventId and the agenda data.
- */
-export const addAgenda = createAsyncThunk(
-  'agendas/addAgenda',
-  async (
-    { eventId, payload }: { eventId: string; payload: CreateAgendaDto },
-    { rejectWithValue }
-  ) => {
-    try {
-      // Use the AgendaService.create method
-      const response = await AgendaService.create(eventId, payload);
-      return response;
-    } catch (error: any) {
-      return rejectWithValue(error.message || 'Failed to add agenda');
-    }
-  }
-);
-
-/**
- * Updates an existing agenda.
- * Payload should include eventId, agendaId, and the update data.
- */
-export const updateAgenda = createAsyncThunk(
-  'agendas/updateAgenda',
-  async (
-    { eventId, agendaId, payload }: { eventId: string; agendaId: string; payload: UpdateAgendaDto },
-    { rejectWithValue }
-  ) => {
-    try {
-      // Use the AgendaService.update method
-      const response = await AgendaService.update(eventId, agendaId, payload);
-      return response;
-    } catch (error: any) {
-      return rejectWithValue(error.message || 'Failed to update agenda');
-    }
-  }
-);
-
-/**
- * Removes an agenda by its ID.
- * Payload should include eventId and agendaId.
- */
-export const removeAgenda = createAsyncThunk(
-  'agendas/removeAgenda',
-  async ({ eventId, agendaId }: { eventId: string; agendaId: string }, { rejectWithValue }) => {
-    try {
-      // Use the AgendaService.remove method
-      await AgendaService.remove(eventId, agendaId);
-      return agendaId; // Return the ID of the removed item to update the state
-    } catch (error: any) {
-      return rejectWithValue(error.message || 'Failed to remove agenda');
-    }
-  }
-);
-
-// --- Slice Definition ---
-
-const agendasSlice = createSlice({
+const agendaSlice = createSlice({
   name: 'agendas',
   initialState,
-  reducers: {},
+  reducers: {
+    clearAgendaError: (state) => {
+      state.error = null;
+    }
+  },
   extraReducers: (builder) => {
     builder
-      // Fetch All Agendas
-      .addCase(fetchAgendas.pending, (state) => {
-        state.status = 'loading';
+      .addCase(fetchAgendas.fulfilled, (state, action) => {
+        state.loading = false;
+        state.list = action.payload as Agenda[];
       })
-      .addCase(fetchAgendas.fulfilled, (state, action: PayloadAction<Agenda[]>) => {
-        state.status = 'succeeded';
-        state.list = action.payload;
+      .addCase(addAgenda.fulfilled, (state, action) => {
+        state.loading = false; 
+        state.list.push(action.payload as Agenda);
       })
-      .addCase(fetchAgendas.rejected, (state, action) => {
-        state.status = 'failed';
-        state.error = action.error.message || 'Unknown error';
+      .addCase(updateAgenda.fulfilled, (state, action) => {
+        state.loading = false; 
+        const updatedAgenda = action.payload as Agenda;
+        state.list = state.list.map((a) =>
+          a._id === updatedAgenda._id ? updatedAgenda : a
+        );
       })
-      // Add Agenda
-      .addCase(addAgenda.fulfilled, (state, action: PayloadAction<Agenda>) => {
-        state.list.push(action.payload);
+      .addCase(removeAgenda.fulfilled, (state, action) => {
+        state.loading = false;
+        const removedId = action.payload as string;
+        state.list = state.list.filter((a) => a._id !== removedId);
       })
-      // Update Agenda
-      .addCase(updateAgenda.fulfilled, (state, action: PayloadAction<Agenda>) => {
-        const index = state.list.findIndex((agenda) => agenda._id === action.payload._id);
-        if (index !== -1) {
-          state.list[index] = action.payload;
+      .addMatcher(
+        (action) => action.type.endsWith('/pending'),
+        (state) => {
+          state.loading = true;
+          state.error = null;
         }
-      })
-      // Remove Agenda
-      .addCase(removeAgenda.fulfilled, (state, action: PayloadAction<string>) => {
-        // Filter out the deleted agenda using the returned ID
-        state.list = state.list.filter((agenda) => agenda._id !== action.payload);
-      });
+      )
+      .addMatcher(
+        (action) => action.type.endsWith('/rejected'),
+        (state, action) => {
+          state.loading = false;
+          state.error = (action.payload as string) || 'An unknown error occurred.'; 
+        }
+      );
   },
 });
 
-export default agendasSlice.reducer;
+export const { clearAgendaError } = agendaSlice.actions;
+
+export default agendaSlice.reducer;

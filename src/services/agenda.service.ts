@@ -4,15 +4,14 @@ import { Agenda } from '@/lib/types/agenda';
 import { HTTP_METHODS } from 'next/dist/server/web/http';
 
 export const AgendaService = {
-  getAll: async (eventId: string): Promise<Agenda[]> => {
-    const res = await fetchApi<any>(ENDPOINTS.AGENDAS.ROOT(eventId), {
+  getAll: async (eventId: string) => {
+    return await fetchApi<Agenda[]>(ENDPOINTS.AGENDAS.ROOT(eventId), {
       method: HTTP_METHODS[0],
     });
-    return Array.isArray(res) ? res : res.data || [];
   },
 
   getById: async (eventId: string, agendaId: string) => {
-    return await fetchApi<any>(ENDPOINTS.AGENDAS.BY_ID(eventId, agendaId), {
+    return await fetchApi<Agenda>(ENDPOINTS.AGENDAS.BY_ID(eventId, agendaId), {
       method: HTTP_METHODS[0],
     });
   },

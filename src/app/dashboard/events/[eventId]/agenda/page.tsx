@@ -10,7 +10,7 @@ import { Header } from '@/components/layout/Header';
 import { Button } from '@/components/ui/button';
 import { AgendaFormDialog } from './components/AgendaFormDialog';
 import { AgendaTable } from './components/AgendaTable';
-import { useAgendas } from './hooks/useAgenda';
+import { useAgendas } from '../../../../../hooks/useAgenda';
 
 export default function AgendaPage() {
   const dispatch = useAppDispatch();

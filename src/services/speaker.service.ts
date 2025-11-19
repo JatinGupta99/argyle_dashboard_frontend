@@ -1,6 +1,6 @@
 import { ENDPOINTS } from '@/lib/api-endpoints';
 import { fetchApi } from '@/lib/fetch-api';
-import type { CreateSpeakerDto, UpdateSpeakerDto } from '@/lib/types/speaker';
+import type { CreateSpeakerDto, Speaker, UpdateSpeakerDto } from '@/lib/types/speaker';
 import { HTTP_METHODS } from 'next/dist/server/web/http';
 
 export interface PresignedUrlResponse {
@@ -13,14 +13,14 @@ export interface PresignedUrlResponse {
 
 export const SpeakerService = {
   getAll: async (eventId: string) => {
-    return await fetchApi(ENDPOINTS.SPEAKERS.ROOT(eventId), {
-      method: HTTP_METHODS[0],
-    });
-  },
+  return fetchApi<Speaker[]>(ENDPOINTS.SPEAKERS.ROOT(eventId), {
+    method: HTTP_METHODS[0],
+  });
+},
 
   getById: async (eventId: string, speakerId: string) => {
-    return await fetchApi(ENDPOINTS.SPEAKERS.BY_ID(eventId, speakerId), {
-      method: HTTP_METHODS[0],
+    return fetchApi(ENDPOINTS.SPEAKERS.BY_ID(eventId, speakerId), {
+    method: HTTP_METHODS[0],
     });
   },
 
@@ -54,7 +54,7 @@ export const SpeakerService = {
     contentType: string;
   }): Promise<PresignedUrlResponse> => {
     return fetchApi(ENDPOINTS.SPEAKERS.UPLOAD_URL(eventId, speakerId), {
-      method: HTTP_METHODS[3],
+   method: HTTP_METHODS[3],
       body: JSON.stringify({ contentType }),
     });
   },
