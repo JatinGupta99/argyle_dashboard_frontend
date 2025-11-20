@@ -40,24 +40,22 @@ const DEFAULT_FORM = {
 
 export function AgendaFormDialog() {
   const dispatch = useAppDispatch();
-
   const { formOpen, editing, eventId } = useAppSelector((s) => s.agendas);
 
   const [formData, setFormData] = useState(DEFAULT_FORM);
   const [selectedSpeaker, setSelectedSpeaker] = useState('');
 
-  /* ---------------- Temporary Speaker List 👇 Replace when API ready ---------------- */
   const availableSpeakers: SpeakerItem[] = [
     { id: '67b0c7a35d12a92c9b077777', name: 'Speaker A' },
     { id: '67b0c7a35d12a92c9b078888', name: 'Speaker B' },
   ];
 
-  /* ---------------- Load agenda from API when editing ---------------- */
+  /* ---------------- Load fresh data ONCE when dialog opens ---------------- */
   useEffect(() => {
     if (formOpen && editing && eventId) {
       dispatch(fetchAgendaById({ agendaId: editing._id }));
     }
-  }, [formOpen, editing, eventId, dispatch]);
+  }, [formOpen]); // <-- ONLY run ONCE, not on every editing change
 
   /* ---------------- Prefill Form When Editing Data Arrives ---------------- */
   useEffect(() => {
@@ -65,15 +63,15 @@ export function AgendaFormDialog() {
       setFormData(DEFAULT_FORM);
       return;
     }
-
-    const start = editing.startDateTime ? new Date(editing.startDateTime) : null;
-    const end = editing.endDateTime ? new Date(editing.endDateTime) : null;
+    console.log(editing,'calnlkcsnlac')
+    // const start = editing.startTime ? new Date(editing.startTime) : null;
+    // const end = editing.endTime ? new Date(editing.endTime) : null;
 
     setFormData({
       title: editing.title ?? "",
-      date: start ? start.toISOString().split("T")[0] : "",
-      startTime: start ? start.toISOString().slice(11, 16) : "",
-      endTime: end ? end.toISOString().slice(11, 16) : "",
+      date: editing.date ? editing.date:"",
+      startTime: editing.startTime ? editing.startTime : "",
+      endTime: editing.endTime ? editing.endTime : "",
       description: editing.description ?? "",
       speakers: editing.speakers ?? [],
       hasPoll: Boolean(editing.hasPoll),
@@ -122,10 +120,7 @@ export function AgendaFormDialog() {
 
         toast.success("Agenda updated successfully");
       } else {
-        await dispatch(
-          addAgenda({ payload })
-        ).unwrap();
-
+        await dispatch(addAgenda({ payload })).unwrap();
         toast.success("Agenda added successfully");
       }
 
@@ -144,7 +139,7 @@ export function AgendaFormDialog() {
         </DialogHeader>
 
         <div className="space-y-4">
-          {/* Title */}
+
           <FormField label="Title">
             <Input
               value={formData.title}
@@ -153,7 +148,6 @@ export function AgendaFormDialog() {
             />
           </FormField>
 
-          {/* Date */}
           <FormField label="Date">
             <Input
               type="date"
@@ -162,7 +156,6 @@ export function AgendaFormDialog() {
             />
           </FormField>
 
-          {/* Time */}
           <div className="flex gap-4">
             <FormField label="Start Time" className="flex-1">
               <Input
@@ -181,7 +174,6 @@ export function AgendaFormDialog() {
             </FormField>
           </div>
 
-          {/* Description */}
           <FormField label="Description">
             <Textarea
               value={formData.description}
@@ -189,7 +181,6 @@ export function AgendaFormDialog() {
             />
           </FormField>
 
-          {/* Speakers */}
           <FormField label="Speakers">
             <Select
               value={selectedSpeaker}
@@ -201,7 +192,6 @@ export function AgendaFormDialog() {
               <SelectTrigger>
                 <SelectValue placeholder="Add a speaker" />
               </SelectTrigger>
-
               <SelectContent>
                 {availableSpeakers.map((sp) => (
                   <SelectItem key={sp.id} value={sp.id}>
@@ -215,10 +205,7 @@ export function AgendaFormDialog() {
               {formData.speakers.map((id) => {
                 const speaker = availableSpeakers.find((s) => s.id === id);
                 return (
-                  <div
-                    key={id}
-                    className="flex items-center justify-between rounded bg-gray-100 px-3 py-2"
-                  >
+                  <div key={id} className="flex items-center justify-between rounded bg-gray-100 px-3 py-2">
                     <span>{speaker?.name ?? id}</span>
                     <Button variant="ghost" onClick={() => removeSpeaker(id)}>
                       Remove
@@ -229,7 +216,6 @@ export function AgendaFormDialog() {
             </div>
           </FormField>
 
-          {/* Poll Toggle */}
           <FormField label="Enable Poll">
             <div className="flex items-center gap-2">
               <input
@@ -241,9 +227,9 @@ export function AgendaFormDialog() {
               <Label htmlFor="poll-checkbox">Enable Poll</Label>
             </div>
           </FormField>
+
         </div>
 
-        {/* Buttons */}
         <div className="mt-6 flex justify-end gap-3">
           <Button variant="outline" onClick={() => dispatch(closeAgendaForm())}>
             Cancel
@@ -253,6 +239,7 @@ export function AgendaFormDialog() {
             {editing ? "Save Changes" : "Add Agenda"}
           </Button>
         </div>
+
       </DialogContent>
     </Dialog>
   );

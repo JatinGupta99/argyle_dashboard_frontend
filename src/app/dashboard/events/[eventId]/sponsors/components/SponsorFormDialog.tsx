@@ -134,6 +134,8 @@ const cleanPayload = (data: CreateSponsorDto) => {
     }
   });
 
+  const forbidden = ["_id", "eventId", "createdBy", "createdAt", "updatedAt"];
+  forbidden.forEach((key) => delete copy[key]);
   return copy;
 };
 

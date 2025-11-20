@@ -8,18 +8,32 @@ import type { CreateSpeakerDto, Speaker, UpdateSpeakerDto } from '@/lib/types/sp
 export const fetchSpeakers = createAsyncThunk(
   'speakers/fetchAll',
   async (
-    { eventId, page = 1, limit = 10, search = '' }:
-    { eventId: string; page?: number; limit?: number; search?: string },
+    {
+      eventId,
+      page = 1,
+      limit = 10,
+      search = '',
+    }: {
+      eventId: string;
+      page?: number;
+      limit?: number;
+      search?: string;
+    },
     thunkAPI
   ) => {
     try {
-      const result = await SpeakerService.getAll(eventId);
+      // Build query params
+      const query = { page, limit, search };
+
+      const result = await SpeakerService.getAll(eventId, query);
+
       return { ...result, eventId };
-    } catch {
+    } catch (error) {
       return thunkAPI.rejectWithValue('Failed to fetch speakers');
     }
   }
 );
+
 
 /* --------------------------------------------------------
    CREATE SPEAKER (with optional image upload)

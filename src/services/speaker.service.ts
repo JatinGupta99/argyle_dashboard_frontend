@@ -12,12 +12,15 @@ export interface PresignedUrlResponse {
 }
 
 export const SpeakerService = {
-  getAll: async (eventId: string) => {
-    return fetchApi<Speaker[]>(ENDPOINTS.SPEAKERS.ROOT(eventId), {
-      method: HTTP_METHODS[0],
-    });
-  },
-
+  getAll: async (
+  eventId: string,
+  query: { page?: number; limit?: number; search?: string } = {}
+) => {
+  return fetchApi(ENDPOINTS.SPEAKERS.ROOT(eventId), {
+    method: "GET",
+    query,
+  });
+},
   getById: async (eventId: string, speakerId: string) => {
     return fetchApi(ENDPOINTS.SPEAKERS.BY_ID(eventId, speakerId), {
       method: HTTP_METHODS[0],

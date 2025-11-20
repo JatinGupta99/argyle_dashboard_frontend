@@ -22,16 +22,16 @@ export const fetchAgendas = createAsyncThunk(
 );
 export const fetchAgendaById = createAsyncThunk(
   "agendas/fetchById",
-  async (_, thunkAPI) => {
+  async ({ agendaId }: { agendaId: string }, thunkAPI) => {
     const state = thunkAPI.getState() as RootState;
     const eventId = state.agendas.eventId;
-    const agendaId = state.agendas.agendaId;
 
-    if (!eventId) return thunkAPI.rejectWithValue("Missing eventId");
+    if (!eventId || !agendaId)
+      return thunkAPI.rejectWithValue("Missing eventId or agendaId");
 
     try {
       const res = await AgendaService.getById(eventId, agendaId);
-      return res.data; // full agenda object
+      return res.data;
     } catch {
       return thunkAPI.rejectWithValue("Failed to load agenda");
     }

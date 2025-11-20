@@ -43,20 +43,23 @@ async function uploadFile(
 ): Promise<string | null> {
   if (!file) return null;
 
-  const { data } = await SponsorService.getUploadUrl({
+  const res = await SponsorService.getUploadUrl({
     eventId,
     sponsorId,
     contentType: file.type,
     type,
   });
 
-  await fetch(data.url, {
+  const { key, uploadUrl } = res.data; // BACKEND RETURNS key + url
+
+  await fetch(uploadUrl, {
     method: 'PUT',
     body: file,
   });
 
-  return data.key;
+  return key;
 }
+
 
 /* ───────────────────────────────────────────────
    Fetch Sponsors
@@ -93,21 +96,25 @@ export const createSponsor = createAsyncThunk<
   { rejectValue: string }
 >('sponsors/create', async ({ eventId, data, logoFile, documentFile }, thunkAPI) => {
   try {
-    // 1. CREATE sponsor first
+    // Create sponsor
     const res = await SponsorService.create(eventId, data);
-    const sponsor = res.data;
+    const sponsor = res.data as Sponsor;
 
-    // 2. UPLOAD files
+    // Upload logo
     const logoKey = await uploadFile(eventId, sponsor._id, logoFile, 'logo');
+
+    // Upload document (single for now)
     const documentKey = await uploadFile(eventId, sponsor._id, documentFile, 'document');
 
-    // 3. PATCH if needed
+    // Prepare update payload
+    const payload: any = { ...data };
+
+    if (logoKey) payload.logoKey = logoKey;
+    if (documentKey) payload.documents = [documentKey]; // backend expects array
+
+    // If files uploaded, patch sponsor
     if (logoKey || documentKey) {
-      const patch = await SponsorService.update(eventId, sponsor._id, {
-        ...data,
-        ...(logoKey && { logoKey }),
-        ...(documentKey && { documentKey }),
-      });
+      const patch = await SponsorService.update(eventId, sponsor._id, payload);
       return patch.data;
     }
 
@@ -116,6 +123,7 @@ export const createSponsor = createAsyncThunk<
     return thunkAPI.rejectWithValue('Failed to create sponsor');
   }
 });
+
 
 /* ───────────────────────────────────────────────
    Update Sponsor
@@ -135,11 +143,10 @@ export const updateSponsor = createAsyncThunk<
     const logoKey = await uploadFile(eventId, sponsorId, logoFile, 'logo');
     const documentKey = await uploadFile(eventId, sponsorId, documentFile, 'document');
 
-    const payload = {
-      ...data,
-      ...(logoKey && { logoKey }),
-      ...(documentKey && { documentKey }),
-    };
+    const payload: any = { ...data };
+
+    if (logoKey) payload.logoKey = logoKey;
+    if (documentKey) payload.$push = { documents: documentKey };
 
     const res = await SponsorService.update(eventId, sponsorId, payload);
     return res.data;
@@ -147,6 +154,7 @@ export const updateSponsor = createAsyncThunk<
     return thunkAPI.rejectWithValue('Failed to update sponsor');
   }
 });
+
 
 /* ───────────────────────────────────────────────
    Delete Sponsor
@@ -176,10 +184,11 @@ const sponsorSlice = createSlice({
       - true  → add mode
       - Sponsor object → edit mode
     */
-    openForm(state, action: PayloadAction<true | Sponsor>) {
-      state.formOpen = true;
-      state.editing = action.payload === true ? null : action.payload;
-    },
+   openForm(state, action: PayloadAction<true | Sponsor>) {
+  state.formOpen = true;
+  state.editing = action.payload === true ? null : action.payload;
+}
+,
 
     closeForm(state) {
       state.formOpen = false;

@@ -15,19 +15,28 @@ export interface AgendaTableProps {
   onEdit?: (row: any) => void;
   onDelete?: (row: any) => void;
 }
+function formatAgendaTime(start?: string, end?: string) {
+  const to12Hour = (time?: string) => {
+    if (!time) return "—"; // safe fallback
 
-function formatAgendaTime(start: string, end: string) {
-  const s = new Date(start);
-  const e = new Date(end);
+    const [h, m] = time.split(":").map(Number);
 
-  if (isNaN(s.getTime()) || isNaN(e.getTime())) return '—';
+    if (isNaN(h) || isNaN(m)) return "—";
 
-  const date = s.toLocaleDateString();
-  const startTime = s.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  const endTime = e.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const period = h < 12 ? "AM" : "PM";
+    const hour = h % 12 || 12;
 
-  return `${date} • ${startTime} - ${endTime}`;
+    return `${hour.toString().padStart(2, "0")}:${m
+      .toString()
+      .padStart(2, "0")} ${period}`;
+  };
+
+  const startFormatted = to12Hour(start);
+  const endFormatted = to12Hour(end);
+
+  return `${startFormatted} - ${endFormatted}`;
 }
+
 
 export function AgendaTable({ data, onEdit, onDelete }: AgendaTableProps) {
   const isEmpty = data.length === 0;
@@ -54,6 +63,7 @@ export function AgendaTable({ data, onEdit, onDelete }: AgendaTableProps) {
             </tr>
           ) : (
             data.map((row: Agenda) => {
+              console.log(row,'ancslknslacn')
               const speakerCount = row.speakers?.length ?? 0;
 
               return (
