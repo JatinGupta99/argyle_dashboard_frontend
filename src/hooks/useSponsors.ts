@@ -2,14 +2,19 @@
 
 import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
-import { fetchSponsors } from '@/redux/slices/sponsors-thunks';
-
-export const useAgendas = (eventId: string) => {
+import { fetchSponsors } from '@/redux/slices/sponsor-slice';
+export const useSponsors = () => {
   const dispatch = useAppDispatch();
-  const { list, loading, error } = useAppSelector((state) => state.agendas);
+
+  // Match EXACT fields from SponsorState
+  const { eventId, items, loading, error } = useAppSelector(
+    (state) => state.sponsors
+  );
 
   const refresh = () => {
-    if (eventId) dispatch(fetchSponsors(eventId));
+    if (eventId) {
+      dispatch(fetchSponsors());
+    }
   };
 
   useEffect(() => {
@@ -17,7 +22,7 @@ export const useAgendas = (eventId: string) => {
   }, [eventId]);
 
   return {
-    sponsors: list,
+    sponsors: items,
     loading,
     error,
     refresh,

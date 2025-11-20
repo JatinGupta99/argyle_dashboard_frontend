@@ -9,11 +9,18 @@ export function useEvent(eventId: string) {
     [eventId],
   );
 
-  const event: Event | undefined = data?.data;
+  // Extract event safely
+  const event = data?.data;
+
+  // 🚨 Detect API success but missing event
+  const normalizedError =
+    error ??
+    (!isLoading && !event ? "Event not found" : null);
+
   return {
     event,
     isLoading,
-    error,
+    error: normalizedError,
     refetch,
   };
 }

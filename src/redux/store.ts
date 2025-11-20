@@ -3,13 +3,16 @@ import toolbarReducer from '@/redux//slices/toolbar-slice';
 import dialogReducer from '@/redux//slices/dialog-slice';
 import speakerReducer from '@/redux//slices/speaker-slice';
 import agendaReducer from '@/redux/slices/agenda-slice';
-
+import sponsorReducer from '@/redux/slices/sponsor-slice';
+import eventOverviewReducer from "@/redux/slices/event-overview.slice";
 export const store = configureStore({
   reducer: {
     toolbar: toolbarReducer,
     dialog: dialogReducer,
     speakers: speakerReducer,
     agendas: agendaReducer,
+    sponsors: sponsorReducer,
+    eventOverview: eventOverviewReducer,
   },
 });
 

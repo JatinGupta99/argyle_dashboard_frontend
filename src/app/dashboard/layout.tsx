@@ -1,6 +1,7 @@
 'use client';
 
 import { AppSidebar } from '@/components/layout/AppSidebar';
+import { Header } from '@/components/layout/Header';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { store } from '@/redux/store';
 import { Provider } from 'react-redux';

@@ -1,70 +1,36 @@
-import { useState, useCallback } from 'react';
-import { toast } from 'sonner';
+import { useState } from "react";
 
-interface Identifiable {
-  _id: string;
-}
-interface CrudService<T> {
-  getAll: (eventId: string) => Promise<{ data: T[] } | T[]>;
-  remove: (eventId: string, id: string) => Promise<{ statusCode: number; data: unknown }>;
-}
-
-export function useCrud<T extends Identifiable>(eventId: string, service: CrudService<T>) {
+export function useCrud<T>(eventId: string, service: any) {
   const [items, setItems] = useState<T[]>([]);
-  const [openDialog, setOpenDialog] = useState(false);
-  const [editItem, setEditItem] = useState<T | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<T | null>(null);
-
-  const loadItems = useCallback(async () => {
-    if (!eventId) return;
-
-    try {
-      const res = await service.getAll(eventId);
-      const data = Array.isArray(res) ? res : res.data;
-      setItems(data ?? []);
-    } catch (e) {
-      console.error('Failed to load items', e);
-      toast.error('Failed to load data');
-    }
-  }, [eventId, service]);
-
-  const addItem = () => {
-    setEditItem(null);
-    setOpenDialog(true);
-  };
-
-  const editExisting = (item: T) => {
-    setEditItem(item);
-    setOpenDialog(true);
-  };
-
-  const deleteItem = (item: T) => setDeleteTarget(item);
-
-  const confirmDelete = async () => {
-    if (!deleteTarget) return;
-
-    try {
-      await service.remove(eventId, deleteTarget._id);
-      toast.success('Item deleted');
-      await loadItems();
-    } catch (e) {
-      console.error('Failed to delete item', e);
-      toast.error('Failed to delete');
-    } finally {
-      setDeleteTarget(null);
-    }
-  };
+  const [editItem, setEditItem] = useState<T | null>(null);
+  const [openDialog, setOpenDialog] = useState(false);
 
   return {
     items,
-    openDialog,
-    setOpenDialog,
-    editItem,
     deleteTarget,
-    loadItems,
-    addItem,
-    editExisting,
-    deleteItem,
-    confirmDelete,
+    openDialog,
+    editItem,
+    setOpenDialog,
+    deleteItem: setDeleteTarget,
+    editExisting: setEditItem,
+
+    async loadItems(params = { page: 1, limit: 10, search: "" }) {
+      const res = await service.getAll(eventId, params);
+      setItems(res.data);
+      return res;
+    },
+
+    async confirmDelete() {
+      if (!deleteTarget) return;
+      await service.delete(eventId, (deleteTarget as any)._id);
+      setDeleteTarget(null);
+      this.loadItems();
+    },
+
+    addItem() {
+      setEditItem(null);
+      setOpenDialog(true);
+    },
   };
 }

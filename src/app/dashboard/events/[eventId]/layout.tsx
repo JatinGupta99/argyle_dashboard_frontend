@@ -1,14 +1,15 @@
-'use client';
+"use client";
 
-import { useParams } from 'next/navigation';
-import { Loader2 } from 'lucide-react';
-import { useEvent } from '@/hooks/useEvents';
-import { EventContextProvider } from '@/components/providers/EventContextProvider';
+import { useParams } from "next/navigation";
+import { Loader2 } from "lucide-react";
+import { useEvent } from "@/hooks/useEvents";
+import { EventContextProvider } from "@/components/providers/EventContextProvider";
 
 export default function EventLayout({ children }: { children: React.ReactNode }) {
-  const params = useParams();
-  const eventId = params?.eventId as string;
+  const { eventId } = useParams() as { eventId: string };
   const { event, isLoading, error } = useEvent(eventId);
+
+  /** 1️⃣ Loading */
   if (isLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
@@ -16,18 +17,21 @@ export default function EventLayout({ children }: { children: React.ReactNode })
       </div>
     );
   }
+
+  /** 2️⃣ Error from API OR missing event */
   if (error || !event) {
-    console.error('❌ Failed to load event:', error);
+    console.error("❌ Failed to load event:", error ?? "Event not found");
     return (
       <div className="flex h-screen items-center justify-center text-gray-500">
-        Failed to load event details.
+        {error ?? "Event not found."}
       </div>
     );
   }
 
+  /** 3️⃣ Success → Provide event */
   return (
     <EventContextProvider event={event}>
-      <div>{children}</div>
+      {children}
     </EventContextProvider>
   );
 }

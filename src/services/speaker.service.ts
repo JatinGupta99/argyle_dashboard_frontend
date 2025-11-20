@@ -44,18 +44,20 @@ export const SpeakerService = {
     });
   },
 
-  getUploadUrl: async ({
-    eventId,
-    speakerId,
-    contentType,
-  }: {
-    eventId: string;
-    speakerId: string;
-    contentType: string;
-  }): Promise<PresignedUrlResponse> => {
-    return fetchApi(ENDPOINTS.SPEAKERS.UPLOAD_URL(eventId, speakerId), {
-      method: HTTP_METHODS[3],
-      body: JSON.stringify({ contentType }),
-    });
-  },
+    getUploadUrl: async (params: {
+      eventId: string;
+      speakerId: string;
+      contentType: string;
+      type: 'logo' | 'document'|'photo';
+    }): Promise<PresignedUrlResponse> => {
+      const { eventId, speakerId, contentType, type } = params;
+  
+      return fetchApi(
+        ENDPOINTS.SPEAKERS.UPLOAD_URL(eventId, speakerId),
+        {
+          method: 'POST',
+          body: JSON.stringify({ contentType, type }),
+        }
+      );
+    },
 };

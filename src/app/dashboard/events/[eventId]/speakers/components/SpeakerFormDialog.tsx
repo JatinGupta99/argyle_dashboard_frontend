@@ -1,5 +1,6 @@
 'use client';
 
+import { FormField } from '@/components/form/FormField';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -9,21 +10,17 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import type { CreateSpeakerDto } from '@/lib/types/speaker';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import {
+  closeForm,
+  createSpeaker,
+  fetchSpeakers,
+  updateSpeaker,
+} from '@/redux/slices/speaker-slice';
 import { Upload } from 'lucide-react';
-import type { CreateSpeakerDto, Speaker } from '@/lib/types/speaker';
-import { SpeakerService } from '@/services/speaker.service';
-
-import { useEffect, useState, DragEvent } from 'react';
+import { DragEvent, useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { FormField } from '@/components/form/FormField';
-
-interface Props {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onSuccess?: () => void;
-  editData?: Speaker | null;
-  eventId: string;
-}
 
 const DEFAULT_FORM: CreateSpeakerDto = {
   name: { firstName: '', lastName: '' },
@@ -35,34 +32,35 @@ const DEFAULT_FORM: CreateSpeakerDto = {
   pictureUrl: '',
 };
 
-export function SpeakerFormDialog({ open, onOpenChange, onSuccess, editData, eventId }: Props) {
-  const [formData, setFormData] = useState(DEFAULT_FORM);
-  const [loading, setLoading] = useState(false);
+export function SpeakerFormDialog() {
+  const dispatch = useAppDispatch();
+  const { formOpen, editItem, eventId, loading } = useAppSelector((s) => s.speakers);
+
+  const [formData, setFormData] = useState<CreateSpeakerDto>(DEFAULT_FORM);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [dragging, setDragging] = useState(false);
 
-  /* --- Prefill on edit --- */
   useEffect(() => {
-    if (editData) {
+    if (formOpen && editItem) {
       setFormData({
-        name: editData.name,
-        companyName: editData.companyName ?? '',
-        title: editData.title ?? '',
-        email: editData.email ?? '',
-        bio: editData.bio ?? '',
-        linkedInUrl: editData.linkedInUrl ?? '',
-        pictureUrl: editData.pictureUrl ?? '',
+        name: editItem.name,
+        companyName: editItem.companyName ?? '',
+        title: editItem.title ?? '',
+        email: editItem.email ?? '',
+        bio: editItem.bio ?? '',
+        linkedInUrl: editItem.linkedInUrl ?? '',
+        pictureUrl: editItem.pictureUrl ?? '',
       });
-    } else {
+      setPhotoFile(null);
+    } else if (!formOpen) {
       setFormData(DEFAULT_FORM);
       setPhotoFile(null);
     }
-  }, [editData]);
+  }, [formOpen, editItem]);
 
-  /* --- Helpers --- */
   const updateField = (key: string, value: string, nested = false) => {
     setFormData((prev) =>
-      nested ? { ...prev, name: { ...prev.name, [key]: value } } : { ...prev, [key]: value },
+      nested ? { ...prev, name: { ...prev.name, [key]: value } } : { ...prev, [key]: value }
     );
   };
 
@@ -74,61 +72,68 @@ export function SpeakerFormDialog({ open, onOpenChange, onSuccess, editData, eve
     return null;
   };
 
-  /* --- Drag & Drop --- */
   const handleDrop = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setDragging(false);
-
     const file = e.dataTransfer.files?.[0];
     if (!file) return;
-
     setPhotoFile(file);
-    setFormData((prev) => ({
-      ...prev,
-      pictureUrl: URL.createObjectURL(file),
-    }));
+    setFormData((prev) => ({ ...prev, pictureUrl: URL.createObjectURL(file) }));
   };
 
-  /* --- Submit --- */
+  const handleClose = () => dispatch(closeForm());
+
   const handleSubmit = async () => {
-    const error = validate();
-    if (error) return toast.error(error);
+    const err = validate();
+    if (err) return toast.error(err);
 
-    setLoading(true);
+    if (!eventId) return toast.error('Event ID not set');
+
     try {
-      const payload = {
-        ...formData,
-        name: {
-          firstName: formData.name.firstName.trim(),
-          lastName: formData.name.lastName.trim(),
-        },
-      };
-
-      if (editData) {
-        await SpeakerService.update(eventId, editData._id, payload);
+      if (editItem) {
+        await dispatch(
+          updateSpeaker({
+            id: editItem._id,
+            payload: {
+              ...formData,
+              name: {
+                firstName: formData.name.firstName.trim(),
+                lastName: formData.name.lastName.trim(),
+              },
+            },
+            photoFile,
+          })
+        ).unwrap();
         toast.success('Speaker updated');
       } else {
-        await SpeakerService.create(eventId, payload);
+        await dispatch(
+          createSpeaker({
+            payload: {
+              ...formData,
+              name: {
+                firstName: formData.name.firstName.trim(),
+                lastName: formData.name.lastName.trim(),
+              },
+            },
+            photoFile,
+          })
+        ).unwrap();
         toast.success('Speaker added');
       }
 
-      onSuccess?.();
-      onOpenChange(false);
-      setFormData(DEFAULT_FORM);
-      setPhotoFile(null);
+      // refresh current page (uses eventId from slice)
+      dispatch(fetchSpeakers({ page: 1, limit: 10 }));
+      handleClose();
     } catch {
       toast.error('Failed to save speaker');
-    } finally {
-      setLoading(false);
     }
   };
 
-  /* --------------- UI --------------- */
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={formOpen} onOpenChange={(open) => !open && handleClose()}>
       <DialogContent className="max-h-[85vh] w-[90%] max-w-lg overflow-y-auto rounded-lg p-4">
         <DialogHeader>
-          <DialogTitle>{editData ? 'Edit Speaker' : 'Add Speaker'}</DialogTitle>
+          <DialogTitle>{editItem ? 'Edit Speaker' : 'Add Speaker'}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
@@ -227,11 +232,11 @@ export function SpeakerFormDialog({ open, onOpenChange, onSuccess, editData, eve
         </div>
 
         <DialogFooter className="mt-4">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button variant="outline" onClick={handleClose}>
             Cancel
           </Button>
           <Button onClick={handleSubmit} disabled={loading}>
-            {loading ? 'Saving…' : editData ? 'Update' : 'Add Speaker'}
+            {loading ? 'Saving…' : editItem ? 'Update' : 'Add Speaker'}
           </Button>
         </DialogFooter>
       </DialogContent>
