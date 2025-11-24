@@ -14,12 +14,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <Provider store={store}>
       <QueryClientProvider client={queryClient}>
         <SidebarProvider>
-        <div className="fixed left-0 top-0 h-screen w-10 border-r bg-white">
-          <AppSidebar />
-        </div>
-           <main className=" h-full w-full ml-64 flex-1 overflow-y-auto bg-gray-50">
-        {children}
-      </main>
+          <div className="fixed top-0 left-0 h-screen w-10 border-r bg-white">
+            <AppSidebar />
+          </div>
+          <main className="ml-64 h-full w-full flex-1 overflow-y-auto bg-gray-50">{children}</main>
         </SidebarProvider>
       </QueryClientProvider>
     </Provider>

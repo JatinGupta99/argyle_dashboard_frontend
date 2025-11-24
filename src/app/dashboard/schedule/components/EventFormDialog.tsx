@@ -42,7 +42,7 @@ export function EventFormDialog() {
   useEffect(() => {
     if (formOpen && editing) {
       setFormData({
-        title: editing.title??'',
+        title: editing.title ?? '',
         date: editing.date ?? '',
         startTime: editing.startTime ?? '',
         endTime: editing.endTime ?? '',
@@ -90,58 +90,53 @@ export function EventFormDialog() {
   };
 
   const handleClose = () => dispatch(closeEventForm());
-const handleSubmit = async () => {
-  const err = validate();
-  if (err) return toast.error(err);
+  const handleSubmit = async () => {
+    const err = validate();
+    if (err) return toast.error(err);
 
-  // Convert date + time strings to Date objects
-  const startTime = new Date(`${formData.date}T${formData.startTime}:00`);
-  const endTime = new Date(`${formData.date}T${formData.endTime}:00`);
-  const now = new Date();
+    // Convert date + time strings to Date objects
+    const startTime = new Date(`${formData.date}T${formData.startTime}:00`);
+    const endTime = new Date(`${formData.date}T${formData.endTime}:00`);
+    const now = new Date();
 
-  // Frontend validation for future dates
-  if (startTime <= now) return toast.error('Start time must be in the future');
-  if (endTime <= now) return toast.error('End time must be in the future');
-  if (endTime <= startTime) return toast.error('End time must be after start time');
+    // Frontend validation for future dates
+    if (startTime <= now) return toast.error('Start time must be in the future');
+    if (endTime <= now) return toast.error('End time must be in the future');
+    if (endTime <= startTime) return toast.error('End time must be after start time');
 
-  const schedule = {
-    startTime: startTime.toISOString(),
-    endTime: endTime.toISOString(),
-  };
+    const schedule = {
+      startTime: startTime.toISOString(),
+      endTime: endTime.toISOString(),
+    };
 
-  const payload: any = {
-    title: formData.title.trim().replace(/\s+/g, '-').toLowerCase(),
-    description: formData.description,
-    schedule,
-    eventDate: formData.date,
-  };
+    const payload: any = {
+      title: formData.title.trim().replace(/\s+/g, '-').toLowerCase(),
+      description: formData.description,
+      schedule,
+      eventDate: formData.date,
+    };
 
-  if (imageFile) payload.eventLogoUrl = formData.eventLogoUrl;
+    if (imageFile) payload.eventLogoUrl = formData.eventLogoUrl;
 
-  try {
-    if (editing) {
-      await dispatch(
-        updateEvent({
-          id: editing._id,
-          payload,
-          imageFile,
-        })
-      ).unwrap();
-      toast.success('Event updated successfully');
-    } else {
-      await dispatch(createEvent({ payload, imageFile })).unwrap();
-      toast.success('Event created successfully');
+    try {
+      if (editing) {
+        await dispatch(
+          updateEvent({
+            id: editing._id,
+            payload,
+            imageFile,
+          }),
+        ).unwrap();
+        toast.success('Event updated successfully');
+      } else {
+        await dispatch(createEvent({ payload, imageFile })).unwrap();
+        toast.success('Event created successfully');
+      }
+      handleClose();
+    } catch (error: any) {
+      toast.error(error?.message || 'Failed to save event');
     }
-    handleClose();
-  } catch (error: any) {
-    toast.error(error?.message || 'Failed to save event');
-  }
-};
-
-
-
-
-
+  };
 
   return (
     <Dialog open={formOpen} onOpenChange={(open) => !open && handleClose()}>

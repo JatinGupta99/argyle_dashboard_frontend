@@ -8,7 +8,7 @@ import eventOverviewReducer from '@/redux/slices/event-overview.slice';
 import eventReducer from '@/redux/slices/event-slice';
 export const store = configureStore({
   reducer: {
-    events: eventReducer,  
+    events: eventReducer,
     toolbar: toolbarReducer,
     dialog: dialogReducer,
     speakers: speakerReducer,

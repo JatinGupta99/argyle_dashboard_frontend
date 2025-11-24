@@ -67,8 +67,7 @@ export default function SchedulePage() {
 
       const eventDate = new Date(event.EventDate);
       const isCurrentMonth =
-        eventDate.getMonth() === now.getMonth() &&
-        eventDate.getFullYear() === now.getFullYear();
+        eventDate.getMonth() === now.getMonth() && eventDate.getFullYear() === now.getFullYear();
 
       const matchesTab = activeTab === 'ALL' ? true : event.status === activeTab;
 
@@ -82,7 +81,7 @@ export default function SchedulePage() {
       scheduleCount: filteredEvents.length,
       label: 'Schedules',
     }),
-    [filteredEvents]
+    [filteredEvents],
   );
 
   // EXPORT BUTTON HANDLER
@@ -96,12 +95,11 @@ export default function SchedulePage() {
       <Header />
 
       <div className="bg-sky-50">
-
         {/* Toolbar */}
         <DashboardToolbar
           showDateFilters
           onDateFilter={handleDateFilter}
-          buttonLabel="Export"          // <-- controls icon (FileDown)
+          buttonLabel="Export" // <-- controls icon (FileDown)
           onButtonClick={handleExportClick}
         />
 
@@ -112,10 +110,7 @@ export default function SchedulePage() {
         />
 
         <div className="pl-6">
-          <ScheduleTableTabs
-            activeTab={activeTab}
-            setActiveTab={handleTabChange}
-          />
+          <ScheduleTableTabs activeTab={activeTab} setActiveTab={handleTabChange} />
         </div>
 
         <main className="flex-1 overflow-hidden px-6">

@@ -15,7 +15,7 @@ export const fetchEvents = createAsyncThunk<Event[], void, { rejectValue: string
     } catch {
       return thunkAPI.rejectWithValue('Failed to fetch events');
     }
-  }
+  },
 );
 
 /* ──────────────────────────────
@@ -30,7 +30,7 @@ export const fetchEventById = createAsyncThunk<Event, string, { rejectValue: str
     } catch {
       return thunkAPI.rejectWithValue('Failed to fetch event');
     }
-  }
+  },
 );
 
 /* ──────────────────────────────
@@ -110,5 +110,5 @@ export const deleteEvent = createAsyncThunk<string, string, { rejectValue: strin
     } catch {
       return thunkAPI.rejectWithValue('Failed to delete event');
     }
-  }
+  },
 );

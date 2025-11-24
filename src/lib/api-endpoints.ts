@@ -25,9 +25,8 @@ export const ENDPOINTS = {
   EVENTS: {
     FETCH_BY_ID: (eventId: string) => `events/${eventId}`,
     FETCH_ALL: `events`,
-    ROOT:  `/events`,
+    ROOT: `/events`,
     FETCH_ALL_EVENT_DETAILS: `events/details`,
-    UPLOAD_URL: (eventId: string) =>
-      `/events/${eventId}/upload-url`,
+    UPLOAD_URL: (eventId: string) => `/events/${eventId}/upload-url`,
   },
 };

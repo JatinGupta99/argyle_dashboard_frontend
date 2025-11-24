@@ -7,7 +7,7 @@ import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
-  DropdownMenuItem
+  DropdownMenuItem,
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { CalendarDays, ChevronDown } from 'lucide-react';
@@ -35,7 +35,7 @@ export function DashboardToolbar({
   onButtonClick,
   buttonIcon,
   showButton = true,
-  children
+  children,
 }: DashboardToolbarProps) {
   const pathname = usePathname();
   const router = useRouter();
@@ -60,7 +60,7 @@ export function DashboardToolbar({
   };
 
   return (
-    <Card className="flex w-full flex-col gap-4 border-none bg-transparent px-6 py-3 shadow-none md:flex-row md:items-center md:justify-between overflow-visible">
+    <Card className="flex w-full flex-col gap-4 overflow-visible border-none bg-transparent px-6 py-3 shadow-none md:flex-row md:items-center md:justify-between">
       {/* LEFT AREA */}
       <div className="flex items-center gap-3">
         <div className="flex items-center justify-center rounded-md bg-sky-200 p-2">
@@ -74,16 +74,26 @@ export function DashboardToolbar({
       </div>
 
       {/* RIGHT AREA */}
-      <div className="flex items-center gap-3 ml-auto flex-wrap">
+      <div className="ml-auto flex flex-wrap items-center gap-3">
         {children}
 
         {/* Date Filters */}
         {showDateFilters && (
           <div className="flex items-center gap-2 text-sm text-gray-600">
             <span>From</span>
-            <Input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} className="h-8 w-36" />
+            <Input
+              type="date"
+              value={fromDate}
+              onChange={(e) => setFromDate(e.target.value)}
+              className="h-8 w-36"
+            />
             <span>to</span>
-            <Input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} className="h-8 w-36" />
+            <Input
+              type="date"
+              value={toDate}
+              onChange={(e) => setToDate(e.target.value)}
+              className="h-8 w-36"
+            />
           </div>
         )}
 
@@ -93,14 +103,14 @@ export function DashboardToolbar({
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="h-8 px-3 text-sm">
                 {view === 'card' ? 'Card' : 'Table'}
-                <ChevronDown className="h-4 w-4 ml-1" />
+                <ChevronDown className="ml-1 h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
 
             <DropdownMenuContent
               align="end"
               forceMount
-              className="z-50 bg-white shadow-md rounded-md p-1"
+              className="z-50 rounded-md bg-white p-1 shadow-md"
             >
               <DropdownMenuItem onClick={() => handleViewChange('card')}>Card</DropdownMenuItem>
               <DropdownMenuItem onClick={() => handleViewChange('table')}>Table</DropdownMenuItem>

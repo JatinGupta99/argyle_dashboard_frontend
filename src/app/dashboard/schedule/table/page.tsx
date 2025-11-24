@@ -23,7 +23,7 @@ export default function ScheduleTableContent() {
       scheduleCount: meta.total,
       label: 'Schedules',
     }),
-    [meta]
+    [meta],
   );
 
   const handleTabChange = (tab: string) => {

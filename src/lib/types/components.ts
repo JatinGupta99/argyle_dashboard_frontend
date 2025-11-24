@@ -2,8 +2,8 @@ import { Speaker } from './speaker';
 
 // --- Main Event Interface ---
 export interface EventSchedule {
-  startTime: Date|string; // ISO 8601 Date string, e.g., "2025-11-11T08:41:00.000Z"
-  endTime: Date|string; // ISO 8601 Date string
+  startTime: Date | string; // ISO 8601 Date string, e.g., "2025-11-11T08:41:00.000Z"
+  endTime: Date | string; // ISO 8601 Date string
   _id?: string;
 }
 
@@ -12,12 +12,11 @@ export interface CreateEventDto {
   description?: string;
   eventDate: string;
   schedule: {
-    startTime: string|Date;
-    endTime: string|Date;
+    startTime: string | Date;
+    endTime: string | Date;
   };
   eventLogoUrl?: string;
 }
-
 
 export interface UpdateEventDto {
   title?: string;
@@ -29,8 +28,6 @@ export interface UpdateEventDto {
   };
   eventLogoUrl?: string;
 }
-
-
 
 export interface Event {
   _id: string;

@@ -9,8 +9,8 @@ export interface EventQuery {
   status?: string;
   sortBy?: string;
   sortOrder?: string;
-  from_date?:string;
-  to_date?:string;
+  from_date?: string;
+  to_date?: string;
 }
 
 export interface PaginatedEventsResponse {
