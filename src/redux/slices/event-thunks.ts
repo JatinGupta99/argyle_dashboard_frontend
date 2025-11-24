@@ -1,7 +1,7 @@
-import { createAsyncThunk } from '@reduxjs/toolkit';
+import type { CreateEventDto, Event, UpdateEventDto } from '@/lib/types/components';
 import { EventService } from '@/services/event.service';
-import type { Event } from '@/lib/types/components';
-import type { CreateEventDto, UpdateEventDto } from '@/lib/types/components';
+import { createAsyncThunk } from '@reduxjs/toolkit';
+import { addEvent, removeEvent, updateEventInState } from './event-slice';
 
 /* ──────────────────────────────
    Fetch All Events
@@ -52,14 +52,14 @@ export const createEvent = createAsyncThunk<
         type: 'logo',
       });
 
-      await fetch(uploadRes.data.url, {
-        method: 'PUT',
-        body: imageFile,
-      });
+      await fetch(uploadRes.data.url, { method: 'PUT', body: imageFile });
 
       event.eventLogoUrl = uploadRes.data.url;
       await EventService.update(event._id, { eventLogoUrl: uploadRes.data.url });
     }
+
+    // Update Redux state immediately
+    thunkAPI.dispatch(addEvent(event));
 
     return event;
   } catch {
@@ -83,16 +83,17 @@ export const updateEvent = createAsyncThunk<
         type: 'logo',
       });
 
-      await fetch(uploadRes.data.url, {
-        method: 'PUT',
-        body: imageFile,
-      });
-
+      await fetch(uploadRes.data.url, { method: 'PUT', body: imageFile });
       payload.eventLogoUrl = uploadRes.data.url;
     }
 
     const res = await EventService.update(id, payload);
-    return res.data as Event;
+    const updatedEvent = res.data as Event;
+
+    // Update Redux state immediately
+    thunkAPI.dispatch(updateEventInState(updatedEvent));
+
+    return updatedEvent;
   } catch {
     return thunkAPI.rejectWithValue('Failed to update event');
   }
@@ -106,6 +107,10 @@ export const deleteEvent = createAsyncThunk<string, string, { rejectValue: strin
   async (id, thunkAPI) => {
     try {
       await EventService.remove(id);
+
+      // Remove from Redux state immediately
+      thunkAPI.dispatch(removeEvent(id));
+
       return id;
     } catch {
       return thunkAPI.rejectWithValue('Failed to delete event');

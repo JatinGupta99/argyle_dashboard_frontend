@@ -12,16 +12,24 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
-import { closeEventForm, CreateEventForm, UpdateEventForm } from '@/redux/slices/event-slice';
-import { createEvent, updateEvent } from '@/redux/slices/event-thunks';
+import { closeEventForm, addEvent, updateEventInState } from '@/redux/slices/event-slice';
+import { createEvent, fetchEventById, updateEvent } from '@/redux/slices/event-thunks';
 import { Upload } from 'lucide-react';
 import { DragEvent, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
+import { Event } from '@/lib/types/components';
+import { EventService } from '@/services/event.service';
 
-// Define a clean EventForm type for the form
+interface FormData {
+  title: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  description: string;
+  eventLogoUrl?: string;
+}
 
-// Default form state
-const DEFAULT_FORM: CreateEventForm = {
+const DEFAULT_FORM: FormData = {
   title: '',
   date: '',
   startTime: '',
@@ -34,44 +42,59 @@ export function EventFormDialog() {
   const dispatch = useAppDispatch();
   const { formOpen, editing, loading } = useAppSelector((s) => s.events);
 
-  const [formData, setFormData] = useState<CreateEventForm>(DEFAULT_FORM);
+  const [formData, setFormData] = useState<FormData>(DEFAULT_FORM);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    if (formOpen && editing) {
-      setFormData({
-        title: editing.title ?? '',
-        date: editing.date ?? '',
-        startTime: editing.startTime ?? '',
-        endTime: editing.endTime ?? '',
-        description: editing.description ?? '',
-        eventLogoUrl: editing.imageUrl ?? '',
-      });
-      setImagePreview(editing.imageUrl ?? null);
-      setImageFile(null);
+  // Pre-fill form when editing
+  // useEffect(() => {
+  //   if (editing) {
+  //     setFormData({
+  //       title: editing.title,
+  //       date: editing.eventDate?.split('T')[0] || '',
+  //       startTime: editing.schedule?.startTime?.slice(11, 16) || '',
+  //       endTime: editing.schedule?.endTime?.slice(11, 16) || '',
+  //       description: editing.description,
+  //       eventLogoUrl: editing.eventLogoUrl || '',
+  //     });
+  //     setImagePreview(editing.eventLogoUrl || null);
+  //     setImageFile(null);
+  //   } else if (!formOpen) {
+  //     setFormData(DEFAULT_FORM);
+  //     setImageFile(null);
+  //     setImagePreview(null);
+  //   }
+  // }, [editing, formOpen]);
+
+    useEffect(() => {
+    if (editing && editing._id) {
+      dispatch(fetchEventById(editing._id))
+        .unwrap()
+        .then((event) => {
+          setFormData({
+            title: event.title,
+            date: event.EventDate?.split('T')[0] || '',
+            startTime: event.schedule?.startTime.toString()?.slice(11, 16) || '',
+            endTime: event.schedule?.endTime?.toString().slice(11, 16) || '',
+            description: event.eventDetails,
+            eventLogoUrl: event.eventLogoUrl || '',
+          });
+          setImagePreview(event.eventLogoUrl || null);
+          setImageFile(null);
+        })
+        .catch(() => toast.error('Failed to fetch event data'));
     } else if (!formOpen) {
       setFormData(DEFAULT_FORM);
       setImageFile(null);
       setImagePreview(null);
     }
-  }, [formOpen, editing]);
-
-  const updateField = (key: keyof UpdateEventForm, value: string) => {
+  }, [editing, formOpen, dispatch]);
+  const updateField = (key: keyof FormData, value: string) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
   };
 
-  const validate = () => {
-    if (!formData.title.trim()) return 'Event title is required';
-    if (!formData.date.trim()) return 'Event date is required';
-    if (!formData.startTime.trim()) return 'Start time is required';
-    if (!formData.endTime.trim()) return 'End time is required';
-    return null;
-  };
-
   const handleImageClick = () => imageInputRef.current?.click();
-
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -79,7 +102,6 @@ export function EventFormDialog() {
       setImagePreview(URL.createObjectURL(file));
     }
   };
-
   const handleImageDrop = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     const file = e.dataTransfer.files?.[0];
@@ -90,48 +112,70 @@ export function EventFormDialog() {
   };
 
   const handleClose = () => dispatch(closeEventForm());
+
+  const validate = () => {
+    if (!formData.title.trim()) return 'Event title is required';
+    if (!formData.date.trim()) return 'Event date is required';
+    if (!formData.startTime.trim()) return 'Start time is required';
+    if (!formData.endTime.trim()) return 'End time is required';
+    return null;
+  };
+
+  // Upload image to S3 if a new file is selected
+  const uploadImage = async () => {
+    if (!imageFile) return formData.eventLogoUrl || '';
+    if (!editing?._id) return formData.eventLogoUrl || '';
+
+    const presignedRes = await EventService.getUploadUrl({
+      eventId: editing?._id || 'temp-id',
+      contentType: imageFile.type,
+      type: 'logo',
+    });
+
+    const res = await fetch(presignedRes.data.url, {
+      method: 'PUT',
+      body: imageFile,
+      headers: { 'Content-Type': imageFile.type },
+    });
+
+    if (!res.ok) throw new Error('Failed to upload image');
+    return presignedRes.data.url.split('?')[0]; // clean URL
+  };
+
   const handleSubmit = async () => {
     const err = validate();
     if (err) return toast.error(err);
 
-    // Convert date + time strings to Date objects
-    const startTime = new Date(`${formData.date}T${formData.startTime}:00`);
-    const endTime = new Date(`${formData.date}T${formData.endTime}:00`);
-    const now = new Date();
-
-    // Frontend validation for future dates
-    if (startTime <= now) return toast.error('Start time must be in the future');
-    if (endTime <= now) return toast.error('End time must be in the future');
-    if (endTime <= startTime) return toast.error('End time must be after start time');
-
-    const schedule = {
-      startTime: startTime.toISOString(),
-      endTime: endTime.toISOString(),
-    };
-
-    const payload: any = {
-      title: formData.title.trim().replace(/\s+/g, '-').toLowerCase(),
-      description: formData.description,
-      schedule,
-      eventDate: formData.date,
-    };
-
-    if (imageFile) payload.eventLogoUrl = formData.eventLogoUrl;
-
     try {
+      const startTime = new Date(`${formData.date}T${formData.startTime}:00`);
+      const endTime = new Date(`${formData.date}T${formData.endTime}:00`);
+      const now = new Date();
+
+      if (startTime <= now) return toast.error('Start time must be in the future');
+      if (endTime <= now) return toast.error('End time must be in the future');
+      if (endTime <= startTime) return toast.error('End time must be after start time');
+
+      const uploadedUrl = await uploadImage();
+
+      const payload = {
+        title: formData.title.trim(),
+        description: formData.description,
+        eventDate: formData.date,
+        schedule: { startTime: startTime.toISOString(), endTime: endTime.toISOString() },
+        eventLogoUrl: uploadedUrl,
+      };
+
+      let event: Event;
       if (editing) {
-        await dispatch(
-          updateEvent({
-            id: editing._id,
-            payload,
-            imageFile,
-          }),
-        ).unwrap();
+        event = await dispatch(updateEvent({ id: editing._id, payload, imageFile })).unwrap();
+        dispatch(updateEventInState(event)); // update Redux state immediately
         toast.success('Event updated successfully');
       } else {
-        await dispatch(createEvent({ payload, imageFile })).unwrap();
+        event = await dispatch(createEvent({ payload, imageFile })).unwrap();
+        dispatch(addEvent(event)); // add to Redux state immediately
         toast.success('Event created successfully');
       }
+
       handleClose();
     } catch (error: any) {
       toast.error(error?.message || 'Failed to save event');
@@ -162,7 +206,6 @@ export function EventFormDialog() {
                 onChange={(e) => updateField('date', e.target.value)}
               />
             </FormField>
-
             <FormField label="Start Time" className="flex-1">
               <Input
                 type="time"
@@ -170,7 +213,6 @@ export function EventFormDialog() {
                 onChange={(e) => updateField('startTime', e.target.value)}
               />
             </FormField>
-
             <FormField label="End Time" className="flex-1">
               <Input
                 type="time"
@@ -193,25 +235,34 @@ export function EventFormDialog() {
               onClick={handleImageClick}
               onDrop={handleImageDrop}
               onDragOver={(e) => e.preventDefault()}
-              className="cursor-pointer rounded-md border-2 border-dashed p-6 text-center"
+              className="cursor-pointer rounded-md border-2 border-dashed p-6 text-center relative"
             >
-              {!imageFile ? (
+              {!imageFile && !imagePreview ? (
                 <div className="flex flex-col items-center text-sm opacity-60">
                   <Upload className="mb-2 h-6 w-6" />
                   Drag or click to upload image
                 </div>
               ) : (
-                <p>{imageFile.name}</p>
+                <div className="relative inline-block">
+                  <img
+                    src={imagePreview!}
+                    alt="Preview"
+                    className="h-20 w-20 rounded-md border object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setImageFile(null);
+                      setImagePreview(null);
+                    }}
+                    className="absolute -top-2 -right-2 rounded-full bg-red-600 text-white w-5 h-5 flex items-center justify-center text-xs hover:bg-red-700"
+                  >
+                    ×
+                  </button>
+                </div>
               )}
             </div>
-
-            {imagePreview && (
-              <img
-                src={imagePreview}
-                alt="Preview"
-                className="mt-2 h-20 w-20 rounded-md border object-cover"
-              />
-            )}
 
             <input
               type="file"

@@ -1,6 +1,6 @@
 'use client';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-
+import { Linkedin, MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
 import { DataTableColumnHeader } from '@/app/dashboard/schedule/components/data-table-column-header';
 import { Event } from '@/lib/types/components';
 import { ColumnDef } from '@tanstack/react-table';
@@ -9,19 +9,31 @@ import Link from 'next/link';
 import EventId from '../cells/EventId';
 import FormattedDate from '../cells/FormattedDate';
 import StatusBadge from '../cells/StatusBadge';
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from '@/components/ui/dropdown-menu';
 
 function formatTime(date: Date | string) {
   const d = new Date(date);
   return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 
-export const scheduleColumns: ColumnDef<Event>[] = [
+// Make this a function that accepts callbacks
+export const scheduleColumns = ({
+  onEdit,
+  onDelete,
+}: {
+  onEdit?: (event: Event) => void;
+  onDelete?: (event: Event) => void;
+}): ColumnDef<Event>[] => [
   {
     accessorKey: '_id',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Event ID" />,
     cell: ({ row }) => <EventId id={row.original._id} />,
   },
-
   {
     accessorKey: 'title',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Title" />,
@@ -34,23 +46,18 @@ export const scheduleColumns: ColumnDef<Event>[] = [
       </Link>
     ),
   },
-
   {
     accessorKey: 'EventDate',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Date" />,
     cell: ({ row }) => <FormattedDate date={row.original.EventDate} />,
   },
-
   {
     accessorKey: 'schedule',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Time" />,
     cell: ({ row }) => {
       const item = row.original;
-
       const start = item?.schedule?.startTime ? formatTime(item.schedule.startTime) : '--';
-
       const end = item?.schedule?.endTime ? formatTime(item.schedule.endTime) : '--';
-
       return (
         <div className="flex items-center gap-2 whitespace-nowrap">
           <Clock className="h-4 w-4 text-sky-400" />
@@ -61,7 +68,6 @@ export const scheduleColumns: ColumnDef<Event>[] = [
       );
     },
   },
-
   {
     id: 'speakers',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Speakers" />,
@@ -106,8 +112,39 @@ export const scheduleColumns: ColumnDef<Event>[] = [
   },
 
   {
-    accessorKey: 'status',
+    id: 'status',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
     cell: ({ row }) => <StatusBadge status={row.original.status} />,
+  },
+  {
+    id: 'actions',
+    header: () => <div className="text-center">Actions</div>,
+    cell: ({ row }) => {
+      const event = row.original;
+      return (
+        <div className="flex justify-center">
+          <DropdownMenu>
+            <DropdownMenuTrigger className="rounded-md p-2 hover:bg-gray-100">
+              <MoreHorizontal className="h-5 w-5 text-gray-600" />
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent align="end" className="w-32">
+              <DropdownMenuItem onClick={() => onEdit?.(event)}>
+                <Pencil className="mr-2 h-4 w-4 text-sky-500" />
+                Edit
+              </DropdownMenuItem>
+
+              <DropdownMenuItem
+                onClick={() => onDelete?.(event)}
+                className="text-red-600 focus:text-red-600"
+              >
+                <Trash2 className="mr-2 h-4 w-4 text-red-600" />
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      );
+    },
   },
 ];

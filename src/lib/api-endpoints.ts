@@ -24,6 +24,8 @@ export const ENDPOINTS = {
   },
   EVENTS: {
     FETCH_BY_ID: (eventId: string) => `events/${eventId}`,
+    DELETE_BY_ID: (eventId: string) => `/events/${eventId}`,
+    UPDATE_BY_ID: (eventId: string) => `/events/${eventId}`,
     FETCH_ALL: `events`,
     ROOT: `/events`,
     FETCH_ALL_EVENT_DETAILS: `events/details`,

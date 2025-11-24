@@ -20,7 +20,7 @@ export const EventService = {
   },
 
   getById: async (eventId: string) => {
-    return fetchApi<Event>(ENDPOINTS.EVENTS.FETCH_BY_ID(eventId), {
+    return fetchApi<Event>(ENDPOINTS.EVENTS.UPDATE_BY_ID(eventId), {
       method: HTTP_METHODS[0],
     });
   },
@@ -33,14 +33,14 @@ export const EventService = {
   },
 
   update: async (eventId: string, payload: UpdateEventDto) => {
-    return fetchApi<Event>(ENDPOINTS.EVENTS.FETCH_BY_ID(eventId), {
+    return fetchApi<Event>(ENDPOINTS.EVENTS.UPDATE_BY_ID(eventId), {
       method: HTTP_METHODS[6],
       body: JSON.stringify(payload),
     });
   },
 
   remove: async (eventId: string) => {
-    return fetchApi<void>(ENDPOINTS.EVENTS.FETCH_BY_ID(eventId), {
+    return fetchApi<void>(ENDPOINTS.EVENTS.DELETE_BY_ID(eventId), {
       method: HTTP_METHODS[5],
     });
   },

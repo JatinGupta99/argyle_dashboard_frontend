@@ -1,6 +1,8 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useAppDispatch } from '@/redux/hooks';
+import { openEventForm, setEventDeleteTarget } from '@/redux/slices/event-slice';
+import { useEventsContext } from '@/components/providers/EventsContextProvider';
 import {
   getCoreRowModel,
   getSortedRowModel,
@@ -16,16 +18,22 @@ import {
   TableBody,
   TableCell,
 } from '@/components/ui/table';
-import { scheduleColumns } from './ScheduleRow';
+import { scheduleColumns as getColumns } from './ScheduleRow';
 import { DataTablePagination } from './DataTablePagination';
-import { useEventsContext } from '@/components/providers/EventsContextProvider';
 
 export default function ScheduleTable() {
+  const dispatch = useAppDispatch();
   const { events, meta, query, setQuery } = useEventsContext();
+
+  // Pass callbacks to columns
+  const columns = getColumns({
+    onEdit: (event:any) => dispatch(openEventForm(event)),
+    onDelete: (event:any) => dispatch(setEventDeleteTarget(event)),
+  });
 
   const table = useReactTable({
     data: events,
-    columns: scheduleColumns,
+    columns,
     pageCount: meta.totalPages,
     state: { pagination: { pageIndex: (query.page || 1) - 1, pageSize: query.limit || 10 } },
     manualPagination: true,
@@ -76,10 +84,7 @@ export default function ScheduleTable() {
             ))
           ) : (
             <TableRow>
-              <TableCell
-                colSpan={scheduleColumns.length}
-                className="py-10 text-center text-gray-500"
-              >
+              <TableCell colSpan={columns.length} className="py-10 text-center text-gray-500">
                 No schedules found.
               </TableCell>
             </TableRow>

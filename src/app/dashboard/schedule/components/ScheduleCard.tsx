@@ -7,6 +7,7 @@ import { Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface ScheduleCardProps {
+  description: string;
   eventId: string;
   title: string;
   time: string;
@@ -19,6 +20,7 @@ interface ScheduleCardProps {
 }
 
 export function ScheduleCard({
+  description,
   eventId,
   title,
   time,
@@ -46,7 +48,7 @@ export function ScheduleCard({
         {/* Header */}
         <CardHeader className="pb-2">
           <h3 className="text-base leading-tight font-semibold">{title}</h3>
-          <p className="mt-1 text-sm text-gray-500">Lorem ipsum dolor sit amet consectetur.</p>
+          <p className="mt-1 text-sm text-gray-700 line-clamp-3">{description}</p>
         </CardHeader>
 
         {/* Schedule Row */}
