@@ -39,7 +39,7 @@ async function uploadFile(
   eventId: string,
   sponsorId: string,
   file: File | null,
-  type: 'logo' | 'document'
+  type: 'logo' | 'document',
 ): Promise<string | null> {
   if (!file) return null;
 
@@ -60,28 +60,26 @@ async function uploadFile(
   return key;
 }
 
-
 /* ───────────────────────────────────────────────
    Fetch Sponsors
 ──────────────────────────────────────────────── */
-export const fetchSponsors = createAsyncThunk<
-  Sponsor[],
-  void,
-  { rejectValue: string }
->('sponsors/fetch', async (_, thunkAPI) => {
-  try {
-    const state: any = thunkAPI.getState();
-    const eventId = state.sponsors?.eventId;
+export const fetchSponsors = createAsyncThunk<Sponsor[], void, { rejectValue: string }>(
+  'sponsors/fetch',
+  async (_, thunkAPI) => {
+    try {
+      const state: any = thunkAPI.getState();
+      const eventId = state.sponsors?.eventId;
 
-    if (!eventId) return thunkAPI.rejectWithValue('Missing eventId');
+      if (!eventId) return thunkAPI.rejectWithValue('Missing eventId');
 
-    const res = await SponsorService.getAll(eventId);
-    console.log('acsnlkascnlacsnlsc',res);
-    return res.data.results;
-  } catch {
-    return thunkAPI.rejectWithValue('Failed to fetch sponsors');
-  }
-});
+      const res = await SponsorService.getAll(eventId);
+      console.log('acsnlkascnlacsnlsc', res);
+      return res.data.results;
+    } catch {
+      return thunkAPI.rejectWithValue('Failed to fetch sponsors');
+    }
+  },
+);
 /* ───────────────────────────────────────────────
    Create Sponsor (Corrected)
 ──────────────────────────────────────────────── */
@@ -124,7 +122,6 @@ export const createSponsor = createAsyncThunk<
   }
 });
 
-
 /* ───────────────────────────────────────────────
    Update Sponsor
 ──────────────────────────────────────────────── */
@@ -155,7 +152,6 @@ export const updateSponsor = createAsyncThunk<
   }
 });
 
-
 /* ───────────────────────────────────────────────
    Delete Sponsor
 ──────────────────────────────────────────────── */
@@ -184,12 +180,10 @@ const sponsorSlice = createSlice({
       - true  → add mode
       - Sponsor object → edit mode
     */
-   openForm(state, action: PayloadAction<true | Sponsor>) {
-  state.formOpen = true;
-  state.editing = action.payload === true ? null : action.payload;
-}
-,
-
+    openForm(state, action: PayloadAction<true | Sponsor>) {
+      state.formOpen = true;
+      state.editing = action.payload === true ? null : action.payload;
+    },
     closeForm(state) {
       state.formOpen = false;
       state.editing = null;
@@ -227,9 +221,7 @@ const sponsorSlice = createSlice({
 
       // UPDATE
       .addCase(updateSponsor.fulfilled, (state, action) => {
-        state.items = state.items.map((i) =>
-          i._id === action.payload._id ? action.payload : i
-        );
+        state.items = state.items.map((i) => (i._id === action.payload._id ? action.payload : i));
       })
 
       // DELETE
@@ -239,11 +231,6 @@ const sponsorSlice = createSlice({
   },
 });
 
-export const {
-  openForm,
-  closeForm,
-  setSponsorEventId,
-  setDeleteTarget,
-} = sponsorSlice.actions;
+export const { openForm, closeForm, setSponsorEventId, setDeleteTarget } = sponsorSlice.actions;
 
 export default sponsorSlice.reducer;

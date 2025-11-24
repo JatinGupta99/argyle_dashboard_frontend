@@ -2,16 +2,16 @@ import { getAuthToken } from '@/utils/auth';
 
 export async function fetchApi<T>(
   url: string,
-   options?: RequestInit & { query?: Record<string, any> },
+  options?: RequestInit & { query?: Record<string, any> },
 ): Promise<{ statusCode: number; data: T }> {
   console.log('🌍 API Base URL:', process.env.NEXT_PUBLIC_NESTJS_API_BASE_URL); // <-- debug
 
   let fullUrl = `${process.env.NEXT_PUBLIC_NESTJS_API_BASE_URL}${url}`;
-   if (options?.query) {
+  if (options?.query) {
     const params = new URLSearchParams();
 
     Object.entries(options.query).forEach(([key, value]) => {
-      if (value !== undefined && value !== null && value !== "") {
+      if (value !== undefined && value !== null && value !== '') {
         params.append(key, String(value));
       }
     });

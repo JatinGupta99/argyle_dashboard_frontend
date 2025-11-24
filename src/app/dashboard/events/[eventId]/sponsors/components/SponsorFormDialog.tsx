@@ -117,27 +117,21 @@ export function SponsorFormDialog() {
   };
 
   /* Remove empty/null URL fields before sending to backend */
-const cleanPayload = (data: CreateSponsorDto) => {
-  const copy: any = { ...data };
+  const cleanPayload = (data: CreateSponsorDto) => {
+    const copy: any = { ...data };
 
-  const optionalUrls = [
-    "websiteUrl",
-    "facebookUrl",
-    "twitterUrl",
-    "instagramUrl",
-    "linkedInUrl",
-  ];
+    const optionalUrls = ['websiteUrl', 'facebookUrl', 'twitterUrl', 'instagramUrl', 'linkedInUrl'];
 
-  optionalUrls.forEach((key) => {
-    if (!copy[key] || copy[key]?.trim() === "") {
-      delete copy[key]; // ⬅ remove from payload
-    }
-  });
+    optionalUrls.forEach((key) => {
+      if (!copy[key] || copy[key]?.trim() === '') {
+        delete copy[key]; // ⬅ remove from payload
+      }
+    });
 
-  const forbidden = ["_id", "eventId", "createdBy", "createdAt", "updatedAt"];
-  forbidden.forEach((key) => delete copy[key]);
-  return copy;
-};
+    const forbidden = ['_id', 'eventId', 'createdBy', 'createdAt', 'updatedAt'];
+    forbidden.forEach((key) => delete copy[key]);
+    return copy;
+  };
 
   /* SUBMIT */
   const handleSubmit = async () => {
@@ -148,16 +142,16 @@ const cleanPayload = (data: CreateSponsorDto) => {
 
     try {
       setLoading(true);
- const cleanedData = cleanPayload(formData);
+      const cleanedData = cleanPayload(formData);
       if (editing) {
         await dispatch(
           updateSponsor({
             eventId,
             sponsorId: editing._id,
             data: cleanedData,
-            logoFile,        // optional
-            documentFile,    // optional
-          })
+            logoFile, // optional
+            documentFile, // optional
+          }),
         ).unwrap();
         toast.success('Sponsor updated');
       } else {
@@ -165,9 +159,9 @@ const cleanPayload = (data: CreateSponsorDto) => {
           createSponsor({
             eventId,
             data: cleanedData,
-            logoFile,        // optional
-            documentFile,    // optional
-          })
+            logoFile, // optional
+            documentFile, // optional
+          }),
         ).unwrap();
         toast.success('Sponsor created');
       }
@@ -188,7 +182,6 @@ const cleanPayload = (data: CreateSponsorDto) => {
         </DialogHeader>
 
         <div className="space-y-4">
-
           {/* DOCUMENT UPLOAD (optional) */}
           <FormField label="Upload Document (optional)">
             <div
@@ -217,13 +210,10 @@ const cleanPayload = (data: CreateSponsorDto) => {
 
           {/* TEXT FIELDS */}
           <FormField label="Name">
-            <Input
-              value={formData.name}
-              onChange={(e) => updateField('name', e.target.value)}
-            />
+            <Input value={formData.name} onChange={(e) => updateField('name', e.target.value)} />
           </FormField>
 
-          <FormField label="Website (optional)">
+          <FormField label="Website">
             <Input
               value={formData.websiteUrl || ''}
               onChange={(e) => updateField('websiteUrl', e.target.value)}
@@ -231,28 +221,28 @@ const cleanPayload = (data: CreateSponsorDto) => {
           </FormField>
 
           <div className="grid grid-cols-2 gap-4">
-            <FormField label="Facebook (optional)">
+            <FormField label="Facebook">
               <Input
                 value={formData.facebookUrl || ''}
                 onChange={(e) => updateField('facebookUrl', e.target.value)}
               />
             </FormField>
 
-            <FormField label="Twitter (optional)">
+            <FormField label="Twitter">
               <Input
                 value={formData.twitterUrl || ''}
                 onChange={(e) => updateField('twitterUrl', e.target.value)}
               />
             </FormField>
 
-            <FormField label="Instagram (optional)">
+            <FormField label="Instagram">
               <Input
                 value={formData.instagramUrl || ''}
                 onChange={(e) => updateField('instagramUrl', e.target.value)}
               />
             </FormField>
 
-            <FormField label="LinkedIn (optional)">
+            <FormField label="LinkedIn">
               <Input
                 value={formData.linkedInUrl || ''}
                 onChange={(e) => updateField('linkedInUrl', e.target.value)}
@@ -288,10 +278,7 @@ const cleanPayload = (data: CreateSponsorDto) => {
             </div>
 
             {logoPreview && (
-              <img
-                src={logoPreview}
-                className="mt-2 h-20 w-20 rounded-md border object-cover"
-              />
+              <img src={logoPreview} className="mt-2 h-20 w-20 rounded-md border object-cover" />
             )}
 
             <input

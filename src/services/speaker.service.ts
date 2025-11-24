@@ -13,14 +13,14 @@ export interface PresignedUrlResponse {
 
 export const SpeakerService = {
   getAll: async (
-  eventId: string,
-  query: { page?: number; limit?: number; search?: string } = {}
-) => {
-  return fetchApi(ENDPOINTS.SPEAKERS.ROOT(eventId), {
-    method: "GET",
-    query,
-  });
-},
+    eventId: string,
+    query: { page?: number; limit?: number; search?: string } = {},
+  ) => {
+    return fetchApi(ENDPOINTS.SPEAKERS.ROOT(eventId), {
+      method: 'GET',
+      query,
+    });
+  },
   getById: async (eventId: string, speakerId: string) => {
     return fetchApi(ENDPOINTS.SPEAKERS.BY_ID(eventId, speakerId), {
       method: HTTP_METHODS[0],
@@ -47,20 +47,17 @@ export const SpeakerService = {
     });
   },
 
-    getUploadUrl: async (params: {
-      eventId: string;
-      speakerId: string;
-      contentType: string;
-      type: 'logo' | 'document'|'photo';
-    }): Promise<PresignedUrlResponse> => {
-      const { eventId, speakerId, contentType, type } = params;
-  
-      return fetchApi(
-        ENDPOINTS.SPEAKERS.UPLOAD_URL(eventId, speakerId),
-        {
-          method: 'POST',
-          body: JSON.stringify({ contentType, type }),
-        }
-      );
-    },
+  getUploadUrl: async (params: {
+    eventId: string;
+    speakerId: string;
+    contentType: string;
+    type: 'logo' | 'document' | 'photo';
+  }): Promise<PresignedUrlResponse> => {
+    const { eventId, speakerId, contentType, type } = params;
+
+    return fetchApi(ENDPOINTS.SPEAKERS.UPLOAD_URL(eventId, speakerId), {
+      method: 'POST',
+      body: JSON.stringify({ contentType, type }),
+    });
+  },
 };

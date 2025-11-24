@@ -1,18 +1,27 @@
 'use client';
 
 import { AppSidebar } from '@/components/layout/AppSidebar';
-import { Header } from '@/components/layout/Header';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { store } from '@/redux/store';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { useState } from 'react';
 import { Provider } from 'react-redux';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const [queryClient] = useState(() => new QueryClient());
+
   return (
     <Provider store={store}>
-      <SidebarProvider>
-        <AppSidebar />
-        <main className="h-full w-full">{children}</main>
-      </SidebarProvider>
+      <QueryClientProvider client={queryClient}>
+        <SidebarProvider>
+        <div className="fixed left-0 top-0 h-screen w-10 border-r bg-white">
+          <AppSidebar />
+        </div>
+           <main className=" h-full w-full ml-64 flex-1 overflow-y-auto bg-gray-50">
+        {children}
+      </main>
+        </SidebarProvider>
+      </QueryClientProvider>
     </Provider>
   );
 }

@@ -1,31 +1,43 @@
 'use client';
 
-import { Event } from '@/lib/types/components';
-import ScheduleTableRow from './ScheduleRow';
+import { useEffect } from 'react';
+import ScheduleTable from './ScheduleTable';
+import { useEventsContext } from '@/components/providers/EventsContextProvider';
 
 interface Props {
-  events: Event[];
-  activeTab: string;
+  activeTab: string; // ALL, PENDING, UPCOMING, PAST
 }
 
-export default function ScheduleTableBody({ events, activeTab }: Props) {
-  const filteredEvents = events.filter((e) => {
-    if (activeTab === 'ALL') return true;
-    if (activeTab === 'PENDING') return e.status === 'PENDING';
-    if (activeTab === 'UPCOMING') return e.status === 'UPCOMING';
-    if (activeTab === 'PAST') return e.status === 'PAST';
-    return true;
-  });
+export default function ScheduleTableBody({ activeTab }: Props) {
+  const { events, isLoading, error, query, setQuery } = useEventsContext();
 
-  if (!filteredEvents.length) {
+  useEffect(() => {
+    setQuery({
+      ...query,
+      page: 1,
+      status: activeTab !== 'ALL' ? activeTab : undefined,
+    });
+  }, [activeTab]);
+
+  if (isLoading) {
+    return (
+      <div className="flex h-40 items-center justify-center">
+        <span className="text-primary animate-spin">Loading...</span>
+      </div>
+    );
+  }
+
+  if (error) {
+    return <div className="p-6 text-center text-red-500">Failed to load events.</div>;
+  }
+
+  if (!events.length) {
     return <div className="p-6 text-center text-gray-500">No schedules found.</div>;
   }
 
   return (
-    <div className="max-h-[600px] divide-y overflow-y-auto rounded-md bg-white">
-      {filteredEvents.map((event) => (
-        <ScheduleTableRow key={event._id} item={event} />
-      ))}
+    <div className="max-h-[600px] w-full divide-y overflow-y-auto rounded-md bg-white">
+      <ScheduleTable />
     </div>
   );
 }

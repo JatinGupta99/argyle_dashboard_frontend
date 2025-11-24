@@ -71,10 +71,7 @@ export function AppSidebar() {
               <SidebarMenuItem key={item.title}>
                 <SidebarMenuButton
                   onClick={() => handleMenuClick(item)}
-                  className={cn(
-                    'cursor-pointer transition',
-                    isActive && 'bg-muted text-primary'
-                  )}
+                  className={cn('cursor-pointer transition', isActive && 'bg-muted text-primary')}
                 >
                   <Icon size={16} />
                   {item.title}
@@ -86,7 +83,7 @@ export function AppSidebar() {
       </SidebarContent>
 
       {/* Footer */}
-       <div className="mt-auto mb-2 px-4 text-xs font-semibold text-black">Other</div>
+      <div className="mt-auto mb-2 px-4 text-xs font-semibold text-black">Other</div>
       <SidebarFooter>
         {otherMenu.map((item) => (
           <SidebarMenuItem key={item.title}>
@@ -112,6 +109,3 @@ export function AppSidebar() {
     </Sidebar>
   );
 }
-
-
-

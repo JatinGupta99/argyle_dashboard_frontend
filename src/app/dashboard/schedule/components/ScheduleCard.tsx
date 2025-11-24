@@ -30,7 +30,7 @@ export function ScheduleCard({
   onSelect,
 }: ScheduleCardProps) {
   const router = useRouter();
-
+  console.log(eventId, 'acslascln');
   const handleDetailClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     router.push(`/dashboard/events/${eventId}`);

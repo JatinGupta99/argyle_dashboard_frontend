@@ -63,16 +63,16 @@ export function AgendaFormDialog() {
       setFormData(DEFAULT_FORM);
       return;
     }
-    console.log(editing,'calnlkcsnlac')
+    console.log(editing, 'calnlkcsnlac');
     // const start = editing.startTime ? new Date(editing.startTime) : null;
     // const end = editing.endTime ? new Date(editing.endTime) : null;
 
     setFormData({
-      title: editing.title ?? "",
-      date: editing.date ? editing.date:"",
-      startTime: editing.startTime ? editing.startTime : "",
-      endTime: editing.endTime ? editing.endTime : "",
-      description: editing.description ?? "",
+      title: editing.title ?? '',
+      date: editing.date ? editing.date : '',
+      startTime: editing.startTime ? editing.startTime : '',
+      endTime: editing.endTime ? editing.endTime : '',
+      description: editing.description ?? '',
       speakers: editing.speakers ?? [],
       hasPoll: Boolean(editing.hasPoll),
     });
@@ -89,13 +89,16 @@ export function AgendaFormDialog() {
   };
 
   const removeSpeaker = (id: string) => {
-    updateField('speakers', formData.speakers.filter((s) => s !== id));
+    updateField(
+      'speakers',
+      formData.speakers.filter((s) => s !== id),
+    );
   };
 
   /* ---------------- Submit ---------------- */
   const handleSave = async () => {
     if (!eventId) {
-      toast.error("Missing Event ID");
+      toast.error('Missing Event ID');
       return;
     }
 
@@ -115,18 +118,18 @@ export function AgendaFormDialog() {
           updateAgenda({
             agendaId: editing._id,
             payload,
-          })
+          }),
         ).unwrap();
 
-        toast.success("Agenda updated successfully");
+        toast.success('Agenda updated successfully');
       } else {
         await dispatch(addAgenda({ payload })).unwrap();
-        toast.success("Agenda added successfully");
+        toast.success('Agenda added successfully');
       }
 
       dispatch(closeAgendaForm());
     } catch (err: any) {
-      toast.error(err?.message || "Something went wrong while saving");
+      toast.error(err?.message || 'Something went wrong while saving');
     }
   };
 
@@ -135,11 +138,10 @@ export function AgendaFormDialog() {
     <Dialog open={formOpen} onOpenChange={() => dispatch(closeAgendaForm())}>
       <DialogContent className="max-h-[85vh] w-[90%] max-w-lg overflow-y-auto rounded-lg p-4">
         <DialogHeader>
-          <DialogTitle>{editing ? "Edit Agenda" : "Add Agenda"}</DialogTitle>
+          <DialogTitle>{editing ? 'Edit Agenda' : 'Add Agenda'}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
-
           <FormField label="Title">
             <Input
               value={formData.title}
@@ -205,7 +207,10 @@ export function AgendaFormDialog() {
               {formData.speakers.map((id) => {
                 const speaker = availableSpeakers.find((s) => s.id === id);
                 return (
-                  <div key={id} className="flex items-center justify-between rounded bg-gray-100 px-3 py-2">
+                  <div
+                    key={id}
+                    className="flex items-center justify-between rounded bg-gray-100 px-3 py-2"
+                  >
                     <span>{speaker?.name ?? id}</span>
                     <Button variant="ghost" onClick={() => removeSpeaker(id)}>
                       Remove
@@ -227,7 +232,6 @@ export function AgendaFormDialog() {
               <Label htmlFor="poll-checkbox">Enable Poll</Label>
             </div>
           </FormField>
-
         </div>
 
         <div className="mt-6 flex justify-end gap-3">
@@ -235,11 +239,8 @@ export function AgendaFormDialog() {
             Cancel
           </Button>
 
-          <Button onClick={handleSave}>
-            {editing ? "Save Changes" : "Add Agenda"}
-          </Button>
+          <Button onClick={handleSave}>{editing ? 'Save Changes' : 'Add Agenda'}</Button>
         </div>
-
       </DialogContent>
     </Dialog>
   );

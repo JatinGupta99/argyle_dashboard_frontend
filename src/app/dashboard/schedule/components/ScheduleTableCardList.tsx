@@ -4,7 +4,11 @@ import { useState } from 'react';
 import { Event } from '@/lib/types/components';
 import { ScheduleCardWrapper } from './ScheduleCardWrapper';
 
-export function ScheduleTableCardList({ events }: { events: Event[] }) {
+interface ScheduleTableCardListProps {
+  events: Event[];
+}
+
+export function ScheduleTableCardList({ events }: ScheduleTableCardListProps) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   if (!events || events.length === 0) {
@@ -12,7 +16,7 @@ export function ScheduleTableCardList({ events }: { events: Event[] }) {
   }
 
   return (
-    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+    <div className="grid w-full grid-cols-1 gap-4 pl-4 md:grid-cols-2 lg:grid-cols-3">
       {events.map((event) => (
         <ScheduleCardWrapper
           key={event._id}

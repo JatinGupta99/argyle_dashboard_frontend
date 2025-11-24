@@ -19,7 +19,7 @@ import {
   updateSpeaker,
 } from '@/redux/slices/speaker-slice';
 import { Upload } from 'lucide-react';
-import { DragEvent, useEffect, useState } from 'react';
+import { DragEvent, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 const DEFAULT_FORM: CreateSpeakerDto = {
@@ -38,7 +38,9 @@ export function SpeakerFormDialog() {
 
   const [formData, setFormData] = useState<CreateSpeakerDto>(DEFAULT_FORM);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
-  const [dragging, setDragging] = useState(false);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+
+  const photoInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (formOpen && editItem) {
@@ -51,16 +53,18 @@ export function SpeakerFormDialog() {
         linkedInUrl: editItem.linkedInUrl ?? '',
         pictureUrl: editItem.pictureUrl ?? '',
       });
+      setPhotoPreview(editItem.pictureUrl ?? null);
       setPhotoFile(null);
     } else if (!formOpen) {
       setFormData(DEFAULT_FORM);
       setPhotoFile(null);
+      setPhotoPreview(null);
     }
   }, [formOpen, editItem]);
 
   const updateField = (key: string, value: string, nested = false) => {
     setFormData((prev) =>
-      nested ? { ...prev, name: { ...prev.name, [key]: value } } : { ...prev, [key]: value }
+      nested ? { ...prev, name: { ...prev.name, [key]: value } } : { ...prev, [key]: value },
     );
   };
 
@@ -72,13 +76,24 @@ export function SpeakerFormDialog() {
     return null;
   };
 
-  const handleDrop = (e: DragEvent<HTMLDivElement>) => {
+  /* PHOTO UPLOAD */
+  const handlePhotoClick = () => photoInputRef.current?.click();
+
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setPhotoFile(file);
+      setPhotoPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handlePhotoDrop = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
-    setDragging(false);
     const file = e.dataTransfer.files?.[0];
-    if (!file) return;
-    setPhotoFile(file);
-    setFormData((prev) => ({ ...prev, pictureUrl: URL.createObjectURL(file) }));
+    if (file) {
+      setPhotoFile(file);
+      setPhotoPreview(URL.createObjectURL(file));
+    }
   };
 
   const handleClose = () => dispatch(closeForm());
@@ -102,7 +117,7 @@ export function SpeakerFormDialog() {
               },
             },
             photoFile,
-          })
+          }),
         ).unwrap();
         toast.success('Speaker updated');
       } else {
@@ -116,12 +131,12 @@ export function SpeakerFormDialog() {
               },
             },
             photoFile,
-          })
+          }),
         ).unwrap();
         toast.success('Speaker added');
       }
 
-      // refresh current page (uses eventId from slice)
+      // refresh current page
       dispatch(fetchSpeakers({ page: 1, limit: 10 }));
       handleClose();
     } catch {
@@ -137,6 +152,7 @@ export function SpeakerFormDialog() {
         </DialogHeader>
 
         <div className="space-y-4">
+          {/* Name */}
           <div className="flex gap-4">
             <FormField label="First Name" className="flex-1">
               <Input
@@ -155,6 +171,7 @@ export function SpeakerFormDialog() {
             </FormField>
           </div>
 
+          {/* Company & Title */}
           <div className="flex gap-4">
             <FormField label="Company" className="flex-1">
               <Input
@@ -173,6 +190,7 @@ export function SpeakerFormDialog() {
             </FormField>
           </div>
 
+          {/* Email & LinkedIn */}
           <FormField label="Email">
             <Input
               type="email"
@@ -190,37 +208,42 @@ export function SpeakerFormDialog() {
             />
           </FormField>
 
+          {/* PHOTO UPLOAD */}
           <FormField label="Upload Photo">
             <div
-              onDrop={handleDrop}
-              onDragOver={(e) => {
-                e.preventDefault();
-                setDragging(true);
-              }}
-              onDragLeave={() => setDragging(false)}
-              className={`rounded-md border-2 border-dashed p-6 text-center transition ${
-                dragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
-              }`}
+              onClick={handlePhotoClick}
+              onDrop={handlePhotoDrop}
+              onDragOver={(e) => e.preventDefault()}
+              className="cursor-pointer rounded-md border-2 border-dashed p-6 text-center"
             >
               {!photoFile ? (
-                <div className="text-muted-foreground flex flex-col items-center text-sm">
+                <div className="flex flex-col items-center text-sm opacity-60">
                   <Upload className="mb-2 h-6 w-6" />
-                  Drag & Drop photo here
+                  Drag or click to upload photo
                 </div>
               ) : (
-                <p className="text-sm">{photoFile.name}</p>
+                <p>{photoFile.name}</p>
               )}
             </div>
 
-            {formData.pictureUrl && (
+            {photoPreview && (
               <img
-                src={formData.pictureUrl}
+                src={photoPreview}
                 alt="Preview"
                 className="mt-2 h-20 w-20 rounded-md border object-cover"
               />
             )}
+
+            <input
+              type="file"
+              ref={photoInputRef}
+              accept="image/*"
+              className="hidden"
+              onChange={handlePhotoChange}
+            />
           </FormField>
 
+          {/* Bio */}
           <FormField label="Bio">
             <textarea
               value={formData.bio}

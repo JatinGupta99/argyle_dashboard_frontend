@@ -45,7 +45,7 @@ export const agendaSlice = createSlice({
     openAgendaForm(state, action: PayloadAction<Agenda | null>) {
       state.formOpen = true;
       state.editing = action.payload ?? null;
-      state.agendaId = action.payload?._id ?? null;  // 👈 store agendaId too
+      state.agendaId = action.payload?._id ?? null; // 👈 store agendaId too
     },
 
     closeAgendaForm(state) {
@@ -119,9 +119,7 @@ export const agendaSlice = createSlice({
     /* ---------- UPDATE ---------- */
     builder.addCase(updateAgenda.fulfilled, (state, action) => {
       const updated = action.payload;
-      state.items = state.items.map((a) =>
-        a._id === updated._id ? updated : a
-      );
+      state.items = state.items.map((a) => (a._id === updated._id ? updated : a));
       state.formOpen = false;
       state.editing = null;
       state.agendaId = null;
@@ -144,7 +142,7 @@ export const {
   openAgendaForm,
   closeAgendaForm,
   setAgendaEventId,
-  setAgendaId,          // 👈 Export new action
+  setAgendaId, // 👈 Export new action
   clearAgendaError,
   setAgendaDeleteTarget,
   clearAgendaDeleteTarget,

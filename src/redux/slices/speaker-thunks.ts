@@ -19,7 +19,7 @@ export const fetchSpeakers = createAsyncThunk(
       limit?: number;
       search?: string;
     },
-    thunkAPI
+    thunkAPI,
   ) => {
     try {
       // Build query params
@@ -31,9 +31,8 @@ export const fetchSpeakers = createAsyncThunk(
     } catch (error) {
       return thunkAPI.rejectWithValue('Failed to fetch speakers');
     }
-  }
+  },
 );
-
 
 /* --------------------------------------------------------
    CREATE SPEAKER (with optional image upload)
@@ -50,7 +49,7 @@ export const createSpeaker = createAsyncThunk(
       data: CreateSpeakerDto;
       photoFile?: File | null;
     },
-    thunkAPI
+    thunkAPI,
   ) => {
     try {
       // 1) Create speaker WITHOUT image
@@ -82,7 +81,7 @@ export const createSpeaker = createAsyncThunk(
       if (pictureKey) {
         await SpeakerService.update(eventId, speakerId, {
           ...data,
-          pictureUrl:pictureKey,
+          pictureUrl: pictureKey,
         });
       }
 
@@ -90,9 +89,8 @@ export const createSpeaker = createAsyncThunk(
     } catch (e) {
       return thunkAPI.rejectWithValue('Failed to create speaker');
     }
-  }
+  },
 );
-
 
 /* --------------------------------------------------------
    UPDATE SPEAKER (with optional image upload)
@@ -111,7 +109,7 @@ export const updateSpeaker = createAsyncThunk(
       payload: UpdateSpeakerDto;
       photoFile?: File | null;
     },
-    thunkAPI
+    thunkAPI,
   ) => {
     try {
       let pictureKey: string | undefined = undefined;
@@ -143,7 +141,7 @@ export const updateSpeaker = createAsyncThunk(
     } catch {
       return thunkAPI.rejectWithValue('Failed to update speaker');
     }
-  }
+  },
 );
 
 /* --------------------------------------------------------
@@ -158,7 +156,7 @@ export const deleteSpeaker = createAsyncThunk(
     } catch {
       return thunkAPI.rejectWithValue('Failed to delete speaker');
     }
-  }
+  },
 );
 
 /* --------------------------------------------------------
@@ -169,7 +167,7 @@ export const uploadSpeakerImage = createAsyncThunk(
   'speakers/uploadImage',
   async (
     { file, eventId, speakerId }: { file: File; eventId: string; speakerId: string },
-    thunkAPI
+    thunkAPI,
   ) => {
     try {
       const presign: PresignedUrlResponse = await SpeakerService.getUploadUrl({
@@ -188,5 +186,5 @@ export const uploadSpeakerImage = createAsyncThunk(
     } catch {
       return thunkAPI.rejectWithValue('Failed to upload image');
     }
-  }
+  },
 );

@@ -2,7 +2,6 @@
 
 import { Event } from '@/lib/types/components';
 import { ScheduleCard } from './ScheduleCard';
-import { useSpeakers } from '@/hooks/useSpeakers';
 import { format } from 'date-fns';
 
 export function ScheduleCardWrapper({
@@ -14,8 +13,8 @@ export function ScheduleCardWrapper({
   selected: boolean;
   onSelect: () => void;
 }) {
-  const { speakers, loading } = useSpeakers(event._id);
-  const speaker = speakers?.[0];
+  // Get first speaker from event.speakerPreview
+  const speaker = event.speakerPreview?.[0];
 
   const day = format(new Date(event.EventDate), 'EEEE');
   const time =
@@ -29,9 +28,9 @@ export function ScheduleCardWrapper({
       title={event.title}
       time={time}
       day={day}
-      speaker={loading ? 'Loading…' : (speaker?.name.firstName ?? 'No Speaker')}
+      speaker={speaker?.name ?? 'No Speaker'}
       position={speaker?.title ?? ''}
-      image={speaker?.pictureUrl ?? ''}
+      image={speaker?.photo ?? ''}
       selected={selected}
       onSelect={onSelect}
     />

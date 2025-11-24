@@ -5,17 +5,15 @@ import { useApiRequest } from '@/lib/useApiRequest';
 
 export function useEvent(eventId: string) {
   const { data, isLoading, error, refetch } = useApiRequest<{ data: Event }>(
-    () => privateApiClient.get(ENDPOINTS.Event.FETCH_BY_ID(eventId)),
+    () => privateApiClient.get(ENDPOINTS.EVENTS.FETCH_BY_ID(eventId)),
     [eventId],
   );
 
   // Extract event safely
   const event = data?.data;
-
+  console.log(event, 'EVEENENENT');
   // 🚨 Detect API success but missing event
-  const normalizedError =
-    error ??
-    (!isLoading && !event ? "Event not found" : null);
+  const normalizedError = error ?? (!isLoading && !event ? 'Event not found' : null);
 
   return {
     event,

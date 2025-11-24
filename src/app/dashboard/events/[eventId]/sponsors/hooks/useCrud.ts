@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState } from 'react';
 
 export function useCrud<T>(eventId: string, service: any) {
   const [items, setItems] = useState<T[]>([]);
@@ -15,7 +15,7 @@ export function useCrud<T>(eventId: string, service: any) {
     deleteItem: setDeleteTarget,
     editExisting: setEditItem,
 
-    async loadItems(params = { page: 1, limit: 10, search: "" }) {
+    async loadItems(params = { page: 1, limit: 10, search: '' }) {
       const res = await service.getAll(eventId, params);
       setItems(res.data);
       return res;

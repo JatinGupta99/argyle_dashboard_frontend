@@ -1,31 +1,64 @@
 'use client';
 
-import { Header } from '@/components/layout/Header';
+import { useState, useMemo } from 'react';
 import { useEventsContext } from '@/components/providers/EventsContextProvider';
-import ScheduleTableBody from '../components/ScheduleTableBody';
+import { Header } from '@/components/layout/Header';
 import { DashboardToolbar } from '@/components/dashboard/DashboardToolBar';
 import MonthlySummary from '@/components/dashboard/MonthlyScheduleSummary';
-import { useMemo, useState } from 'react';
-import ScheduleHeader from '../components/ScheduleHeader';
-import ScheduleTableTabs from '../components/ScheduleTableTabs';
+import ScheduleTableBody from '../components/ScheduleTableBody';
+import ScheduleTableTabs from '../components/ScheduleTabs';
+import { Plus } from 'lucide-react';
+import { EventFormDialog } from '../components/EventFormDialog';
+import { useAppDispatch } from '@/redux/hooks';
+import { openEventForm } from '@/redux/slices/event-slice';
 
 export default function ScheduleTableContent() {
-  const events = useEventsContext();
+  const { meta, query, setQuery } = useEventsContext();
   const [activeTab, setActiveTab] = useState('ALL');
+  const dispatch = useAppDispatch();
 
   const scheduleData = useMemo(
     () => ({
       month: new Date().toLocaleString('default', { month: 'long' }),
-      scheduleCount: events.length,
+      scheduleCount: meta.total,
       label: 'Schedules',
     }),
-    [events],
+    [meta]
   );
+
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+    setQuery({
+      ...query,
+      page: 1,
+      status: tab === 'ALL' ? undefined : tab,
+    });
+  };
+
+  const handleDateFilter = (from: string, to: string) => {
+    setQuery({
+      ...query,
+      page: 1,
+      from_date: from || undefined,
+      to_date: to || undefined,
+    });
+  };
+
+  const openCreateEventForm = () => {
+    dispatch(openEventForm(null)); // ✅ now opens Event form
+  };
 
   return (
     <div className="w-full">
       <Header />
-      <DashboardToolbar />
+
+      <DashboardToolbar
+        buttonLabel="Add Event"
+        buttonIcon={<Plus className="h-4 w-4" />}
+        onButtonClick={openCreateEventForm}
+        showDateFilters
+        onDateFilter={handleDateFilter}
+      />
 
       <MonthlySummary
         month={scheduleData.month}
@@ -34,14 +67,12 @@ export default function ScheduleTableContent() {
       />
 
       <div className="mt-4 mb-2 pl-6">
-        <ScheduleTableTabs activeTab={activeTab} setActiveTab={setActiveTab} />
+        <ScheduleTableTabs activeTab={activeTab} setActiveTab={handleTabChange} />
+        <ScheduleTableBody activeTab={activeTab} />
       </div>
 
-      <div className="sticky top-20 z-20 bg-sky-50 shadow-sm">
-        <ScheduleHeader />
-      </div>
-
-      <ScheduleTableBody events={events} activeTab={activeTab} />
+      {/* Event Form Modal */}
+      <EventFormDialog />
     </div>
   );
 }

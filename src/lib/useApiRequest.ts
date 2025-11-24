@@ -10,6 +10,7 @@ export function useApiRequest<T>(requestFn: () => Promise<T>, deps: any[] = []) 
     setError(null);
     try {
       const result = await requestFn();
+      console.log(result, 'cklnsal');
       setData(result);
     } catch (err: any) {
       setError(err instanceof Error ? err.message : 'Unknown error');

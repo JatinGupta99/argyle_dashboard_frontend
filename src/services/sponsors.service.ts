@@ -9,8 +9,8 @@ import type {
 export interface PresignedUrlResponse {
   statusCode: number;
   data: {
-    key: string;           // S3 Key
-    uploadUrl: string;     // Pre-signed PUT URL
+    key: string; // S3 Key
+    uploadUrl: string; // Pre-signed PUT URL
   };
 }
 
@@ -19,57 +19,43 @@ export const SponsorService = {
      GET ALL SPONSORS
   -------------------------------------------------------------*/
   getAll: async (eventId: string) => {
-    return await fetchApi<{ results: Sponsor[] }>(
-      ENDPOINTS.SPONSORS.ROOT(eventId),
-      { method: 'GET' }
-    );
-
+    return await fetchApi<{ results: Sponsor[] }>(ENDPOINTS.SPONSORS.ROOT(eventId), {
+      method: 'GET',
+    });
   },
 
   /* ------------------------------------------------------------
      GET SPONSOR BY ID
   -------------------------------------------------------------*/
   getById: async (eventId: string, sponsorId: string) => {
-    return fetchApi(
-      ENDPOINTS.SPONSORS.BY_ID(eventId, sponsorId),
-      { method: 'GET' }
-    );
+    return fetchApi(ENDPOINTS.SPONSORS.BY_ID(eventId, sponsorId), { method: 'GET' });
   },
 
   /* ------------------------------------------------------------
      CREATE SPONSOR (NO FILES HERE)
   -------------------------------------------------------------*/
   create: async (eventId: string, payload: CreateSponsorDto) => {
-    return fetchApi(
-      ENDPOINTS.SPONSORS.ROOT(eventId),
-      {
-        method: 'POST',
-        body: JSON.stringify(payload),
-      }
-    );
+    return fetchApi(ENDPOINTS.SPONSORS.ROOT(eventId), {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
   },
 
   /* ------------------------------------------------------------
      UPDATE SPONSOR
   -------------------------------------------------------------*/
   update: async (eventId: string, sponsorId: string, payload: UpdateSponsorDto) => {
-    return fetchApi(
-      ENDPOINTS.SPONSORS.BY_ID(eventId, sponsorId),
-      {
-        method: 'PATCH',
-        body: JSON.stringify(payload),
-      }
-    );
+    return fetchApi(ENDPOINTS.SPONSORS.BY_ID(eventId, sponsorId), {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    });
   },
 
   /* ------------------------------------------------------------
      DELETE SPONSOR
   -------------------------------------------------------------*/
   remove: async (eventId: string, sponsorId: string) => {
-    return fetchApi(
-      ENDPOINTS.SPONSORS.BY_ID(eventId, sponsorId),
-      { method: 'DELETE' }
-    );
+    return fetchApi(ENDPOINTS.SPONSORS.BY_ID(eventId, sponsorId), { method: 'DELETE' });
   },
 
   /* ------------------------------------------------------------
@@ -83,13 +69,10 @@ export const SponsorService = {
   }): Promise<PresignedUrlResponse> => {
     const { eventId, sponsorId, contentType, type } = params;
 
-    return fetchApi(
-      ENDPOINTS.SPONSORS.UPLOAD_URL(eventId, sponsorId),
-      {
-        method: 'POST',
-        body: JSON.stringify({ contentType, type }),
-      }
-    );
+    return fetchApi(ENDPOINTS.SPONSORS.UPLOAD_URL(eventId, sponsorId), {
+      method: 'POST',
+      body: JSON.stringify({ contentType, type }),
+    });
   },
 
   /* ------------------------------------------------------------
@@ -117,12 +100,9 @@ export const SponsorService = {
   }) => {
     const { eventId, sponsorId, key, type } = params;
 
-    return fetchApi(
-      ENDPOINTS.SPONSORS.CONFIRM_UPLOAD(eventId, sponsorId),
-      {
-        method: 'POST',
-        body: JSON.stringify({ key, type }),
-      }
-    );
+    return fetchApi(ENDPOINTS.SPONSORS.CONFIRM_UPLOAD(eventId, sponsorId), {
+      method: 'POST',
+      body: JSON.stringify({ key, type }),
+    });
   },
 };

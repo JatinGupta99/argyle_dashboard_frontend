@@ -2,10 +2,35 @@ import { Speaker } from './speaker';
 
 // --- Main Event Interface ---
 export interface EventSchedule {
-  startTime: Date; // ISO 8601 Date string, e.g., "2025-11-11T08:41:00.000Z"
-  endTime: Date; // ISO 8601 Date string
-  _id: string;
+  startTime: Date|string; // ISO 8601 Date string, e.g., "2025-11-11T08:41:00.000Z"
+  endTime: Date|string; // ISO 8601 Date string
+  _id?: string;
 }
+
+export interface CreateEventDto {
+  title: string;
+  description?: string;
+  eventDate: string;
+  schedule: {
+    startTime: string|Date;
+    endTime: string|Date;
+  };
+  eventLogoUrl?: string;
+}
+
+
+export interface UpdateEventDto {
+  title?: string;
+  description?: string;
+  eventDate?: string;
+  schedule?: {
+    startTime?: string;
+    endTime?: string;
+  };
+  eventLogoUrl?: string;
+}
+
+
 
 export interface Event {
   _id: string;
@@ -13,7 +38,7 @@ export interface Event {
   eventDetails: string;
   eventLogoUrl: string;
   EventDate: string; // YYYY-MM-DD format
-  schedule: EventSchedule;
+  schedule?: EventSchedule;
   privacy: 'public' | 'private' | string;
   status: 'UPCOMING' | 'LIVE' | 'COMPLETED' | string;
   host: string; // User ID

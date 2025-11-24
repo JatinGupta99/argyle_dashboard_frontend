@@ -1,12 +1,16 @@
 'use client';
 
 import { EventsContextProvider } from '@/components/providers/EventsContextProvider';
-import { useAllEvents } from '@/hooks/useAllEvents';
+import { fetchEvents } from '@/hooks/useAllEvents';
+import { useQuery } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  const { events, isLoading, error } = useAllEvents();
-  console.log(events, 'events in schedule layout before loading check');
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['events', { page: 1, limit: 20 }],
+    queryFn: () => fetchEvents({ page: 1, limit: 10 }),
+  });
+
   if (isLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
@@ -14,18 +18,21 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       </div>
     );
   }
-  if (error || !events) {
-    console.error('❌ Failed to load events:', error);
+
+  if (error) {
     return (
       <div className="flex h-screen items-center justify-center text-gray-500">
-        Failed to load events details.
+        Failed to load events.
       </div>
     );
   }
-  console.log(events, 'events in schedule layout');
+
   return (
-    <EventsContextProvider events={events}>
-      <div>{children}</div>
+    <EventsContextProvider
+      initialEvents={data?.events || []}
+      initialMeta={data?.meta || { page: 1, limit: 20, total: 0, totalPages: 1 }}
+    >
+      {children}
     </EventsContextProvider>
   );
 }

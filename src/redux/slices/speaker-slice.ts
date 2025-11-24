@@ -44,22 +44,19 @@ export const fetchSpeakers = createAsyncThunk<
   { data: Speaker[]; total: number; page: number; limit: number },
   { page?: number; limit?: number; search?: string } | undefined,
   { rejectValue: string }
->(
-  'speakers/fetch',
-  async (args = {}, thunkAPI) => {
-    const { page = 1, limit = 10, search = '' } = args || {};
-    const state: any = thunkAPI.getState();
-    const eventId: string | null = state.speakers?.eventId ?? null;
-    if (!eventId) return thunkAPI.rejectWithValue('Missing eventId');
+>('speakers/fetch', async (args = {}, thunkAPI) => {
+  const { page = 1, limit = 10, search = '' } = args || {};
+  const state: any = thunkAPI.getState();
+  const eventId: string | null = state.speakers?.eventId ?? null;
+  if (!eventId) return thunkAPI.rejectWithValue('Missing eventId');
 
-    try {
-      const res: any = await (SpeakerService as any).getAll(eventId, { page, limit, search });
-      return { data: res.data ?? [], total: res.total ?? 0, page, limit };
-    } catch (err: any) {
-      return thunkAPI.rejectWithValue(err?.message ?? 'Failed to fetch speakers');
-    }
+  try {
+    const res: any = await (SpeakerService as any).getAll(eventId, { page, limit, search });
+    return { data: res.data ?? [], total: res.total ?? 0, page, limit };
+  } catch (err: any) {
+    return thunkAPI.rejectWithValue(err?.message ?? 'Failed to fetch speakers');
   }
-);
+});
 
 export const createSpeaker = createAsyncThunk<
   Speaker,
@@ -105,22 +102,21 @@ export const updateSpeaker = createAsyncThunk<
   }
 });
 
-export const deleteSpeaker = createAsyncThunk<
-  string,
-  { id: string },
-  { rejectValue: string }
->('speakers/delete', async ({ id }, thunkAPI) => {
-  const state: any = thunkAPI.getState();
-  const eventId: string | null = state.speakers?.eventId ?? null;
-  if (!eventId) return thunkAPI.rejectWithValue('Missing eventId');
+export const deleteSpeaker = createAsyncThunk<string, { id: string }, { rejectValue: string }>(
+  'speakers/delete',
+  async ({ id }, thunkAPI) => {
+    const state: any = thunkAPI.getState();
+    const eventId: string | null = state.speakers?.eventId ?? null;
+    if (!eventId) return thunkAPI.rejectWithValue('Missing eventId');
 
-  try {
-    await SpeakerService.remove(eventId, id);
-    return id;
-  } catch (err: any) {
-    return thunkAPI.rejectWithValue(err?.message ?? 'Failed to delete speaker');
-  }
-});
+    try {
+      await SpeakerService.remove(eventId, id);
+      return id;
+    } catch (err: any) {
+      return thunkAPI.rejectWithValue(err?.message ?? 'Failed to delete speaker');
+    }
+  },
+);
 
 /* ---------- Slice ---------- */
 const speakersSlice = createSlice({
@@ -167,7 +163,7 @@ const speakersSlice = createSlice({
       })
       .addCase(fetchSpeakers.rejected, (s, a) => {
         s.loading = false;
-        s.error = a.payload ?? (a.error?.message ?? 'Failed to fetch speakers');
+        s.error = a.payload ?? a.error?.message ?? 'Failed to fetch speakers';
       })
 
       /* create */
@@ -219,14 +215,7 @@ const speakersSlice = createSlice({
   },
 });
 
-export const {
-  setEventId,
-  openForm,
-  closeForm,
-  setDeleteTarget,
-  setPage,
-  setLimit,
-  clearError,
-} = speakersSlice.actions;
+export const { setEventId, openForm, closeForm, setDeleteTarget, setPage, setLimit, clearError } =
+  speakersSlice.actions;
 
 export default speakersSlice.reducer;

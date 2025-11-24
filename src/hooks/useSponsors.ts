@@ -7,9 +7,7 @@ export const useSponsors = () => {
   const dispatch = useAppDispatch();
 
   // Match EXACT fields from SponsorState
-  const { eventId, items, loading, error } = useAppSelector(
-    (state) => state.sponsors
-  );
+  const { eventId, items, loading, error } = useAppSelector((state) => state.sponsors);
 
   const refresh = () => {
     if (eventId) {
