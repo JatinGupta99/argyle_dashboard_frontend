@@ -18,6 +18,8 @@ export const ENDPOINTS = {
   AUTH: {
     LOGIN: '/auth/login',
     LOGOUT: '/auth/logout',
+    RESET_PASSWORD: '/auth/reset-password',
+    FORGOT_PASSWORD: '/auth/forgot-password',
   },
   USER: {
     GET_PROFILE: '/company-user/profile',

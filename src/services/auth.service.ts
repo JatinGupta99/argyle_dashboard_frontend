@@ -24,4 +24,31 @@ export const AuthService = {
     });
     return data;
   },
+
+   resetPassword: async (payload: { token: string; newPassword: string }): Promise<void> => {
+    const { token, newPassword } = payload;
+
+    const res = await fetchApi<{ message?: string }>(ENDPOINTS.AUTH.RESET_PASSWORD, {
+      method: HTTP_METHODS[3],
+      body: JSON.stringify({ token, newPassword }),
+    });
+
+    if (!res) {
+      throw new Error('Failed to reset password');
+    }
+  },
+
+  forgotPassword: async (payload: { email: string }): Promise<void> => {
+  const { email } = payload;
+
+  const res = await fetchApi<{ message?: string }>(ENDPOINTS.AUTH.FORGOT_PASSWORD, {
+    method: HTTP_METHODS[3],
+    body: JSON.stringify({ email }),
+  });
+
+  if (!res) {
+    throw new Error('Failed to send password reset email');
+  }
+},
+
 };

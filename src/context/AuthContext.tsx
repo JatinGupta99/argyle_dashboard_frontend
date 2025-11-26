@@ -11,16 +11,23 @@ type AuthContextType = {
   loading: boolean;
   login: (payload: UserLoginDto) => Promise<AuthResponse>;
   logout: () => Promise<void>;
+  resetPassword: (payload: { token: string; newPassword: string }) => Promise<void>;
+  forgotPassword: (payload: { email: string }) => Promise<void>; // ← Added
 };
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
-  // 🧠 default implementations now throw clear errors if used before provider
   login: async () => {
     throw new Error('AuthContext not initialized yet. Wrap your app in <AuthProvider>.');
   },
   logout: async () => {
+    throw new Error('AuthContext not initialized yet. Wrap your app in <AuthProvider>.');
+  },
+  resetPassword: async () => {
+    throw new Error('AuthContext not initialized yet. Wrap your app in <AuthProvider>.');
+  },
+  forgotPassword: async () => {                            // ← Added
     throw new Error('AuthContext not initialized yet. Wrap your app in <AuthProvider>.');
   },
 });
@@ -31,26 +38,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
   const pathname = usePathname();
 
-  // --- ✅ Check existing token and fetch profile on load ---
+  // --- Initialize authentication on load ---
   useEffect(() => {
     const initAuth = async () => {
-      console.log('[Auth] Initializing...');
       const { access_token } = getAuthToken() || {};
 
       if (!access_token) {
-        console.log('[Auth] No token found, user unauthenticated');
         setUser(null);
         setLoading(false);
         return;
       }
 
       try {
-        console.log('[Auth] Token found, fetching profile...');
         const profile = await AuthService.getProfile();
         setUser(profile);
-        console.log('[Auth] Profile fetched successfully:', profile);
       } catch (err) {
-        console.error('[Auth] Invalid token. Clearing credentials.');
         clearAuthToken();
         setUser(null);
         if (!pathname.startsWith('/auth')) router.replace('/auth/login');
@@ -62,33 +64,30 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     initAuth();
   }, [router, pathname]);
 
-  // --- ✅ Login Flow ---
-
+  // --- Login ---
   const login = async ({ email, password }: UserLoginDto): Promise<AuthResponse> => {
     const data = await AuthService.login({ email, password });
-    const { access_token, expires_in, user } = data;
-    if (!access_token) throw new Error('No access token returned from API.');
+
+    if (!data.access_token) throw new Error('No access token returned from API.');
 
     setAuthToken({
-      access_token,
+      access_token: data.access_token,
       refresh_token: '',
-      expires_in,
+      expires_in: data.expires_in,
       refresh_expires_in: 0,
       token_type: 'Bearer',
       session_state: '',
     });
-    const UserProfile = await AuthService.getProfile();
-    console.log(UserProfile, '1221121212121221');
-    setUser(UserProfile);
+
+    const profile = await AuthService.getProfile();
+    setUser(profile);
 
     router.replace('/dashboard/schedule/card');
-
     return data;
   };
 
-  // --- ✅ Logout Flow ---
+  // --- Logout ---
   const logout = async () => {
-    console.log('[Auth] Logging out...');
     try {
       await AuthService.logout();
     } catch (err) {
@@ -100,8 +99,40 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  // --- Reset Password ---
+  const resetPassword = async ({ token, newPassword }: { token: string; newPassword: string }) => {
+    try {
+      await AuthService.resetPassword({ token, newPassword });
+    } catch (err: any) {
+      console.error('[Auth] Reset password failed:', err);
+      throw err;
+    }
+  };
+
+  // --- Forgot Password (new) ---
+const forgotPassword = async ({ email }: { email: string }) => {
+  try {
+    await AuthService.forgotPassword({ email })
+  } catch (err: any) {
+    const backendMessage = err?.response?.data?.message
+    if (backendMessage === "User not found" || err?.status === 404) return
+    throw err // Only throw for real server errors
+  }
+}
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>{children}</AuthContext.Provider>
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        login,
+        logout,
+        resetPassword,
+        forgotPassword,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
   );
 };
 
