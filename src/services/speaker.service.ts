@@ -1,35 +1,63 @@
 import { ENDPOINTS } from '@/lib/api-endpoints';
 import { fetchApi } from '@/lib/fetch-api';
-import type { Speaker, CreateSpeakerDto, UpdateSpeakerDto } from '@/lib/types/speaker';
+import type { CreateSpeakerDto, Speaker, UpdateSpeakerDto } from '@/lib/types/speaker';
+import { HTTP_METHODS } from 'next/dist/server/web/http';
+
+export interface PresignedUrlResponse {
+  statusCode: number;
+  data: {
+    key: string;
+    url: string;
+  };
+}
 
 export const SpeakerService = {
-  getAll: async (): Promise<Speaker[]> => {
-    const res = await fetchApi<any>(ENDPOINTS.SPEAKERS.ROOT);
-    return Array.isArray(res) ? res : res.data || [];
+  getAll: async (
+    eventId: string,
+    query: { page?: number; limit?: number; search?: string } = {},
+  ) => {
+    return fetchApi(ENDPOINTS.SPEAKERS.ROOT(eventId), {
+      method: 'GET',
+      query,
+    });
+  },
+  getById: async (eventId: string, speakerId: string) => {
+    return fetchApi(ENDPOINTS.SPEAKERS.BY_ID(eventId, speakerId), {
+      method: HTTP_METHODS[0],
+    });
   },
 
-  getById: async (id: string): Promise<Speaker> => {
-    const res = await fetchApi<any>(ENDPOINTS.SPEAKERS.BY_ID(id));
-    return res.data || res;
+  create: async (eventId: string, payload: CreateSpeakerDto) => {
+    return fetchApi(ENDPOINTS.SPEAKERS.ROOT(eventId), {
+      method: HTTP_METHODS[3],
+      body: JSON.stringify(payload),
+    });
   },
 
-  create: async (payload: CreateSpeakerDto) => {
-    return fetchApi(ENDPOINTS.SPEAKERS.ROOT, {
+  update: async (eventId: string, speakerId: string, payload: UpdateSpeakerDto) => {
+    return fetchApi(ENDPOINTS.SPEAKERS.BY_ID(eventId, speakerId), {
+      method: HTTP_METHODS[6],
+      body: JSON.stringify(payload),
+    });
+  },
+
+  remove: async (eventId: string, speakerId: string) => {
+    return fetchApi(ENDPOINTS.SPEAKERS.BY_ID(eventId, speakerId), {
+      method: HTTP_METHODS[5],
+    });
+  },
+
+  getUploadUrl: async (params: {
+    eventId: string;
+    speakerId: string;
+    contentType: string;
+    type: 'logo' | 'document' | 'photo';
+  }): Promise<PresignedUrlResponse> => {
+    const { eventId, speakerId, contentType, type } = params;
+
+    return fetchApi(ENDPOINTS.SPEAKERS.UPLOAD_URL(eventId, speakerId), {
       method: 'POST',
-      body: JSON.stringify(payload),
-    });
-  },
-
-  update: async (id: string, payload: UpdateSpeakerDto) => {
-    return fetchApi(ENDPOINTS.SPEAKERS.BY_ID(id), {
-      method: 'PUT',
-      body: JSON.stringify(payload),
-    });
-  },
-
-  remove: async (id: string) => {
-    return fetchApi(ENDPOINTS.SPEAKERS.BY_ID(id), {
-      method: 'DELETE',
+      body: JSON.stringify({ contentType, type }),
     });
   },
 };

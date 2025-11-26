@@ -1,10 +1,10 @@
-import './globals.css'
-import { AuthProvider } from '@/context/AuthContext'
-import { Toaster } from "@/components/ui/sonner";
+import { Toaster } from '@/components/ui/sonner';
+import { AuthProvider } from '@/context/AuthContext';
+import './globals.css';
 export const metadata = {
   title: 'Argyle Dashboard',
   description: 'Admin dashboard app',
-}
+};
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -12,9 +12,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <AuthProvider>
           {children}
-          <Toaster richColors position="top-right" /> 
+          <Toaster richColors position="top-right" />
         </AuthProvider>
       </body>
     </html>
-  )
+  );
 }

@@ -23,7 +23,7 @@ const schedules: Schedule[] = [
   },
 ];
 
-export function ScheduleList() {
+export function ScheduleList(activeTab?: string) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const handleSelect = (index: number) => {
     setSelectedIndex(selectedIndex === index ? null : index);

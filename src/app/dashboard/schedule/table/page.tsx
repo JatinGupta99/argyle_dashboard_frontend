@@ -1,161 +1,94 @@
 'use client';
 
-import { DashboardToolbar } from '@/components/dashboard/DashboardToolBar';
-import MonthlyScheduleSummary from '@/components/dashboard/MonthlyScheduleSummary';
+import { useState, useMemo } from 'react';
+import { useEventsContext } from '@/components/providers/EventsContextProvider';
 import { Header } from '@/components/layout/Header';
-import { useAppDispatch } from '@/redux/hooks';
-import { useEffect, useMemo, useState } from 'react';
-import { SpeakerFormDialog } from '../../speakers/components/SpeakerFormDialog';
-import { ScheduleItem, ScheduleTableContent } from '../components/ScheduleTableContent';
-import { setExportLabel } from '@/redux/slices/toolbar-slice';
+import { DashboardToolbar } from '@/components/dashboard/DashboardToolBar';
+import MonthlySummary from '@/components/dashboard/MonthlyScheduleSummary';
 
-export default function ScheduleTable() {
+import { Plus } from 'lucide-react';
+import { DeleteConfirmDialog } from '@/components/form/DeleteConfirmDialog';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import { openEventForm, setEventDeleteTarget } from '@/redux/slices/event-slice';
+import { deleteEvent } from '@/redux/slices/event-thunks';
+import ScheduleTableTabs from '../components/ScheduleTabs';
+import ScheduleTableBody from '../components/ScheduleTableBody';
+import { EventFormDialog } from '../components/EventFormDialog';
+
+export default function ScheduleTableContent() {
+  const { meta, query, setQuery } = useEventsContext();
+  const [activeTab, setActiveTab] = useState('ALL');
   const dispatch = useAppDispatch();
-  const [schedules, setSchedules] = useState<ScheduleItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [open, setOpen] = useState(false);
+  const { deleteTarget } = useAppSelector((s) => s.events);
 
-  useEffect(() => {
-    let mounted = true;
-
-    const loadSchedules = async () => {
-      setLoading(true);
-      try {
-        // Mock data (you can replace this with real API)
-        const data: ScheduleItem[] = [
-          {
-            title: 'Seminar on infrastructure technology for future life',
-            date: '12-10-2025',
-            time: '08:00 AM - 09:00 AM',
-            speaker: {
-              profileUrl: '/images/schedule.webp',
-              name: 'Agnes Diva',
-              designation: 'CEO of Rush Technology',
-            },
-            status: 'Upcoming',
-          },
-          {
-            title: 'Seminar on smart cities and sustainability',
-            date: '15-10-2025',
-            time: '02:00 PM - 03:30 PM',
-            speaker: {
-              profileUrl: '/images/schedule.webp',
-              name: 'John Smith',
-              designation: 'Urban Planner, FutureCity Labs',
-            },
-            status: 'Pending',
-          },
-          {
-            title: 'Seminar on infrastructure technology for future life',
-            date: '12-10-2025',
-            time: '08:00 AM - 09:00 AM',
-            speaker: {
-              profileUrl: '/images/schedule.webp',
-              name: 'Agnes Diva',
-              designation: 'CEO of Rush Technology',
-            },
-            status: 'Upcoming',
-          },
-          {
-            title: 'Seminar on smart cities and sustainability',
-            date: '15-10-2025',
-            time: '02:00 PM - 03:30 PM',
-            speaker: {
-              profileUrl: '/images/schedule.webp',
-              name: 'John Smith',
-              designation: 'Urban Planner, FutureCity Labs',
-            },
-            status: 'Pending',
-          },
-          {
-            title: 'Seminar on infrastructure technology for future life',
-            date: '12-10-2025',
-            time: '08:00 AM - 09:00 AM',
-            speaker: {
-              profileUrl: '/images/schedule.webp',
-              name: 'Agnes Diva',
-              designation: 'CEO of Rush Technology',
-            },
-            status: 'Upcoming',
-          },
-          {
-            title: 'Seminar on smart cities and sustainability',
-            date: '15-10-2025',
-            time: '02:00 PM - 03:30 PM',
-            speaker: {
-              profileUrl: '/images/schedule.webp',
-              name: 'John Smith',
-              designation: 'Urban Planner, FutureCity Labs',
-            },
-            status: 'Pending',
-          },
-          {
-            title: 'Seminar on infrastructure technology for future life',
-            date: '12-10-2025',
-            time: '08:00 AM - 09:00 AM',
-            speaker: {
-              profileUrl: '/images/schedule.webp',
-              name: 'Agnes Diva',
-              designation: 'CEO of Rush Technology',
-            },
-            status: 'Upcoming',
-          },
-          {
-            title: 'Seminar on smart cities and sustainability',
-            date: '15-10-2025',
-            time: '02:00 PM - 03:30 PM',
-            speaker: {
-              profileUrl: '/images/schedule.webp',
-              name: 'John Smith',
-              designation: 'Urban Planner, FutureCity Labs',
-            },
-            status: 'Pending',
-          },
-        ];
-
-        if (mounted) setSchedules(data);
-      } catch (err: any) {
-        if (mounted) setError(err.message || 'Something went wrong');
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    };
-
-    loadSchedules();
-
-    dispatch(setExportLabel('Export'));
-
-    return () => {
-      mounted = false;
-    };
-  }, [dispatch, schedules.length]);
-
-  const summaryData = useMemo(
+  const scheduleData = useMemo(
     () => ({
       month: new Date().toLocaleString('default', { month: 'long' }),
-      scheduleCount: schedules.length,
+      scheduleCount: meta.total,
       label: 'Schedules',
     }),
-    [schedules.length]
+    [meta],
   );
 
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+    setQuery({
+      ...query,
+      page: 1,
+      status: tab === 'ALL' ? undefined : tab,
+    });
+  };
+
+  const handleDateFilter = (from: string, to: string) => {
+    setQuery({
+      ...query,
+      page: 1,
+      from_date: from || undefined,
+      to_date: to || undefined,
+    });
+  };
+
+  const openCreateEventForm = () => dispatch(openEventForm(null));
+
   return (
-    <div className="flex h-screen flex-col overflow-hidden bg-gray-50">
+    <div className="w-full">
       <Header />
-      <DashboardToolbar />
-
-      <MonthlyScheduleSummary
-        month={summaryData.month}
-        scheduleCount={summaryData.scheduleCount}
-        label={summaryData.label}
+      <DashboardToolbar
+        buttonLabel="Add Event"
+        buttonIcon={<Plus className="h-4 w-4" />}
+        onButtonClick={openCreateEventForm}
+        showDateFilters
+        onDateFilter={handleDateFilter}
       />
-
-      <div className="flex-1 overflow-y-auto px-4 pb-4">
-        <ScheduleTableContent schedules={schedules} loading={loading} error={error} />
+      <MonthlySummary
+        month={scheduleData.month}
+        scheduleCount={scheduleData.scheduleCount}
+        label={scheduleData.label}
+      />
+      <div className="mt-4 mb-2 pl-6">
+        <ScheduleTableTabs activeTab={activeTab} setActiveTab={handleTabChange} />
+        <ScheduleTableBody activeTab={activeTab} />
       </div>
 
-      <SpeakerFormDialog open={open} onOpenChange={setOpen} onSuccess={() => {}} editData={null} />
+      {/* Event Form Modal */}
+      <EventFormDialog />
+
+      {/* Delete Confirmation */}
+     <DeleteConfirmDialog
+  open={!!deleteTarget}
+  title="Delete Event"
+  message={`Delete "${deleteTarget?.title}"?`}
+  onConfirm={async () => {
+    try {
+      await dispatch(deleteEvent(deleteTarget!._id)).unwrap(); // unwrap to catch errors
+      dispatch(setEventDeleteTarget(null));
+      setQuery({ ...query, page: 1 }); // close the modal
+    } catch (err) {
+      console.error('Failed to delete event', err);
+    }
+  }}
+  onCancel={() => dispatch(setEventDeleteTarget(null))}
+/>
     </div>
   );
 }

@@ -1,74 +1,102 @@
 'use client';
 
-import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { toast } from 'sonner'; // ✅ Import Sonner toast
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+import Link from 'next/link';
+import { z } from 'zod';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { loginSchema } from '@/lib/validation-schemas';
+import Image from 'next/image';
+
+type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
   const { login } = useAuth();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
+  const form = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+  });
 
+  const isSubmitting = form.formState.isSubmitting;
+
+  const onSubmit = async (values: LoginFormValues) => {
     try {
-      await login({ email, password });
+      await login(values);
+
       toast.success('Login successful', {
         description: 'Redirecting to dashboard...',
       });
     } catch (err: any) {
-      console.error('Login failed:', err);
-
-      const message =
-        err?.response?.data?.message ||
-        err?.message ||
-        'Invalid email or password.';
-
+      // Always show generic message regardless of backend error
       toast.error('Login failed', {
-        description: message,
+        description: 'Invalid email or password.',
       });
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="flex h-screen items-center justify-center bg-gray-50">
-      <form
-        onSubmit={handleSubmit}
-        className="w-80 space-y-4 rounded-lg border border-gray-200 bg-white p-6 shadow-sm"
-      >
-        <h1 className="text-xl font-semibold text-gray-800 text-center">Login</h1>
-
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full rounded border p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-          required
-        />
-
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full rounded border p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-          required
-        />
-
-        <button
-          type="submit"
-          disabled={isSubmitting || !email || !password}
-          className="w-full rounded bg-blue-600 py-2 text-white hover:bg-blue-700 disabled:bg-blue-400"
+    <div className="flex h-screen items-center justify-center bg-gray-50 px-4">
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="w-80 space-y-4 rounded-lg border border-gray-200 bg-white p-6 shadow-sm"
         >
-          {isSubmitting ? 'Logging in...' : 'Login'}
-        </button>
-      </form>
+          <h1 className="text-center text-xl font-semibold text-gray-800">Login</h1>
+
+          {/* Email Field */}
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem className="grid gap-1">
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input type="email" placeholder="johndoe@mail.com" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Password Field */}
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem className="grid gap-1">
+                <FormLabel>Password</FormLabel>
+                <FormControl>
+                  <Input type="password" placeholder="Password" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Forgot Password Link */}
+          <div className="text-right">
+            <Link
+              href="/auth/forgot-password"
+              className="text-sm text-blue-600 hover:underline"
+            >
+              Forgot Password?
+            </Link>
+          </div>
+
+          {/* Submit Button */}
+          <Button type="submit" className="w-full bg-sky-400" disabled={isSubmitting}>
+            {isSubmitting ? 'Logging in...' : 'Login'}
+          </Button>
+        </form>
+      </Form>
     </div>
   );
 }

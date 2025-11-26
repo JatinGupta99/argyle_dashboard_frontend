@@ -12,7 +12,7 @@ export default function RegisterPage() {
         href="/"
         className={cn(
           buttonVariants({ variant: 'ghost' }),
-          'absolute top-4 left-4 md:top-8 md:left-8'
+          'absolute top-4 left-4 md:top-8 md:left-8',
         )}
       >
         <>

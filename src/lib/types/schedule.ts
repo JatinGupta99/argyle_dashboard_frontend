@@ -10,4 +10,23 @@ export interface Schedule {
   updatedAt?: string;
 }
 
+export type TabLabel = 'ALL' | 'UPCOMING' | 'PAST';
+
 export type CreateScheduleDto = Omit<Schedule, '_id' | 'createdAt' | 'updatedAt'>;
+
+export type ScheduleStatus = 'ALL' | 'UPCOMING' | 'PAST';
+
+export interface Speaker {
+  profileUrl: string;
+  name: string;
+  designation: string;
+}
+
+export interface ScheduleItem {
+  _id: string;
+  title: string;
+  date: string;
+  time: string;
+  speakers: Speaker[];
+  status: ScheduleStatus;
+}

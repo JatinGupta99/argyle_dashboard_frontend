@@ -1,16 +1,22 @@
 import { configureStore } from '@reduxjs/toolkit';
-import toolbarReducer from './slices/toolbar-slice';
-import dialogReducer from './slices/dialog-slice'; // if you have it
-import speakerReducer from './slices/speaker-slice'; // if you have it
-
+import toolbarReducer from '@/redux//slices/toolbar-slice';
+import dialogReducer from '@/redux//slices/dialog-slice';
+import speakerReducer from '@/redux//slices/speaker-slice';
+import agendaReducer from '@/redux/slices/agenda-slice';
+import sponsorReducer from '@/redux/slices/sponsor-slice';
+import eventOverviewReducer from '@/redux/slices/event-overview.slice';
+import eventReducer from '@/redux/slices/event-slice';
 export const store = configureStore({
   reducer: {
+    events: eventReducer,
     toolbar: toolbarReducer,
     dialog: dialogReducer,
     speakers: speakerReducer,
+    agendas: agendaReducer,
+    sponsors: sponsorReducer,
+    eventOverview: eventOverviewReducer,
   },
 });
 
-// ✅ Add these exports
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
