@@ -1,25 +1,38 @@
-// src/redux/slices/agenda-thunks.ts
+import { Agenda, CreateAgendaDto } from '@/lib/types/agenda';
+import { AgendaService } from '@/services/agenda.service';
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { RootState } from '../store';
-import { CreateAgendaDto } from '@/lib/types/agenda';
-import { AgendaService } from '@/services/agenda.service';
 
-export const fetchAgendas = createAsyncThunk('agendas/fetch', async (_, thunkAPI) => {
-  const state = thunkAPI.getState() as RootState;
-  const eventId = state.agendas.eventId;
+/* FETCH AGENDAS (paginated) */
+export const fetchAgendas = createAsyncThunk<
+  { data: Agenda[]; total: number; page: number; limit: number; totalPages: number },
+  { page?: number; limit?: number; search?: string; sortBy?: string; sortOrder?: 'asc' | 'desc' } | undefined,
+  { rejectValue: string; state: RootState }
+>(
+  'agendas/fetch',
+  async (args = {}, thunkAPI) => {
+    const { page = 1, limit = 10, search = '', sortBy, sortOrder } = args || {};
+    const state = thunkAPI.getState();
+    const eventId = state.agendas.eventId;
 
-  if (!eventId) return thunkAPI.rejectWithValue('Missing eventId');
+    if (!eventId) return thunkAPI.rejectWithValue('Missing eventId');
 
-  try {
-    const res = await AgendaService.getAll(eventId);
-    return res.data;
-  } catch {
-    return thunkAPI.rejectWithValue('Failed to load agendas');
+    try {
+      return await AgendaService.getAll(eventId, { page, limit, search, sortBy, sortOrder });
+    } catch (err: any) {
+      return thunkAPI.rejectWithValue(err?.message ?? 'Failed to fetch agendas');
+    }
   }
-});
-export const fetchAgendaById = createAsyncThunk(
+);
+
+/* FETCH AGENDA BY ID */
+export const fetchAgendaById = createAsyncThunk<
+  Agenda,
+  string, // agendaId
+  { rejectValue: string; state: RootState }
+>(
   'agendas/fetchById',
-  async ({ agendaId }: { agendaId: string }, thunkAPI) => {
+  async (agendaId, thunkAPI) => {
     const state = thunkAPI.getState() as RootState;
     const eventId = state.agendas.eventId;
 
@@ -28,55 +41,75 @@ export const fetchAgendaById = createAsyncThunk(
     try {
       const res = await AgendaService.getById(eventId, agendaId);
       return res.data;
-    } catch {
-      return thunkAPI.rejectWithValue('Failed to load agenda');
+    } catch (err: any) {
+      return thunkAPI.rejectWithValue(err?.message ?? 'Failed to fetch agenda');
     }
-  },
+  }
 );
 
-export const addAgenda = createAsyncThunk(
+/* ADD AGENDA */
+export const addAgenda = createAsyncThunk<
+  Agenda,
+  CreateAgendaDto,
+  { rejectValue: string; state: RootState }
+>(
   'agendas/add',
-  async (payload: { payload: CreateAgendaDto }, thunkAPI) => {
+  async (payload, thunkAPI) => {
     const state = thunkAPI.getState() as RootState;
     const eventId = state.agendas.eventId;
 
     if (!eventId) return thunkAPI.rejectWithValue('Missing eventId');
 
     try {
-      const res = await AgendaService.create(eventId, payload.payload);
+      const res = await AgendaService.create(eventId, payload);
       return res.data;
-    } catch {
-      return thunkAPI.rejectWithValue('Failed to add agenda');
+    } catch (err: any) {
+      return thunkAPI.rejectWithValue(err?.message ?? 'Failed to add agenda');
     }
-  },
+  }
 );
 
-export const updateAgenda = createAsyncThunk(
+/* UPDATE AGENDA */
+export const updateAgenda = createAsyncThunk<
+  Agenda,
+  { agendaId: string; payload: CreateAgendaDto },
+  { rejectValue: string; state: RootState }
+>(
   'agendas/update',
-  async (data: { agendaId: string; payload: CreateAgendaDto }, thunkAPI) => {
+  async ({ agendaId, payload }, thunkAPI) => {
     const state = thunkAPI.getState() as RootState;
     const eventId = state.agendas.eventId;
 
-    if (!eventId) return thunkAPI.rejectWithValue('Missing eventId');
+    if (!eventId || !agendaId) return thunkAPI.rejectWithValue('Missing eventId or agendaId');
 
     try {
-      const res = await AgendaService.update(eventId, data.agendaId, data.payload);
+      const res = await AgendaService.update(eventId, agendaId, payload);
       return res.data;
-    } catch {
-      return thunkAPI.rejectWithValue('Failed to update agenda');
+    } catch (err: any) {
+      return thunkAPI.rejectWithValue(err?.message ?? 'Failed to update agenda');
     }
-  },
+  }
 );
 
-export const removeAgenda = createAsyncThunk(
+/* DELETE AGENDA */
+export const deleteAgenda = createAsyncThunk<
+  string,
+  string, // just agendaId
+  { rejectValue: string; state: RootState }
+>(
   'agendas/delete',
-  async (agendaId: string, thunkAPI) => {
+  async (agendaId, thunkAPI) => {
     const state = thunkAPI.getState() as RootState;
     const eventId = state.agendas.eventId;
 
     if (!eventId) return thunkAPI.rejectWithValue('Missing eventId');
+    if (!agendaId) return thunkAPI.rejectWithValue('Missing agendaId');
 
-    await AgendaService.remove(eventId, agendaId);
-    return agendaId;
-  },
+    try {
+      await AgendaService.remove(eventId, agendaId);
+      return agendaId;
+    } catch (err: any) {
+      return thunkAPI.rejectWithValue(err?.message ?? 'Failed to delete agenda');
+    }
+  }
 );

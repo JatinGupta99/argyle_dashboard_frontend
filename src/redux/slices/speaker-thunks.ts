@@ -1,120 +1,84 @@
-import { createAsyncThunk } from '@reduxjs/toolkit';
-import { SpeakerService, PresignedUrlResponse } from '@/services/speaker.service';
 import type { CreateSpeakerDto, Speaker, UpdateSpeakerDto } from '@/lib/types/speaker';
+import { PresignedUrlResponse, SpeakerService } from '@/services/speaker.service';
+import { createAsyncThunk } from '@reduxjs/toolkit';
+import { RootState } from '../store';
 
 /* --------------------------------------------------------
    FETCH ALL SPEAKERS
 -------------------------------------------------------- */
-export const fetchSpeakers = createAsyncThunk(
-  'speakers/fetchAll',
-  async (
-    {
-      eventId,
-      page = 1,
-      limit = 10,
-      search = '',
-    }: {
-      eventId: string;
-      page?: number;
-      limit?: number;
-      search?: string;
-    },
-    thunkAPI,
-  ) => {
+export const fetchSpeakers = createAsyncThunk<
+  { data: Speaker[]; total: number; page: number; limit: number; totalPages: number },
+  { page?: number; limit?: number; search?: string; sortBy?: string; sortOrder?: 'asc' | 'desc' } | undefined,
+  { rejectValue: string; state: RootState }
+>(
+  'speakers/fetch',
+  async (args = {}, thunkAPI) => {
+    const { page = 1, limit = 10, search = '', sortBy, sortOrder } = args || {};
+    const state = thunkAPI.getState();
+    const eventId = state.speakers.eventId;
+
+    if (!eventId) return thunkAPI.rejectWithValue('Missing eventId');
+
     try {
-      // Build query params
-      const query = { page, limit, search };
-
-      const result = await SpeakerService.getAll(eventId, query);
-
-      return { ...result, eventId };
-    } catch (error) {
-      return thunkAPI.rejectWithValue('Failed to fetch speakers');
+      return await SpeakerService.getAll(eventId, { page, limit, search, sortBy, sortOrder });
+    } catch (err: any) {
+      return thunkAPI.rejectWithValue(err?.message ?? 'Failed to fetch speakers');
     }
-  },
+  }
 );
 
 /* --------------------------------------------------------
    CREATE SPEAKER (with optional image upload)
 -------------------------------------------------------- */
-export const createSpeaker = createAsyncThunk(
+export const createSpeaker = createAsyncThunk<Speaker, { data: CreateSpeakerDto; photoFile?: File | null }, { rejectValue: string; state: RootState }>(
   'speakers/create',
-  async (
-    {
-      eventId,
-      data,
-      photoFile,
-    }: {
-      eventId: string;
-      data: CreateSpeakerDto;
-      photoFile?: File | null;
-    },
-    thunkAPI,
-  ) => {
+  async ({ data, photoFile }, thunkAPI) => {
+    const state = thunkAPI.getState();
+    const eventId = state.speakers.eventId;
+
+    if (!eventId) return thunkAPI.rejectWithValue('Missing eventId');
+
     try {
-      // 1) Create speaker WITHOUT image
+      // 1) Create speaker
       const created = await SpeakerService.create(eventId, data);
       const speaker = created.data as Speaker;
       const speakerId = speaker._id;
 
-      let pictureKey: string | null = null;
-
-      // 2) Upload photo (if provided)
+      // 2) Upload photo if provided
       if (photoFile) {
         const presign = await SpeakerService.getUploadUrl({
           eventId,
-          speakerId: speakerId, // or speakerId if API expects speakerId
+          speakerId,
           contentType: photoFile.type,
-          type: 'photo', // <-- FIXED
+          type: 'photo',
         });
 
-        // Upload file to presigned URL
-        await fetch(presign.data.url, {
-          method: 'PUT',
-          body: photoFile,
-        });
+        await fetch(presign.data.url, { method: 'PUT', body: photoFile });
 
-        pictureKey = presign.data.key; // <-- FIXED
-      }
-
-      // 3) Update speaker with uploaded key
-      if (pictureKey) {
-        await SpeakerService.update(eventId, speakerId, {
-          ...data,
-          pictureUrl: pictureKey,
-        });
+        await SpeakerService.update(eventId, speakerId, { ...data, pictureUrl: presign.data.key });
       }
 
       return speaker;
-    } catch (e) {
-      return thunkAPI.rejectWithValue('Failed to create speaker');
+    } catch (err: any) {
+      return thunkAPI.rejectWithValue(err?.message ?? 'Failed to create speaker');
     }
-  },
+  }
 );
 
 /* --------------------------------------------------------
    UPDATE SPEAKER (with optional image upload)
 -------------------------------------------------------- */
-export const updateSpeaker = createAsyncThunk(
+export const updateSpeaker = createAsyncThunk<Speaker, { id: string; payload: UpdateSpeakerDto; photoFile?: File | null }, { rejectValue: string; state: RootState }>(
   'speakers/update',
-  async (
-    {
-      eventId,
-      id,
-      payload,
-      photoFile,
-    }: {
-      eventId: string;
-      id: string;
-      payload: UpdateSpeakerDto;
-      photoFile?: File | null;
-    },
-    thunkAPI,
-  ) => {
-    try {
-      let pictureKey: string | undefined = undefined;
+  async ({ id, payload, photoFile }, thunkAPI) => {
+    const state = thunkAPI.getState();
+    const eventId = state.speakers.eventId;
 
-      // 1) If a new photo is uploaded
+    if (!eventId) return thunkAPI.rejectWithValue('Missing eventId');
+
+    try {
+      let pictureKey: string | undefined;
+
       if (photoFile) {
         const presign = await SpeakerService.getUploadUrl({
           eventId,
@@ -123,52 +87,49 @@ export const updateSpeaker = createAsyncThunk(
           type: 'logo',
         });
 
-        await fetch(presign.data.url, {
-          method: 'PUT',
-          body: photoFile,
-        });
-
+        await fetch(presign.data.url, { method: 'PUT', body: photoFile });
         pictureKey = presign.data.key;
       }
 
-      // 2) Update speaker info (+ pictureKey if provided)
-      const updated = await SpeakerService.update(eventId, id, {
-        ...payload,
-        ...(pictureKey ? { pictureKey } : {}),
-      });
-
+      const updated = await SpeakerService.update(eventId, id, { ...payload, ...(pictureKey ? { pictureUrl: pictureKey } : {}) });
       return updated.data;
-    } catch {
-      return thunkAPI.rejectWithValue('Failed to update speaker');
+    } catch (err: any) {
+      return thunkAPI.rejectWithValue(err?.message ?? 'Failed to update speaker');
     }
-  },
+  }
 );
 
 /* --------------------------------------------------------
    DELETE SPEAKER
 -------------------------------------------------------- */
-export const deleteSpeaker = createAsyncThunk(
+export const deleteSpeaker = createAsyncThunk<string, string, { rejectValue: string; state: RootState }>(
   'speakers/delete',
-  async ({ eventId, id }: { eventId: string; id: string }, thunkAPI) => {
+  async (id, thunkAPI) => {
+    const state = thunkAPI.getState();
+    const eventId = state.speakers.eventId;
+
+    if (!eventId) return thunkAPI.rejectWithValue('Missing eventId');
+
     try {
       await SpeakerService.remove(eventId, id);
-      return { id };
-    } catch {
-      return thunkAPI.rejectWithValue('Failed to delete speaker');
+      return id;
+    } catch (err: any) {
+      return thunkAPI.rejectWithValue(err?.message ?? 'Failed to delete speaker');
     }
-  },
+  }
 );
 
 /* --------------------------------------------------------
-   OPTIONAL: DIRECT IMAGE UPLOAD HELP THUNK
-   (Kept only if UI wants to upload before saving)
+   OPTIONAL: DIRECT IMAGE UPLOAD
 -------------------------------------------------------- */
-export const uploadSpeakerImage = createAsyncThunk(
+export const uploadSpeakerImage = createAsyncThunk<string, { file: File; speakerId: string }, { rejectValue: string; state: RootState }>(
   'speakers/uploadImage',
-  async (
-    { file, eventId, speakerId }: { file: File; eventId: string; speakerId: string },
-    thunkAPI,
-  ) => {
+  async ({ file, speakerId }, thunkAPI) => {
+    const state = thunkAPI.getState();
+    const eventId = state.speakers.eventId;
+
+    if (!eventId) return thunkAPI.rejectWithValue('Missing eventId');
+
     try {
       const presign: PresignedUrlResponse = await SpeakerService.getUploadUrl({
         eventId,
@@ -177,14 +138,10 @@ export const uploadSpeakerImage = createAsyncThunk(
         type: 'logo',
       });
 
-      await fetch(presign.data.url, {
-        method: 'PUT',
-        body: file,
-      });
-
+      await fetch(presign.data.url, { method: 'PUT', body: file });
       return presign.data.key;
-    } catch {
-      return thunkAPI.rejectWithValue('Failed to upload image');
+    } catch (err: any) {
+      return thunkAPI.rejectWithValue(err?.message ?? 'Failed to upload image');
     }
-  },
+  }
 );

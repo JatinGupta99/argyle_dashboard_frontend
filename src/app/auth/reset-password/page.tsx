@@ -37,7 +37,9 @@ export default function ResetPasswordPage() {
       toast.success('Password reset successfully');
       router.push('/auth/login');
     } catch (err: any) {
-      toast.error('Reset password failed', { description: err.message || 'Something went wrong' });
+        console.error('[ResetPassword] Error:', err);
+        const message = err?.message || 'Failed to update password';
+        toast.error(message);
     }
   };
 

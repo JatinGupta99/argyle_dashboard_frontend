@@ -11,7 +11,10 @@ export interface Speaker {
   pictureUrl?: string;
   linkedInUrl?: string;
 }
-
+export interface SpeakerView{
+  title:string;
+  photo:string;
+}
 export interface CreateSpeakerDto {
   name: {
     firstName: string;

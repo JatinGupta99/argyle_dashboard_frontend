@@ -8,12 +8,23 @@ export interface Agenda {
   endTime: string; // ISO Date String (e.g., "2025-12-10T09:00:00.000Z")
   endDateTime?: string; // ISO Date String
   /** Array of Speaker IDs */
-  speakers: string[];
+  speakers: SpeakerAssiciatedwithAgendas[];
   hasPoll: boolean;
   event: string; // Event ID
   createdAt: string;
   updatedAt: string;
   __v: number;
+}
+
+export interface SpeakerAssiciatedwithAgendas {
+  _id: string;
+  name: {
+    firstName: string;
+    lastName: string;
+  };
+  title: string;
+  pictureUrl: string;
+  linkedInUrl: string;
 }
 
 export type CreateAgendaDto = Omit<Agenda, '_id' | 'createdAt' | 'updatedAt' | '__v' | 'event'>;
