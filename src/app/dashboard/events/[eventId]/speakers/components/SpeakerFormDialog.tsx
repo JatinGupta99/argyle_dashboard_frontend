@@ -12,12 +12,8 @@ import {
 import { Input } from '@/components/ui/input';
 import type { CreateSpeakerDto } from '@/lib/types/speaker';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
-import {
-  closeForm,
-  createSpeaker,
-  fetchSpeakers,
-  updateSpeaker,
-} from '@/redux/slices/speaker-slice';
+import { createSpeaker, fetchSpeakers, updateSpeaker } from '@/redux/slices/speaker-thunks';
+import { closeSpeakerForm } from '@/redux/slices/speaker-slice';
 import { Upload } from 'lucide-react';
 import { DragEvent, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
@@ -34,7 +30,7 @@ const DEFAULT_FORM: CreateSpeakerDto = {
 
 export function SpeakerFormDialog() {
   const dispatch = useAppDispatch();
-  const { formOpen, editItem, eventId, loading } = useAppSelector((s) => s.speakers);
+  const { formOpen, editing, eventId, loading } = useAppSelector((s) => s.speakers);
 
   const [formData, setFormData] = useState<CreateSpeakerDto>(DEFAULT_FORM);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
@@ -43,28 +39,28 @@ export function SpeakerFormDialog() {
   const photoInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (formOpen && editItem) {
+    if (formOpen && editing) {
       setFormData({
-        name: editItem.name,
-        companyName: editItem.companyName ?? '',
-        title: editItem.title ?? '',
-        email: editItem.email ?? '',
-        bio: editItem.bio ?? '',
-        linkedInUrl: editItem.linkedInUrl ?? '',
-        pictureUrl: editItem.pictureUrl ?? '',
+        name: editing.name,
+        companyName: editing.companyName ?? '',
+        title: editing.title ?? '',
+        email: editing.email ?? '',
+        bio: editing.bio ?? '',
+        linkedInUrl: editing.linkedInUrl ?? '',
+        pictureUrl: editing.pictureUrl ?? '',
       });
-      setPhotoPreview(editItem.pictureUrl ?? null);
+      setPhotoPreview(editing.pictureUrl ?? null);
       setPhotoFile(null);
     } else if (!formOpen) {
       setFormData(DEFAULT_FORM);
       setPhotoFile(null);
       setPhotoPreview(null);
     }
-  }, [formOpen, editItem]);
+  }, [formOpen, editing]);
 
   const updateField = (key: string, value: string, nested = false) => {
     setFormData((prev) =>
-      nested ? { ...prev, name: { ...prev.name, [key]: value } } : { ...prev, [key]: value },
+      nested ? { ...prev, name: { ...prev.name, [key]: value } } : { ...prev, [key]: value }
     );
   };
 
@@ -76,7 +72,6 @@ export function SpeakerFormDialog() {
     return null;
   };
 
-  /* PHOTO UPLOAD */
   const handlePhotoClick = () => photoInputRef.current?.click();
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -96,7 +91,7 @@ export function SpeakerFormDialog() {
     }
   };
 
-  const handleClose = () => dispatch(closeForm());
+  const handleClose = () => dispatch(closeSpeakerForm());
 
   const handleSubmit = async () => {
     const err = validate();
@@ -105,10 +100,10 @@ export function SpeakerFormDialog() {
     if (!eventId) return toast.error('Event ID not set');
 
     try {
-      if (editItem) {
+      if (editing) {
         await dispatch(
           updateSpeaker({
-            id: editItem._id,
+            id: editing._id,
             payload: {
               ...formData,
               name: {
@@ -117,13 +112,13 @@ export function SpeakerFormDialog() {
               },
             },
             photoFile,
-          }),
+          })
         ).unwrap();
         toast.success('Speaker updated');
       } else {
         await dispatch(
           createSpeaker({
-            payload: {
+            data: {
               ...formData,
               name: {
                 firstName: formData.name.firstName.trim(),
@@ -131,7 +126,7 @@ export function SpeakerFormDialog() {
               },
             },
             photoFile,
-          }),
+          })
         ).unwrap();
         toast.success('Speaker added');
       }
@@ -145,10 +140,10 @@ export function SpeakerFormDialog() {
   };
 
   return (
-    <Dialog open={formOpen} onOpenChange={(open) => !open && handleClose()}>
+  <Dialog open={formOpen} onOpenChange={(open) => !open && handleClose()}>
       <DialogContent className="max-h-[85vh] w-[90%] max-w-lg overflow-y-auto rounded-lg p-4">
         <DialogHeader>
-          <DialogTitle>{editItem ? 'Edit Speaker' : 'Add Speaker'}</DialogTitle>
+          <DialogTitle>{editing ? 'Edit Speaker' : 'Add Speaker'}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
@@ -161,7 +156,6 @@ export function SpeakerFormDialog() {
                 placeholder="John"
               />
             </FormField>
-
             <FormField label="Last Name" className="flex-1">
               <Input
                 value={formData.name.lastName}
@@ -180,7 +174,6 @@ export function SpeakerFormDialog() {
                 placeholder="Google"
               />
             </FormField>
-
             <FormField label="Title in Company" className="flex-1">
               <Input
                 value={formData.title}
@@ -199,7 +192,6 @@ export function SpeakerFormDialog() {
               placeholder="john@example.com"
             />
           </FormField>
-
           <FormField label="LinkedIn Link">
             <Input
               value={formData.linkedInUrl}
@@ -208,7 +200,7 @@ export function SpeakerFormDialog() {
             />
           </FormField>
 
-          {/* PHOTO UPLOAD */}
+          {/* Photo Upload */}
           <FormField label="Upload Photo">
             <div
               onClick={handlePhotoClick}
@@ -259,7 +251,7 @@ export function SpeakerFormDialog() {
             Cancel
           </Button>
           <Button onClick={handleSubmit} disabled={loading}>
-            {loading ? 'Saving…' : editItem ? 'Update' : 'Add Speaker'}
+            {loading ? 'Saving…' : editing ? 'Update' : 'Add Speaker'}
           </Button>
         </DialogFooter>
       </DialogContent>

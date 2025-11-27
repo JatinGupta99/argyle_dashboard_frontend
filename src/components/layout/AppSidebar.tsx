@@ -11,39 +11,22 @@ import {
 } from '@/components/ui/sidebar';
 import { useAuth } from '@/context/AuthContext';
 import { cn } from '@/lib/utils';
-import { Calendar, LogOut, Settings } from 'lucide-react';
+import { Calendar, LogOut, Settings, ChevronRight } from 'lucide-react';
 import Image from 'next/image';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter, useParams } from 'next/navigation';
 import React from 'react';
-
-const mainMenu = [
-  {
-    title: 'Event Schedule',
-    icon: Calendar,
-    href: '/dashboard/schedule/card',
-  },
-];
-
-const otherMenu = [
-  { title: 'Setting', icon: Settings, href: '/dashboard/settings' },
-  { title: 'Logout', icon: LogOut, danger: true },
-];
 
 export function AppSidebar() {
   const router = useRouter();
   const pathname = usePathname();
+  const params = useParams(); // get eventId from URL
   const { logout } = useAuth();
 
-  const handleMenuClick = async (item: any) => {
-    if (item.title === 'Logout') {
-      await logout();
-      return;
-    }
-
-    if (item.href) {
-      router.push(item.href);
-    }
+  const handleLogout = async () => {
+    await logout();
   };
+
+  const isEventPage = pathname.startsWith('/dashboard/events');
 
   return (
     <Sidebar className="flex w-64 flex-col border-r bg-white">
@@ -63,48 +46,64 @@ export function AppSidebar() {
         <div className="mb-2 px-4 text-xs font-semibold text-black">Main Menu</div>
 
         <SidebarMenu className="space-y-2 pl-3">
-          {mainMenu.map((item) => {
-            const Icon = item.icon;
-            const isActive = pathname === item.href;
+          {/* Event Schedule parent */}
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              onClick={() => router.push('/dashboard/schedule/card')}
+              className={cn(
+                'cursor-pointer transition flex justify-between items-center',
+                pathname.startsWith('/dashboard/schedule') && 'bg-muted text-primary'
+              )}
+            >
+              <div className="flex items-center gap-2">
+                <Calendar size={16} />
+                Event Schedule
+              </div>
+              {params?.eventId && (
+                <ChevronRight
+                  size={16}
+                  className={cn('transition-transform', isEventPage && 'rotate-90')}
+                />
+              )}
+            </SidebarMenuButton>
+          </SidebarMenuItem>
 
-            return (
-              <SidebarMenuItem key={item.title}>
+          {params?.eventId && (
+            <div className="pl-6 mt-1 flex flex-col space-y-1">
+              <SidebarMenuItem>
                 <SidebarMenuButton
-                  onClick={() => handleMenuClick(item)}
-                  className={cn('cursor-pointer transition', isActive && 'bg-muted text-primary')}
+                  onClick={() =>
+                    router.push(`/dashboard/events/${params.eventId}`)
+                  }
+                  className="text-sm font-bold text-sky-300"
                 >
-                  <Icon size={16} />
-                  {item.title}
+                  {params.eventId.slice(0, 8)} 
                 </SidebarMenuButton>
               </SidebarMenuItem>
-            );
-          })}
+            </div>
+          )}
         </SidebarMenu>
       </SidebarContent>
 
       {/* Footer */}
       <div className="mt-auto mb-2 px-4 text-xs font-semibold text-black">Other</div>
       <SidebarFooter>
-        {otherMenu.map((item) => (
-          <SidebarMenuItem key={item.title}>
-            <SidebarMenuButton
-              onClick={async () => {
-                if (item.title === 'Logout') {
-                  await logout(); // ✅ use context logout here
-                } else if (item.title === 'Setting') {
-                  router.push('/dashboard/settings');
-                }
-              }}
-              className={cn(
-                'hover:bg-muted/40 flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition',
-                item.danger && 'text-red-500 hover:bg-red-50',
-              )}
-            >
-              <item.icon size={16} />
-              {item.title}
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        ))}
+        <SidebarMenuItem>
+          <SidebarMenuButton
+            onClick={() => router.push('/dashboard/settings')}
+            className="hover:bg-muted/40 flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition"
+          >
+            <Settings size={16} /> Setting
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+        <SidebarMenuItem>
+          <SidebarMenuButton
+            onClick={handleLogout}
+            className="hover:bg-muted/40 flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition text-red-500 hover:bg-red-50"
+          >
+            <LogOut size={16} /> Logout
+          </SidebarMenuButton>
+        </SidebarMenuItem>
       </SidebarFooter>
     </Sidebar>
   );

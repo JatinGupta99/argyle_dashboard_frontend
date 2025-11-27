@@ -49,11 +49,10 @@ export default function ForgotPasswordPage() {
 const onSubmit = async (values: z.infer<typeof formSchema>) => {
   try {
     await forgotPassword({ email: values.email })
-
-    // Always show the same message, whether user exists or not
     toast.success(
       "If an account exists with this email, a reset link has been sent."
     )
+    router.push('/auth/login');
   } catch (err: any) {
     // Check if the error is 404 User not found
     const backendMessage = err?.response?.data?.message || err?.message

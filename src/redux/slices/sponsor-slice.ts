@@ -2,6 +2,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { Sponsor, CreateSponsorDto } from '@/lib/types/sponsor';
 import { SponsorService } from '@/services/sponsors.service';
+import { RootState } from '../store';
 
 /* ───────────────────────────────────────────────
    State
@@ -17,6 +18,8 @@ interface SponsorState {
   editing: Sponsor | null;
 
   deleteTarget: Sponsor | null;
+
+  meta?: { total: number; page: number; limit: number; totalPages: number };
 }
 
 const initialState: SponsorState = {
@@ -30,143 +33,142 @@ const initialState: SponsorState = {
   editing: null,
 
   deleteTarget: null,
+
+  meta: undefined,
 };
 
 /* ───────────────────────────────────────────────
-   File Upload Helper (Corrected)
+   File Upload Helper
 ──────────────────────────────────────────────── */
 async function uploadFile(
   eventId: string,
   sponsorId: string,
   file: File | null,
-  type: 'logo' | 'document',
+  type: 'logo' | 'document'
 ): Promise<string | null> {
   if (!file) return null;
 
-  const res = await SponsorService.getUploadUrl({
-    eventId,
-    sponsorId,
-    contentType: file.type,
-    type,
-  });
+  const res = await SponsorService.getUploadUrl({ eventId, sponsorId, contentType: file.type, type });
+  const { key, uploadUrl } = res.data;
 
-  const { key, uploadUrl } = res.data; // BACKEND RETURNS key + url
-
-  await fetch(uploadUrl, {
-    method: 'PUT',
-    body: file,
-  });
-
+  await fetch(uploadUrl, { method: 'PUT', body: file });
   return key;
 }
 
 /* ───────────────────────────────────────────────
    Fetch Sponsors
 ──────────────────────────────────────────────── */
-export const fetchSponsors = createAsyncThunk<Sponsor[], void, { rejectValue: string }>(
+export const fetchSponsors = createAsyncThunk<
+  { data: Sponsor[]; total: number; page: number; limit: number; totalPages: number },
+  { page?: number; limit?: number; search?: string; sortBy?: string; sortOrder?: 'asc' | 'desc' } | undefined,
+  { rejectValue: string; state: RootState }
+>(
   'sponsors/fetch',
-  async (_, thunkAPI) => {
+  async (args = {}, thunkAPI) => {
+    const { page = 1, limit = 10, search = '', sortBy, sortOrder } = args || {};
+    const state = thunkAPI.getState();
+    const eventId = state.sponsors.eventId;
+
+    if (!eventId) return thunkAPI.rejectWithValue('Missing eventId');
+
     try {
-      const state: any = thunkAPI.getState();
-      const eventId = state.sponsors?.eventId;
-
-      if (!eventId) return thunkAPI.rejectWithValue('Missing eventId');
-
-      const res = await SponsorService.getAll(eventId);
-      console.log('acsnlkascnlacsnlsc', res);
-      return res.data.results;
-    } catch {
-      return thunkAPI.rejectWithValue('Failed to fetch sponsors');
+      const res = await SponsorService.getAll(eventId, { page, limit, search, sortBy, sortOrder });
+      return res;
+    } catch (err: any) {
+      return thunkAPI.rejectWithValue(err?.message ?? 'Failed to fetch sponsors');
     }
-  },
+  }
 );
+
 /* ───────────────────────────────────────────────
-   Create Sponsor (Corrected)
+   Create Sponsor
 ──────────────────────────────────────────────── */
 export const createSponsor = createAsyncThunk<
   Sponsor,
-  {
-    eventId: string;
-    data: CreateSponsorDto;
-    logoFile: File | null;
-    documentFile: File | null;
-  },
-  { rejectValue: string }
->('sponsors/create', async ({ eventId, data, logoFile, documentFile }, thunkAPI) => {
-  try {
-    // Create sponsor
-    const res = await SponsorService.create(eventId, data);
-    const sponsor = res.data as Sponsor;
+  { data: CreateSponsorDto; logoFile?: File | null; documentFile?: File | null },
+  { rejectValue: string; state: RootState }
+>(
+  'sponsors/create',
+  async ({ data, logoFile, documentFile }, thunkAPI) => {
+    const state = thunkAPI.getState();
+    const eventId = state.sponsors.eventId;
+    if (!eventId) return thunkAPI.rejectWithValue('Missing eventId');
 
-    // Upload logo
-    const logoKey = await uploadFile(eventId, sponsor._id, logoFile, 'logo');
+    try {
+      const res = await SponsorService.create(eventId, data);
+      const sponsor = res.data as Sponsor;
 
-    // Upload document (single for now)
-    const documentKey = await uploadFile(eventId, sponsor._id, documentFile, 'document');
+      const logoKey = await uploadFile(eventId, sponsor._id, logoFile ?? null, 'logo');
+      const documentKey = await uploadFile(eventId, sponsor._id, documentFile ?? null, 'document');
 
-    // Prepare update payload
-    const payload: any = { ...data };
+      const payload: any = { ...data };
+      if (logoKey) payload.logoKey = logoKey;
+      if (documentKey) payload.documents = [documentKey];
 
-    if (logoKey) payload.logoKey = logoKey;
-    if (documentKey) payload.documents = [documentKey]; // backend expects array
+      if (logoKey || documentKey) {
+        const patch = await SponsorService.update(eventId, sponsor._id, payload);
+        return patch.data;
+      }
 
-    // If files uploaded, patch sponsor
-    if (logoKey || documentKey) {
-      const patch = await SponsorService.update(eventId, sponsor._id, payload);
-      return patch.data;
+      return sponsor;
+    } catch (err: any) {
+      return thunkAPI.rejectWithValue(err?.message ?? 'Failed to create sponsor');
     }
-
-    return sponsor;
-  } catch {
-    return thunkAPI.rejectWithValue('Failed to create sponsor');
   }
-});
+);
 
 /* ───────────────────────────────────────────────
    Update Sponsor
 ──────────────────────────────────────────────── */
 export const updateSponsor = createAsyncThunk<
   Sponsor,
-  {
-    eventId: string;
-    sponsorId: string;
-    data: CreateSponsorDto;
-    logoFile: File | null;
-    documentFile: File | null;
-  },
-  { rejectValue: string }
->('sponsors/update', async ({ eventId, sponsorId, data, logoFile, documentFile }, thunkAPI) => {
-  try {
-    const logoKey = await uploadFile(eventId, sponsorId, logoFile, 'logo');
-    const documentKey = await uploadFile(eventId, sponsorId, documentFile, 'document');
+  { sponsorId: string; data: CreateSponsorDto; logoFile?: File | null; documentFile?: File | null },
+  { rejectValue: string; state: RootState }
+>(
+  'sponsors/update',
+  async ({ sponsorId, data, logoFile, documentFile }, thunkAPI) => {
+    const state = thunkAPI.getState();
+    const eventId = state.sponsors.eventId;
+    if (!eventId) return thunkAPI.rejectWithValue('Missing eventId');
 
-    const payload: any = { ...data };
+    try {
+      const logoKey = await uploadFile(eventId, sponsorId, logoFile ?? null, 'logo');
+      const documentKey = await uploadFile(eventId, sponsorId, documentFile ?? null, 'document');
 
-    if (logoKey) payload.logoKey = logoKey;
-    if (documentKey) payload.$push = { documents: documentKey };
+      const payload: any = { ...data };
+      if (logoKey) payload.logoKey = logoKey;
+      if (documentKey) payload.$push = { documents: documentKey };
 
-    const res = await SponsorService.update(eventId, sponsorId, payload);
-    return res.data;
-  } catch {
-    return thunkAPI.rejectWithValue('Failed to update sponsor');
+      const res = await SponsorService.update(eventId, sponsorId, payload);
+      return res.data;
+    } catch (err: any) {
+      return thunkAPI.rejectWithValue(err?.message ?? 'Failed to update sponsor');
+    }
   }
-});
+);
 
 /* ───────────────────────────────────────────────
    Delete Sponsor
 ──────────────────────────────────────────────── */
 export const deleteSponsor = createAsyncThunk<
   string,
-  { eventId: string; sponsorId: string },
-  { rejectValue: string }
->('sponsors/delete', async ({ eventId, sponsorId }, thunkAPI) => {
-  try {
-    await SponsorService.remove(eventId, sponsorId);
-    return sponsorId;
-  } catch {
-    return thunkAPI.rejectWithValue('Failed to delete sponsor');
+  string,
+  { rejectValue: string; state: RootState }
+>(
+  'sponsors/delete',
+  async (sponsorId, thunkAPI) => {
+    const state = thunkAPI.getState();
+    const eventId = state.sponsors.eventId;
+    if (!eventId) return thunkAPI.rejectWithValue('Missing eventId');
+
+    try {
+      await SponsorService.remove(eventId, sponsorId);
+      return sponsorId;
+    } catch (err: any) {
+      return thunkAPI.rejectWithValue(err?.message ?? 'Failed to delete sponsor');
+    }
   }
-});
+);
 
 /* ───────────────────────────────────────────────
    Slice
@@ -175,11 +177,6 @@ const sponsorSlice = createSlice({
   name: 'sponsors',
   initialState,
   reducers: {
-    /* 
-      Accept:
-      - true  → add mode
-      - Sponsor object → edit mode
-    */
     openForm(state, action: PayloadAction<true | Sponsor>) {
       state.formOpen = true;
       state.editing = action.payload === true ? null : action.payload;
@@ -188,17 +185,13 @@ const sponsorSlice = createSlice({
       state.formOpen = false;
       state.editing = null;
     },
-
     setSponsorEventId(state, action: PayloadAction<string>) {
       state.eventId = action.payload;
     },
-
-    // Stores FULL SPONSOR object (UI needs it)
     setDeleteTarget(state, action: PayloadAction<Sponsor | null>) {
       state.deleteTarget = action.payload;
     },
   },
-
   extraReducers: (builder) => {
     builder
       // FETCH
@@ -207,7 +200,13 @@ const sponsorSlice = createSlice({
       })
       .addCase(fetchSponsors.fulfilled, (state, action) => {
         state.loading = false;
-        state.items = action.payload;
+        state.items = action.payload.data;
+        state.meta = {
+          total: action.payload.total,
+          page: action.payload.page,
+          limit: action.payload.limit,
+          totalPages: action.payload.totalPages,
+        };
       })
       .addCase(fetchSponsors.rejected, (state, action) => {
         state.loading = false;
@@ -232,5 +231,4 @@ const sponsorSlice = createSlice({
 });
 
 export const { openForm, closeForm, setSponsorEventId, setDeleteTarget } = sponsorSlice.actions;
-
 export default sponsorSlice.reducer;

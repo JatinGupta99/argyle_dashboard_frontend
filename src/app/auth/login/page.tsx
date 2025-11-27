@@ -1,22 +1,22 @@
 'use client';
 
-import { useAuth } from '@/context/AuthContext';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { toast } from 'sonner';
-import Link from 'next/link';
-import { z } from 'zod';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { useAuth } from '@/context/AuthContext';
 import { loginSchema } from '@/lib/validation-schemas';
-import Image from 'next/image';
+import { zodResolver } from '@hookform/resolvers/zod';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+import { z } from 'zod';
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
   const { login } = useAuth();
-
+  const router=useRouter()
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -34,11 +34,12 @@ export default function LoginPage() {
       toast.success('Login successful', {
         description: 'Redirecting to dashboard...',
       });
+      router.push('/dashboard/schedule/card')
     } catch (err: any) {
       // Always show generic message regardless of backend error
-      toast.error('Login failed', {
-        description: 'Invalid email or password.',
-      });
+        console.error('[LoginPassword] Error:', err);
+        const message = err?.message || 'Failed to login';
+        toast.error(message);
     }
   };
 

@@ -18,11 +18,29 @@ export const SponsorService = {
   /* ------------------------------------------------------------
      GET ALL SPONSORS
   -------------------------------------------------------------*/
-  getAll: async (eventId: string) => {
-    return await fetchApi<{ results: Sponsor[] }>(ENDPOINTS.SPONSORS.ROOT(eventId), {
+ getAll: async (eventId: string, query?: {
+  page?: number;
+  limit?: number;
+  search?: string;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+}) => {
+  const params = new URLSearchParams();
+
+  if (query?.page) params.append('page', String(query.page));
+  if (query?.limit) params.append('limit', String(query.limit));
+  if (query?.search) params.append('search', query.search);
+  if (query?.sortBy) params.append('sortBy', query.sortBy);
+  if (query?.sortOrder) params.append('sortOrder', query.sortOrder);
+
+  return await fetchApi<{ data: Sponsor[]; total: number; totalPages: number }>(
+    `${ENDPOINTS.SPONSORS.ROOT(eventId)}?${params.toString()}`,
+    {
       method: 'GET',
-    });
-  },
+    }
+  );
+},
+
 
   /* ------------------------------------------------------------
      GET SPONSOR BY ID
