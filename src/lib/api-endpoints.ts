@@ -25,6 +25,10 @@ export const ENDPOINTS = {
   USER: {
     GET_PROFILE: '/company-user/profile',
   },
+  USERS:{
+    ROOT:'/company-user',
+    BY_ID:(userId:string)=>`/company-user/${userId}`
+  },
   EVENTS: {
     FETCH_BY_ID: (eventId: string) => `events/${eventId}`,
     DELETE_BY_ID: (eventId: string) => `/events/${eventId}`,

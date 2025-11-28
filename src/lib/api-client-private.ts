@@ -24,6 +24,7 @@ export const privateApiClient = {
         ...authHeaders(),
       },
     });
+    console.log(res,'acsnacslkancs')
     if (!res.ok) throw new Error(`GET failed: ${res.status}`);
     const text = await res.text();
     return text ? JSON.parse(text) : null;

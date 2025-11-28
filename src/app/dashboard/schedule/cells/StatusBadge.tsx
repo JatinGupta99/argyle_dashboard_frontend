@@ -3,6 +3,7 @@ export default function StatusBadge({ status }: { status: string }) {
     UPCOMING: 'bg-blue-100 text-blue-700',
     COMPLETED: 'bg-green-100 text-green-700',
     LIVE: 'bg-red-100 text-red-600',
+    ADMIN:'bg-blue-100 text-blue-700'
   };
 
   // Fallback if unknown status

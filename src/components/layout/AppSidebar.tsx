@@ -66,7 +66,10 @@ export function AppSidebar() {
                 />
               )}
             </SidebarMenuButton>
+
+            
           </SidebarMenuItem>
+          
 
           {params?.eventId && (
             <div className="pl-6 mt-1 flex flex-col space-y-1">
@@ -82,6 +85,21 @@ export function AppSidebar() {
               </SidebarMenuItem>
             </div>
           )}
+
+          <SidebarMenuItem>
+  <SidebarMenuButton
+    onClick={() => router.push('/dashboard/users')}
+    className={cn(
+      'cursor-pointer transition flex justify-between items-center',
+      pathname.startsWith('/dashboard/users') && 'bg-muted text-primary'
+    )}
+  >
+    <div className="flex items-center gap-2">
+      <Settings size={16} /> {/* You can change icon if needed */}
+      Users
+    </div>
+  </SidebarMenuButton>
+</SidebarMenuItem>
         </SidebarMenu>
       </SidebarContent>
 

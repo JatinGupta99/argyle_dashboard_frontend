@@ -17,7 +17,6 @@ interface DataTablePaginationProps<TData> {
 }
 
 export function DataTablePagination<TData>({ table }: DataTablePaginationProps<TData>) {
-  console.log(table, 'jhbknmjhvbknlhjbnk');
   return (
     <div className="flex w-full items-center justify-between px-2 py-3">
       {/* SELECTED ROWS TEXT */}
