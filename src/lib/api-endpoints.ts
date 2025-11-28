@@ -19,10 +19,15 @@ export const ENDPOINTS = {
     LOGIN: '/auth/login',
     LOGOUT: '/auth/logout',
     RESET_PASSWORD: '/auth/reset-password',
+    SETUP_PASSWORD: '/auth/setup-password',
     FORGOT_PASSWORD: '/auth/forgot-password',
   },
   USER: {
     GET_PROFILE: '/company-user/profile',
+  },
+  USERS:{
+    ROOT:'/company-user',
+    BY_ID:(userId:string)=>`/company-user/${userId}`
   },
   EVENTS: {
     FETCH_BY_ID: (eventId: string) => `events/${eventId}`,

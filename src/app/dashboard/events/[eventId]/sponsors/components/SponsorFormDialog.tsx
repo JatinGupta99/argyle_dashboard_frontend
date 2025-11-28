@@ -146,7 +146,6 @@ export function SponsorFormDialog() {
       if (editing) {
         await dispatch(
           updateSponsor({
-            eventId,
             sponsorId: editing._id,
             data: cleanedData,
             logoFile, // optional
@@ -157,7 +156,6 @@ export function SponsorFormDialog() {
       } else {
         await dispatch(
           createSponsor({
-            eventId,
             data: cleanedData,
             logoFile, // optional
             documentFile, // optional

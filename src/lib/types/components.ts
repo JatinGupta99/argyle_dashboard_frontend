@@ -64,7 +64,6 @@ export interface EventAnalytics {
   sessionRecordingsUrl: string;
   joinedUsers: string[];
 }
-
 export interface DailyRoomDetails {
   dailyRoomName: string;
   dailyRoomUrl: string;

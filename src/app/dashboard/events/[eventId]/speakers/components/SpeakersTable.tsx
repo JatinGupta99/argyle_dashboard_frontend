@@ -1,112 +1,35 @@
 'use client';
 
-import { Linkedin, MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { DataTable } from '@/components/common/GenericTable';
+import { SpeakerAssiciatedwithAgendas } from '@/lib/types/agenda';
+import { getSpeakerColumns } from './SpeakerTableColumns';
+import { Speaker } from '@/lib/types/speaker';
 
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from '@/components/ui/dropdown-menu';
-
-import { EmptyState } from '@/components/ui/empty-state';
-
-import type { Speaker } from '@/lib/types/speaker';
-
-interface SpeakersTableProps {
-  speakers: Speaker[];
+export interface SpeakersTableProps {
+  data: SpeakerAssiciatedwithAgendas[];
+  meta?: { total: number; totalPages: number; page: number; limit: number };
+  query: { page: number; limit: number };
+  setQuery: (query: { page: number; limit: number }) => void;
   onEdit?: (speaker: Speaker) => void;
   onDelete?: (speaker: Speaker) => void;
 }
 
-export function SpeakersTable({ speakers, onEdit, onDelete }: SpeakersTableProps) {
-  if (!Array.isArray(speakers) || speakers.length === 0) {
-    return <EmptyState message="No speakers found for this event" />;
-  }
-
+export function SpeakersTable({
+  data,
+  meta,
+  query,
+  setQuery,
+  onEdit,
+  onDelete,
+}: SpeakersTableProps) {
+  console.log(data,'alscnlcs')
   return (
-    <div className="h-[40vh] overflow-y-auto rounded-lg border border-gray-200 shadow-sm">
-      <Table className="w-full text-sm">
-        <TableHeader className="sticky top-0 z-10 bg-gray-50 shadow-sm">
-          <TableRow>
-            <TableHead>Name</TableHead>
-            <TableHead className="text-center">LinkedIn</TableHead>
-            <TableHead className="w-16 text-center">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-
-        <TableBody>
-          {speakers.map((speaker) => {
-            const first = speaker.name?.firstName || '';
-            const last = speaker.name?.lastName || '';
-            const initials = `${first[0] ?? ''}${last[0] ?? ''}` || '?';
-
-            return (
-              <TableRow key={speaker._id} className="hover:bg-gray-50">
-                <TableCell>
-                  <div className="flex items-center gap-3">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src={speaker.pictureUrl || ''} />
-                      <AvatarFallback>{initials}</AvatarFallback>
-                    </Avatar>
-
-                    <span className="font-medium text-gray-900">
-                      {first} {last}
-                    </span>
-                  </div>
-                </TableCell>
-
-                <TableCell className="text-center">
-                  {speaker.linkedInUrl ? (
-                    <a
-                      href={speaker.linkedInUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center justify-center text-blue-600 hover:text-blue-800"
-                    >
-                      <Linkedin className="h-4 w-4" />
-                    </a>
-                  ) : (
-                    <span className="text-gray-400">—</span>
-                  )}
-                </TableCell>
-
-                <TableCell className="text-center">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger className="rounded-md p-2 hover:bg-gray-100">
-                      <MoreHorizontal className="h-5 w-5 text-gray-600" />
-                    </DropdownMenuTrigger>
-
-                    <DropdownMenuContent align="end" className="w-32">
-                      <DropdownMenuItem onClick={() => onEdit?.(speaker)}>
-                        <Pencil className="mr-2 h-4 w-4 text-sky-500" />
-                        Modify
-                      </DropdownMenuItem>
-
-                      <DropdownMenuItem
-                        onClick={() => onDelete?.(speaker)}
-                        className="text-red-600 focus:text-red-600"
-                      >
-                        <Trash2 className="mr-2 h-4 w-4 text-red-600" />
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
-    </div>
+    <DataTable
+      data={data.map(d => ({ ...d, key: d._id }))}
+      columns={getSpeakerColumns({ onEdit, onDelete })}
+      totalItems={meta?.total ?? data.length}
+      query={query}
+      setQuery={setQuery}
+    />
   );
 }

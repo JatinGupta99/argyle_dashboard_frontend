@@ -60,3 +60,16 @@ export const loginSchema = z.object({
 export type LoginFormValues = z.infer<typeof loginSchema>;
 
 export type ResetPasswordFormValues = z.infer<typeof resetPasswordSchema>;
+
+export const setupPasswordSchema = z.object({
+  newPassword: z
+    .string()
+    .min(8, 'Password must be at least 8 characters long')
+    .max(32, 'Password cannot exceed 32 characters'),
+    confirmPassword: z.string(),
+}).refine((data) => data.newPassword === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ['confirmPassword'],
+});
+
+export type SetupPasswordFormValues = z.infer<typeof setupPasswordSchema>;

@@ -12,7 +12,7 @@ export interface Sponsor {
   _id: string;
   name: string;
   logoKey: string;
-
+  email?:string;
   websiteUrl?: string | null;
   facebookUrl?: string | null;
   twitterUrl?: string | null;

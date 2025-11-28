@@ -1,20 +1,19 @@
 'use client';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Linkedin, MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
 import { DataTableColumnHeader } from '@/app/dashboard/schedule/components/data-table-column-header';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Event } from '@/lib/types/components';
 import { ColumnDef } from '@tanstack/react-table';
-import { Clock } from 'lucide-react';
+import { Clock, MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import EventId from '../cells/EventId';
 import FormattedDate from '../cells/FormattedDate';
 import StatusBadge from '../cells/StatusBadge';
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from '@/components/ui/dropdown-menu';
 
 function formatTime(date: Date | string) {
   const d = new Date(date);

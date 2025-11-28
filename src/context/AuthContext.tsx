@@ -12,24 +12,18 @@ type AuthContextType = {
   login: (payload: UserLoginDto) => Promise<AuthResponse>;
   logout: () => Promise<void>;
   resetPassword: (payload: { token: string; newPassword: string }) => Promise<void>;
-  forgotPassword: (payload: { email: string }) => Promise<void>; // ← Added
+  setupPassword: (payload: { token: string; newPassword: string }) => Promise<void>; // ← Added
+  forgotPassword: (payload: { email: string }) => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
-  login: async () => {
-    throw new Error('AuthContext not initialized yet. Wrap your app in <AuthProvider>.');
-  },
-  logout: async () => {
-    throw new Error('AuthContext not initialized yet. Wrap your app in <AuthProvider>.');
-  },
-  resetPassword: async () => {
-    throw new Error('AuthContext not initialized yet. Wrap your app in <AuthProvider>.');
-  },
-  forgotPassword: async () => {                            // ← Added
-    throw new Error('AuthContext not initialized yet. Wrap your app in <AuthProvider>.');
-  },
+  login: async () => { throw new Error('AuthContext not initialized yet'); },
+  logout: async () => { throw new Error('AuthContext not initialized yet'); },
+  resetPassword: async () => { throw new Error('AuthContext not initialized yet'); },
+  setupPassword: async () => { throw new Error('AuthContext not initialized yet'); }, // ← Added
+  forgotPassword: async () => { throw new Error('AuthContext not initialized yet'); },
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -38,11 +32,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
   const pathname = usePathname();
 
-  // --- Initialize authentication on load ---
   useEffect(() => {
     const initAuth = async () => {
       const { access_token } = getAuthToken() || {};
-
       if (!access_token) {
         setUser(null);
         setLoading(false);
@@ -52,7 +44,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       try {
         const profile = await AuthService.getProfile();
         setUser(profile);
-      } catch (err) {
+      } catch(err) {
         clearAuthToken();
         setUser(null);
         if (!pathname.startsWith('/auth')) router.replace('/auth/login');
@@ -68,7 +60,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const login = async ({ email, password }: UserLoginDto): Promise<AuthResponse> => {
     const data = await AuthService.login({ email, password });
 
-    if (!data.access_token) throw new Error('No access token returned from API.');
+    if (!data.access_token) throw new Error('No access token returned');
 
     setAuthToken({
       access_token: data.access_token,
@@ -88,11 +80,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   // --- Logout ---
   const logout = async () => {
-    try {
-      await AuthService.logout();
-    } catch (err) {
-      console.warn('[Auth] Backend logout failed:', err);
-    } finally {
+    try { await AuthService.logout(); } catch (err) { console.warn(err); }
+    finally {
       clearAuthToken();
       setUser(null);
       router.replace('/auth/login');
@@ -103,33 +92,36 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const resetPassword = async ({ token, newPassword }: { token: string; newPassword: string }) => {
     try {
       await AuthService.resetPassword({ token, newPassword });
-    } catch (err: any) {
+    } catch (err) {
       console.error('[Auth] Reset password failed:', err);
       throw err;
     }
   };
 
-  // --- Forgot Password (new) ---
-const forgotPassword = async ({ email }: { email: string }) => {
-  try {
-    await AuthService.forgotPassword({ email })
-  } catch (err: any) {
-    const backendMessage = err?.response?.data?.message
-    if (backendMessage === "User not found" || err?.status === 404) return
-    throw err // Only throw for real server errors
-  }
-}
+  // --- Setup Password (new) ---
+  const setupPassword = async ({ token, newPassword }: { token: string; newPassword: string }) => {
+    try {
+      await AuthService.setupPassword({ token, newPassword });
+    } catch (err) {
+      console.error('[Auth] Setup password failed:', err);
+      throw err;
+    }
+  };
+
+  // --- Forgot Password ---
+  const forgotPassword = async ({ email }: { email: string }) => {
+    try {
+      await AuthService.forgotPassword({ email });
+    } catch (err: any) {
+      const backendMessage = err?.response?.data?.message;
+      if (backendMessage === 'User not found' || err?.status === 404) return;
+      throw err;
+    }
+  };
 
   return (
     <AuthContext.Provider
-      value={{
-        user,
-        loading,
-        login,
-        logout,
-        resetPassword,
-        forgotPassword,
-      }}
+      value={{ user, loading, login, logout, resetPassword, setupPassword, forgotPassword }}
     >
       {children}
     </AuthContext.Provider>

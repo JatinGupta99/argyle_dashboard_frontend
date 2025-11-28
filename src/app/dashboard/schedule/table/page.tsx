@@ -1,19 +1,19 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { useEventsContext } from '@/components/providers/EventsContextProvider';
-import { Header } from '@/components/layout/Header';
 import { DashboardToolbar } from '@/components/dashboard/DashboardToolBar';
 import MonthlySummary from '@/components/dashboard/MonthlyScheduleSummary';
+import { Header } from '@/components/layout/Header';
+import { useEventsContext } from '@/components/providers/EventsContextProvider';
+import { useMemo, useState } from 'react';
 
-import { Plus } from 'lucide-react';
 import { DeleteConfirmDialog } from '@/components/form/DeleteConfirmDialog';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { openEventForm, setEventDeleteTarget } from '@/redux/slices/event-slice';
 import { deleteEvent } from '@/redux/slices/event-thunks';
-import ScheduleTableTabs from '../components/ScheduleTabs';
-import ScheduleTableBody from '../components/ScheduleTableBody';
+import { Plus } from 'lucide-react';
 import { EventFormDialog } from '../components/EventFormDialog';
+import ScheduleTableBody from '../components/ScheduleTableBody';
+import ScheduleTableTabs from '../components/ScheduleTabs';
 
 export default function ScheduleTableContent() {
   const { meta, query, setQuery } = useEventsContext();

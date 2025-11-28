@@ -17,9 +17,14 @@ export type CreateScheduleDto = Omit<Schedule, '_id' | 'createdAt' | 'updatedAt'
 export type ScheduleStatus = 'ALL' | 'UPCOMING' | 'PAST';
 
 export interface Speaker {
-  profileUrl: string;
-  name: string;
-  designation: string;
+  _id:string;
+  pictureUrl: string;
+  linkedInUrl: string;
+  name: {
+    firstName:string;
+    lastName:string;
+  };
+  title: string;
 }
 
 export interface ScheduleItem {

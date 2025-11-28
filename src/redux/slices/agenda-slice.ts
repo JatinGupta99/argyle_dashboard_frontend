@@ -1,40 +1,63 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
-  fetchAgendas,
   addAgenda,
-  updateAgenda,
-  removeAgenda,
+  deleteAgenda,
   fetchAgendaById,
+  fetchAgendas,
+  updateAgenda,
 } from './agenda-thunks';
-
 import type { Agenda } from '@/lib/types/agenda';
 
 interface AgendaState {
   items: Agenda[];
   loading: boolean;
   error: string | null;
-
   formOpen: boolean;
   editing: Agenda | null;
-
   deleteTarget: Agenda | null;
-
   eventId: string | null;
-  agendaId: string | null; // 👈 NEW: Track currently selected agenda
+  agendaId: string | null;
+
+  query: {
+    page: number;
+    limit: number;
+    search?: string;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
+  };
+
+  meta: {
+    total: number;
+    totalPages: number;
+    page: number;
+    limit: number;
+  };
 }
 
 const initialState: AgendaState = {
   items: [],
   loading: false,
   error: null,
-
   formOpen: false,
   editing: null,
-
   deleteTarget: null,
-
   eventId: null,
   agendaId: null,
+
+  query: {
+    page: 1,
+    limit: 10,
+    search: '',
+    sortBy: 'title',
+    sortOrder: 'asc',
+  },
+
+  meta: {
+    total: 0,
+    totalPages: 1,
+    page: 1,
+    limit: 10,
+  },
 };
 
 export const agendaSlice = createSlice({
@@ -45,7 +68,7 @@ export const agendaSlice = createSlice({
     openAgendaForm(state, action: PayloadAction<Agenda | null>) {
       state.formOpen = true;
       state.editing = action.payload ?? null;
-      state.agendaId = action.payload?._id ?? null; // 👈 store agendaId too
+      state.agendaId = action.payload?._id ?? null;
     },
 
     closeAgendaForm(state) {
@@ -59,7 +82,7 @@ export const agendaSlice = createSlice({
     },
 
     setAgendaId(state, action: PayloadAction<string | null>) {
-      state.agendaId = action.payload; // 👈 NEW
+      state.agendaId = action.payload;
     },
 
     clearAgendaError(state) {
@@ -73,42 +96,48 @@ export const agendaSlice = createSlice({
     clearAgendaDeleteTarget(state) {
       state.deleteTarget = null;
     },
+
+    setAgendaQuery(state, action: PayloadAction<Partial<AgendaState['query']>>) {
+      state.query = { ...state.query, ...action.payload };
+    },
   },
 
   extraReducers: (builder) => {
-    /* ---------- FETCH ONE ---------- */
+    // Fetch by ID
     builder.addCase(fetchAgendaById.pending, (state) => {
       state.loading = true;
       state.error = null;
     });
-
     builder.addCase(fetchAgendaById.fulfilled, (state, action) => {
       state.loading = false;
       state.editing = action.payload;
     });
-
     builder.addCase(fetchAgendaById.rejected, (state, action) => {
       state.loading = false;
-      state.error = (action.payload as string) || 'Failed to load agenda';
+      state.error = action.payload ?? 'Failed to load agenda';
     });
 
-    /* ---------- FETCH ALL ---------- */
+    // Fetch all
     builder.addCase(fetchAgendas.pending, (state) => {
       state.loading = true;
       state.error = null;
     });
-
     builder.addCase(fetchAgendas.fulfilled, (state, action) => {
       state.loading = false;
-      state.items = action.payload ?? [];
+      state.items = action.payload.data ?? [];
+      state.meta = {
+        total: action.payload.meta.total ?? 0,
+        totalPages: action.payload.meta.totalPages ?? 1,
+        page: action.payload.meta.page ?? state.query.page,
+        limit: action.payload.meta.limit ?? state.query.limit,
+      };
     });
-
     builder.addCase(fetchAgendas.rejected, (state, action) => {
       state.loading = false;
-      state.error = (action.payload as string) || 'Failed to load agendas';
+      state.error = action.payload ?? 'Failed to load agendas';
     });
 
-    /* ---------- ADD ---------- */
+    // Add agenda
     builder.addCase(addAgenda.fulfilled, (state, action) => {
       state.items.push(action.payload);
       state.formOpen = false;
@@ -116,25 +145,22 @@ export const agendaSlice = createSlice({
       state.agendaId = null;
     });
 
-    /* ---------- UPDATE ---------- */
+    // Update agenda
     builder.addCase(updateAgenda.fulfilled, (state, action) => {
-      const updated = action.payload;
-      state.items = state.items.map((a) => (a._id === updated._id ? updated : a));
+      state.items = state.items.map((a) => (a._id === action.payload._id ? action.payload : a));
       state.formOpen = false;
       state.editing = null;
       state.agendaId = null;
     });
 
-    /* ---------- DELETE ---------- */
-    builder.addCase(removeAgenda.fulfilled, (state, action) => {
-      state.items = state.items.filter((a) => a._id !== action.payload);
-      state.deleteTarget = null;
-
-      if (state.agendaId === action.payload) {
-        state.agendaId = null;
-        state.editing = null;
-      }
-    });
+    // Remove agenda
+builder.addCase(deleteAgenda.fulfilled, (state, action) => {
+  state.items = state.items.filter((a) => a._id !== action.payload);
+  state.deleteTarget = null;
+  if (state.agendaId === action.payload) {
+    state.agendaId = null;
+  }
+});
   },
 });
 
@@ -142,10 +168,11 @@ export const {
   openAgendaForm,
   closeAgendaForm,
   setAgendaEventId,
-  setAgendaId, // 👈 Export new action
+  setAgendaId,
   clearAgendaError,
   setAgendaDeleteTarget,
   clearAgendaDeleteTarget,
+  setAgendaQuery,
 } = agendaSlice.actions;
 
 export default agendaSlice.reducer;

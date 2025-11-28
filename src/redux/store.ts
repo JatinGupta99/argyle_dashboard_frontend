@@ -6,6 +6,7 @@ import agendaReducer from '@/redux/slices/agenda-slice';
 import sponsorReducer from '@/redux/slices/sponsor-slice';
 import eventOverviewReducer from '@/redux/slices/event-overview.slice';
 import eventReducer from '@/redux/slices/event-slice';
+import userReducer from '@/redux/slices/user-slice';
 export const store = configureStore({
   reducer: {
     events: eventReducer,
@@ -15,6 +16,7 @@ export const store = configureStore({
     agendas: agendaReducer,
     sponsors: sponsorReducer,
     eventOverview: eventOverviewReducer,
+    users: userReducer,
   },
 });
 
