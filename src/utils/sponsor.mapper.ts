@@ -5,11 +5,13 @@ export interface SponsorRow {
   id: string;
   name: string;
   logoUrl?: string;
+  youtubeUrl?: string;
   websiteUrl?: string;
   email?: string;
   phone?: string;
   status?: string;
   linkedInUrl?: string;
+  description?: string;
 }
 
 export function mapSponsorToRow(sponsor: Sponsor): SponsorRow {
@@ -18,6 +20,8 @@ export function mapSponsorToRow(sponsor: Sponsor): SponsorRow {
     name: sponsor.name,
     logoUrl: sponsor.logoKey ? `/uploads/${sponsor.logoKey}` : undefined, // adjust path if needed
     websiteUrl: sponsor.websiteUrl ?? '',
+    description: sponsor.description ?? '',
+    youtubeUrl: sponsor.youtubeUrl ?? '',
     linkedInUrl: sponsor.linkedInUrl ?? '',
   };
 }

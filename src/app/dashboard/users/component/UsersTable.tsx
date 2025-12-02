@@ -11,7 +11,6 @@ import { userColumns } from './UserRow';
 export default function UsersTable() {
   const dispatch = useAppDispatch();
   const { items: users, meta, loading } = useAppSelector((s) => s.users);
-  console.log(users,'12222222222222222222222222222222222222222222222222')
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
 
@@ -20,13 +19,14 @@ export default function UsersTable() {
     dispatch(fetchUsers({ page, limit }));
   }, [dispatch, page, limit]);
 
-  const columns = userColumns({
-    onEdit: (u: User) => dispatch(openUserForm(u)),
-    onDelete: (u: User) => dispatch(setUserDeleteTarget(u)),
-  
-  },
-  page,
-    limit,);
+  const columns = userColumns(
+    {
+      onEdit: (u: User) => dispatch(openUserForm(u)),
+      onDelete: (u: User) => dispatch(setUserDeleteTarget(u)),
+    },
+    page,
+    limit,
+  );
 
   return (
     <>

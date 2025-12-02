@@ -13,29 +13,26 @@ export interface PresignedUrlResponse {
 
 export const SpeakerService = {
   getAll: async (
-  eventId: string,
-  query?: {
-    page?: number;
-    limit?: number;
-    search?: string;
-    sortBy?: string;
-    sortOrder?: 'asc' | 'desc';
-  }
-) => {
-  const params = new URLSearchParams();
-  params.append('page', String(query?.page ?? 1));
-  params.append('limit', String(query?.limit ?? 10));
+    eventId: string,
+    query?: {
+      page?: number;
+      limit?: number;
+      search?: string;
+      sortBy?: string;
+      sortOrder?: 'asc' | 'desc';
+    },
+  ) => {
+    const params = new URLSearchParams();
+    params.append('page', String(query?.page ?? 1));
+    params.append('limit', String(query?.limit ?? 10));
 
-  if (query?.search) params.append('search', query.search);
-  if (query?.sortBy) params.append('sortBy', query.sortBy);
-  if (query?.sortOrder) params.append('sortOrder', query.sortOrder);
-  return await fetchApi(
-    `${ENDPOINTS.SPEAKERS.ROOT(eventId)}?${params.toString()}`,
-    {
+    if (query?.search) params.append('search', query.search);
+    if (query?.sortBy) params.append('sortBy', query.sortBy);
+    if (query?.sortOrder) params.append('sortOrder', query.sortOrder);
+    return await fetchApi(`${ENDPOINTS.SPEAKERS.ROOT(eventId)}?${params.toString()}`, {
       method: HTTP_METHODS[0], // GET
-    }
-  );
-},
+    });
+  },
   getById: async (eventId: string, speakerId: string) => {
     return fetchApi(ENDPOINTS.SPEAKERS.BY_ID(eventId, speakerId), {
       method: HTTP_METHODS[0],

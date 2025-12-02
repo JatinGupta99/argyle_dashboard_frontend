@@ -17,7 +17,7 @@ export default function ScheduleTableBody({ activeTab }: Props) {
       page: 1,
       status: activeTab !== 'ALL' ? activeTab : undefined,
     });
-  }, [activeTab, ]);
+  }, [activeTab]);
 
   if (isLoading) {
     return (

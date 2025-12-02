@@ -67,7 +67,7 @@ export function EventFormDialog() {
   //   }
   // }, [editing, formOpen]);
 
-    useEffect(() => {
+  useEffect(() => {
     if (editing && editing._id) {
       dispatch(fetchEventById(editing._id))
         .unwrap()
@@ -235,7 +235,7 @@ export function EventFormDialog() {
               onClick={handleImageClick}
               onDrop={handleImageDrop}
               onDragOver={(e) => e.preventDefault()}
-              className="cursor-pointer rounded-md border-2 border-dashed p-6 text-center relative"
+              className="relative cursor-pointer rounded-md border-2 border-dashed p-6 text-center"
             >
               {!imageFile && !imagePreview ? (
                 <div className="flex flex-col items-center text-sm opacity-60">
@@ -256,7 +256,7 @@ export function EventFormDialog() {
                       setImageFile(null);
                       setImagePreview(null);
                     }}
-                    className="absolute -top-2 -right-2 rounded-full bg-red-600 text-white w-5 h-5 flex items-center justify-center text-xs hover:bg-red-700"
+                    className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-xs text-white hover:bg-red-700"
                   >
                     ×
                   </button>

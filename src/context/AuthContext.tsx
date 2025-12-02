@@ -19,11 +19,21 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
-  login: async () => { throw new Error('AuthContext not initialized yet'); },
-  logout: async () => { throw new Error('AuthContext not initialized yet'); },
-  resetPassword: async () => { throw new Error('AuthContext not initialized yet'); },
-  setupPassword: async () => { throw new Error('AuthContext not initialized yet'); }, // ← Added
-  forgotPassword: async () => { throw new Error('AuthContext not initialized yet'); },
+  login: async () => {
+    throw new Error('AuthContext not initialized yet');
+  },
+  logout: async () => {
+    throw new Error('AuthContext not initialized yet');
+  },
+  resetPassword: async () => {
+    throw new Error('AuthContext not initialized yet');
+  },
+  setupPassword: async () => {
+    throw new Error('AuthContext not initialized yet');
+  }, // ← Added
+  forgotPassword: async () => {
+    throw new Error('AuthContext not initialized yet');
+  },
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -44,7 +54,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       try {
         const profile = await AuthService.getProfile();
         setUser(profile);
-      } catch(err) {
+      } catch (err) {
         clearAuthToken();
         setUser(null);
         if (!pathname.startsWith('/auth')) router.replace('/auth/login');
@@ -80,8 +90,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   // --- Logout ---
   const logout = async () => {
-    try { await AuthService.logout(); } catch (err) { console.warn(err); }
-    finally {
+    try {
+      await AuthService.logout();
+    } catch (err) {
+      console.warn(err);
+    } finally {
       clearAuthToken();
       setUser(null);
       router.replace('/auth/login');

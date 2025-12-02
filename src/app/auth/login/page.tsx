@@ -1,7 +1,14 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/context/AuthContext';
 import { loginSchema } from '@/lib/validation-schemas';
@@ -16,7 +23,7 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
   const { login } = useAuth();
-  const router=useRouter()
+  const router = useRouter();
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -34,12 +41,12 @@ export default function LoginPage() {
       toast.success('Login successful', {
         description: 'Redirecting to dashboard...',
       });
-      router.push('/dashboard/schedule/card')
+      router.push('/dashboard/schedule/card');
     } catch (err: any) {
       // Always show generic message regardless of backend error
-        console.error('[LoginPassword] Error:', err);
-        const message = err?.message || 'Failed to login';
-        toast.error(message);
+      console.error('[LoginPassword] Error:', err);
+      const message = err?.message || 'Failed to login';
+      toast.error(message);
     }
   };
 
@@ -84,10 +91,7 @@ export default function LoginPage() {
 
           {/* Forgot Password Link */}
           <div className="text-right">
-            <Link
-              href="/auth/forgot-password"
-              className="text-sm text-blue-600 hover:underline"
-            >
+            <Link href="/auth/forgot-password" className="text-sm text-blue-600 hover:underline">
               Forgot Password?
             </Link>
           </div>

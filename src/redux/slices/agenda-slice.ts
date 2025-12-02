@@ -154,13 +154,13 @@ export const agendaSlice = createSlice({
     });
 
     // Remove agenda
-builder.addCase(deleteAgenda.fulfilled, (state, action) => {
-  state.items = state.items.filter((a) => a._id !== action.payload);
-  state.deleteTarget = null;
-  if (state.agendaId === action.payload) {
-    state.agendaId = null;
-  }
-});
+    builder.addCase(deleteAgenda.fulfilled, (state, action) => {
+      state.items = state.items.filter((a) => a._id !== action.payload);
+      state.deleteTarget = null;
+      if (state.agendaId === action.payload) {
+        state.agendaId = null;
+      }
+    });
   },
 });
 

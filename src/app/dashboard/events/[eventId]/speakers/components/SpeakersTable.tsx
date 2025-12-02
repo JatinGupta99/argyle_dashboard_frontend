@@ -22,10 +22,9 @@ export function SpeakersTable({
   onEdit,
   onDelete,
 }: SpeakersTableProps) {
-  console.log(data,'alscnlcs')
   return (
     <DataTable
-      data={data.map(d => ({ ...d, key: d._id }))}
+      data={data.map((d) => ({ ...d, key: d._id }))}
       columns={getSpeakerColumns({ onEdit, onDelete })}
       totalItems={meta?.total ?? data.length}
       query={query}

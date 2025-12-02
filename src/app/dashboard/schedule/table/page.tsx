@@ -74,21 +74,21 @@ export default function ScheduleTableContent() {
       <EventFormDialog />
 
       {/* Delete Confirmation */}
-     <DeleteConfirmDialog
-  open={!!deleteTarget}
-  title="Delete Event"
-  message={`Delete "${deleteTarget?.title}"?`}
-  onConfirm={async () => {
-    try {
-      await dispatch(deleteEvent(deleteTarget!._id)).unwrap(); // unwrap to catch errors
-      dispatch(setEventDeleteTarget(null));
-      setQuery({ ...query, page: 1 }); // close the modal
-    } catch (err) {
-      console.error('Failed to delete event', err);
-    }
-  }}
-  onCancel={() => dispatch(setEventDeleteTarget(null))}
-/>
+      <DeleteConfirmDialog
+        open={!!deleteTarget}
+        title="Delete Event"
+        message={`Delete "${deleteTarget?.title}"?`}
+        onConfirm={async () => {
+          try {
+            await dispatch(deleteEvent(deleteTarget!._id)).unwrap(); // unwrap to catch errors
+            dispatch(setEventDeleteTarget(null));
+            setQuery({ ...query, page: 1 }); // close the modal
+          } catch (err) {
+            console.error('Failed to delete event', err);
+          }
+        }}
+        onCancel={() => dispatch(setEventDeleteTarget(null))}
+      />
     </div>
   );
 }

@@ -26,7 +26,7 @@ export const AgendasContextProvider = ({ children }: { children: React.ReactNode
   const dispatch = useAppDispatch();
 
   const { items, meta, query, loading, error, eventId } = useAppSelector(
-    (s: RootState) => s.agendas
+    (s: RootState) => s.agendas,
   );
 
   const [internalQuery, setInternalQuery] = useState(query);

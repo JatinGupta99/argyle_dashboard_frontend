@@ -27,8 +27,8 @@ export default function ScheduleTable() {
 
   // Pass callbacks to columns
   const columns = getColumns({
-    onEdit: (event:any) => dispatch(openEventForm(event)),
-    onDelete: (event:any) => dispatch(setEventDeleteTarget(event)),
+    onEdit: (event: any) => dispatch(openEventForm(event)),
+    onDelete: (event: any) => dispatch(setEventDeleteTarget(event)),
   });
 
   const table = useReactTable({

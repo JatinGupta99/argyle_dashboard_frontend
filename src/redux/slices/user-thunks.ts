@@ -15,19 +15,15 @@ export const fetchUsers = createAsyncThunk<
   PaginatedUsers,
   { page?: number; limit?: number; search?: string; role?: string } | undefined,
   { rejectValue: string }
->(
-  'users/fetch',
-  async (params, thunkAPI) => {
-    try {
-      const res = await UserService.getAll(params);
+>('users/fetch', async (params, thunkAPI) => {
+  try {
+    const res = await UserService.getAll(params);
     console.log('API response:', res.data);
-      return res.data as any;
-    } catch (err) {
-      return thunkAPI.rejectWithValue('Failed to fetch users');
-    }
+    return res.data as any;
+  } catch (err) {
+    return thunkAPI.rejectWithValue('Failed to fetch users');
   }
-);
-
+});
 
 // ───────── CREATE USER ─────────
 export const createUser = createAsyncThunk<User, CreateUserDto, { rejectValue: string }>(
@@ -39,21 +35,22 @@ export const createUser = createAsyncThunk<User, CreateUserDto, { rejectValue: s
     } catch {
       return thunkAPI.rejectWithValue('Failed to create user');
     }
-  }
+  },
 );
 
 // ───────── UPDATE USER ─────────
-export const updateUser = createAsyncThunk<User, { id: string; payload: UpdateUserDto }, { rejectValue: string }>(
-  'users/update',
-  async ({ id, payload }, thunkAPI) => {
-    try {
-      const res = await UserService.update(id, payload);
-      return res.data as User;
-    } catch {
-      return thunkAPI.rejectWithValue('Failed to update user');
-    }
+export const updateUser = createAsyncThunk<
+  User,
+  { id: string; payload: UpdateUserDto },
+  { rejectValue: string }
+>('users/update', async ({ id, payload }, thunkAPI) => {
+  try {
+    const res = await UserService.update(id, payload);
+    return res.data as User;
+  } catch {
+    return thunkAPI.rejectWithValue('Failed to update user');
   }
-);
+});
 
 // ───────── DELETE USER ─────────
 export const deleteUser = createAsyncThunk<string, string, { rejectValue: string }>(
@@ -65,5 +62,5 @@ export const deleteUser = createAsyncThunk<string, string, { rejectValue: string
     } catch {
       return thunkAPI.rejectWithValue('Failed to delete user');
     }
-  }
+  },
 );

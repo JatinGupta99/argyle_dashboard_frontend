@@ -1,19 +1,8 @@
-export interface Speaker {
-  _id: string;
-  name: {
-    firstName: string;
-    lastName: string;
-  };
+import { SpeakerType } from './types';
+
+export interface SpeakerView {
   title: string;
-  email: string;
-  companyName: string;
-  bio?: string;
-  pictureUrl?: string;
-  linkedInUrl?: string;
-}
-export interface SpeakerView{
-  title:string;
-  photo:string;
+  photo: string;
 }
 export interface CreateSpeakerDto {
   name: {
@@ -22,10 +11,12 @@ export interface CreateSpeakerDto {
   };
   title: string;
   email: string;
-  companyName: string;
+  contactId: string;
+  speakerType: SpeakerType;
+  companyName?: string;
   bio?: string;
-  pictureUrl?: string;
-  linkedInUrl?: string;
+  pictureUrl: string;
+  linkedInUrl: string;
 }
 
 export interface UpdateSpeakerDto extends Partial<CreateSpeakerDto> {}

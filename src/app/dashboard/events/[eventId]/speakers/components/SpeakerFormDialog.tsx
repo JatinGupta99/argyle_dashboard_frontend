@@ -11,21 +11,24 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import type { CreateSpeakerDto } from '@/lib/types/speaker';
+import { SpeakerType } from '@/lib/types/types';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
-import { createSpeaker, fetchSpeakers, updateSpeaker } from '@/redux/slices/speaker-thunks';
 import { closeSpeakerForm } from '@/redux/slices/speaker-slice';
+import { createSpeaker, fetchSpeakers, updateSpeaker, uploadSpeakerImage } from '@/redux/slices/speaker-thunks';
 import { Upload } from 'lucide-react';
 import { DragEvent, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 const DEFAULT_FORM: CreateSpeakerDto = {
   name: { firstName: '', lastName: '' },
-  companyName: '',
   title: '',
   email: '',
-  bio: '',
   linkedInUrl: '',
+  contactId: '',
+  companyName: '',
+  bio: '',
   pictureUrl: '',
+  speakerType: SpeakerType.SPEAKER_TBD,
 };
 
 export function SpeakerFormDialog() {
@@ -35,43 +38,49 @@ export function SpeakerFormDialog() {
   const [formData, setFormData] = useState<CreateSpeakerDto>(DEFAULT_FORM);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const photoInputRef = useRef<HTMLInputElement>(null);
 
+  // ---------------- Prefill / Reset Form ----------------
   useEffect(() => {
     if (formOpen && editing) {
+      console.log(editing,'csalnlcasknlac')
       setFormData({
-        name: editing.name,
-        companyName: editing.companyName ?? '',
+        
+        name: editing.name || { firstName: '', lastName: '' },
         title: editing.title ?? '',
         email: editing.email ?? '',
-        bio: editing.bio ?? '',
         linkedInUrl: editing.linkedInUrl ?? '',
+        contactId: editing.contactId ?? editing.email ?? '',
+        companyName: editing.companyName ?? '',
+        bio: editing.bio ?? '',
         pictureUrl: editing.pictureUrl ?? '',
+        speakerType: editing.speakerType ?? SpeakerType.SPEAKER_TBD,
       });
+
       setPhotoPreview(editing.pictureUrl ?? null);
       setPhotoFile(null);
+      setErrors({});
     } else if (!formOpen) {
       setFormData(DEFAULT_FORM);
       setPhotoFile(null);
       setPhotoPreview(null);
+      setErrors({});
     }
   }, [formOpen, editing]);
 
+  // ---------------- Form Field Update ----------------
   const updateField = (key: string, value: string, nested = false) => {
     setFormData((prev) =>
       nested ? { ...prev, name: { ...prev.name, [key]: value } } : { ...prev, [key]: value }
     );
+
+    // Clear field error on change
+    setErrors((prev) => ({ ...prev, [key]: '' }));
   };
 
-  const validate = () => {
-    if (!formData.name.firstName.trim()) return 'First name is required';
-    if (!formData.name.lastName.trim()) return 'Last name is required';
-    if (!formData.companyName.trim()) return 'Company is required';
-    if (!formData.email.trim()) return 'Email is required';
-    return null;
-  };
-
+  // ---------------- Photo Handlers ----------------
   const handlePhotoClick = () => photoInputRef.current?.click();
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -91,56 +100,71 @@ export function SpeakerFormDialog() {
     }
   };
 
+  // ---------------- Validation ----------------
+  const validate = () => {
+    const newErrors: Record<string, string> = {};
+
+    if (!formData.name.firstName.trim()) newErrors.firstName = 'First name is required';
+    if (!formData.name.lastName.trim()) newErrors.lastName = 'Last name is required';
+    if (!formData.title.trim()) newErrors.title = 'Title is required';
+    if (!formData.email.trim()) newErrors.email = 'Email is required';
+    else if (!/^\S+@\S+\.\S+$/.test(formData.email)) newErrors.email = 'Invalid email format';
+    if (!formData.linkedInUrl.trim()) newErrors.linkedInUrl = 'LinkedIn URL is required';
+    else if (!/^https:\/\/(www\.)?linkedin\.com\/(in|company)\/[\w\d_-]+\/?$/i.test(formData.linkedInUrl))
+      newErrors.linkedInUrl = 'Invalid LinkedIn URL';
+    if (!photoFile && !editing) newErrors.photo = 'Photo is required';
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  // ---------------- Close ----------------
   const handleClose = () => dispatch(closeSpeakerForm());
 
+  // ---------------- Submit ----------------
   const handleSubmit = async () => {
-    const err = validate();
-    if (err) return toast.error(err);
-
+    if (!validate()) return;
     if (!eventId) return toast.error('Event ID not set');
 
     try {
-      if (editing) {
-        await dispatch(
-          updateSpeaker({
-            id: editing._id,
-            payload: {
-              ...formData,
-              name: {
-                firstName: formData.name.firstName.trim(),
-                lastName: formData.name.lastName.trim(),
-              },
-            },
-            photoFile,
-          })
-        ).unwrap();
-        toast.success('Speaker updated');
+      let speakerId = editing?._id;
+
+      const payload: CreateSpeakerDto = {
+        ...formData,
+        contactId: formData.email.trim(),
+        name: {
+          firstName: formData.name.firstName.trim(),
+          lastName: formData.name.lastName.trim(),
+        },
+      };
+
+      // 1️⃣ Create or Update Speaker (without picture)
+      if (!editing) {
+        const createdSpeaker = await dispatch(createSpeaker({ data: payload })).unwrap();
+        speakerId = createdSpeaker._id;
       } else {
-        await dispatch(
-          createSpeaker({
-            data: {
-              ...formData,
-              name: {
-                firstName: formData.name.firstName.trim(),
-                lastName: formData.name.lastName.trim(),
-              },
-            },
-            photoFile,
-          })
-        ).unwrap();
-        toast.success('Speaker added');
+        await dispatch(updateSpeaker({ id: speakerId!, payload })).unwrap();
       }
 
-      // refresh current page
+      // 2️⃣ Upload Photo if exists
+      if (photoFile && speakerId) {
+        const imageKey = await dispatch(uploadSpeakerImage({ file: photoFile, speakerId })).unwrap();
+
+        // 3️⃣ Update Speaker with picture URL
+        await dispatch(updateSpeaker({ id: speakerId, payload: { ...payload, pictureUrl: imageKey } })).unwrap();
+      }
+
+      toast.success(editing ? 'Speaker updated' : 'Speaker added');
       dispatch(fetchSpeakers({ page: 1, limit: 10 }));
       handleClose();
-    } catch {
-      toast.error('Failed to save speaker');
+    } catch (error: any) {
+      console.error('❌ Save Speaker Error:', error);
+      toast.error(error?.message || 'Failed to save speaker');
     }
   };
 
   return (
-  <Dialog open={formOpen} onOpenChange={(open) => !open && handleClose()}>
+    <Dialog open={formOpen} onOpenChange={(open) => !open && handleClose()}>
       <DialogContent className="max-h-[85vh] w-[90%] max-w-lg overflow-y-auto rounded-lg p-4">
         <DialogHeader>
           <DialogTitle>{editing ? 'Edit Speaker' : 'Add Speaker'}</DialogTitle>
@@ -153,51 +177,61 @@ export function SpeakerFormDialog() {
               <Input
                 value={formData.name.firstName}
                 onChange={(e) => updateField('firstName', e.target.value, true)}
-                placeholder="John"
+                className={errors.firstName ? 'border-red-500' : ''}
               />
+              {errors.firstName && <p className="mt-1 text-xs text-red-500">{errors.firstName}</p>}
             </FormField>
             <FormField label="Last Name" className="flex-1">
               <Input
                 value={formData.name.lastName}
                 onChange={(e) => updateField('lastName', e.target.value, true)}
-                placeholder="Doe"
+                className={errors.lastName ? 'border-red-500' : ''}
               />
+              {errors.lastName && <p className="mt-1 text-xs text-red-500">{errors.lastName}</p>}
             </FormField>
           </div>
 
-          {/* Company & Title */}
-          <div className="flex gap-4">
-            <FormField label="Company" className="flex-1">
-              <Input
-                value={formData.companyName}
-                onChange={(e) => updateField('companyName', e.target.value)}
-                placeholder="Google"
-              />
-            </FormField>
-            <FormField label="Title in Company" className="flex-1">
-              <Input
-                value={formData.title}
-                onChange={(e) => updateField('title', e.target.value)}
-                placeholder="Senior Engineer"
-              />
-            </FormField>
-          </div>
+          {/* Title */}
+          <FormField label="Title in Company">
+            <Input
+              value={formData.title}
+              onChange={(e) => updateField('title', e.target.value)}
+              className={errors.title ? 'border-red-500' : ''}
+            />
+            {errors.title && <p className="mt-1 text-xs text-red-500">{errors.title}</p>}
+          </FormField>
 
-          {/* Email & LinkedIn */}
+          {/* Email */}
           <FormField label="Email">
             <Input
-              type="email"
               value={formData.email}
               onChange={(e) => updateField('email', e.target.value)}
-              placeholder="john@example.com"
+              className={errors.email ? 'border-red-500' : ''}
             />
+            {errors.email && <p className="mt-1 text-xs text-red-500">{errors.email}</p>}
           </FormField>
-          <FormField label="LinkedIn Link">
+
+          {/* LinkedIn */}
+          <FormField label="LinkedIn URL">
             <Input
               value={formData.linkedInUrl}
               onChange={(e) => updateField('linkedInUrl', e.target.value)}
-              placeholder="https://linkedin.com/in/john"
+              className={errors.linkedInUrl ? 'border-red-500' : ''}
             />
+            {errors.linkedInUrl && <p className="mt-1 text-xs text-red-500">{errors.linkedInUrl}</p>}
+          </FormField>
+
+          {/* Speaker Type */}
+          <FormField label="Speaker Type">
+            <select
+              className="w-full rounded-md border p-2"
+              value={formData.speakerType}
+              onChange={(e) => updateField('speakerType', e.target.value)}
+            >
+              {Object.values(SpeakerType).map((t) => (
+                <option key={t} value={t}>{t}</option>
+              ))}
+            </select>
           </FormField>
 
           {/* Photo Upload */}
@@ -206,24 +240,35 @@ export function SpeakerFormDialog() {
               onClick={handlePhotoClick}
               onDrop={handlePhotoDrop}
               onDragOver={(e) => e.preventDefault()}
-              className="cursor-pointer rounded-md border-2 border-dashed p-6 text-center"
+              className={`cursor-pointer rounded-md border-2 border-dashed p-6 text-center ${errors.photo ? 'border-red-500' : ''}`}
             >
               {!photoFile ? (
                 <div className="flex flex-col items-center text-sm opacity-60">
                   <Upload className="mb-2 h-6 w-6" />
                   Drag or click to upload photo
                 </div>
-              ) : (
-                <p>{photoFile.name}</p>
-              )}
+              ) : <p>{photoFile.name}</p>}
             </div>
 
             {photoPreview && (
-              <img
-                src={photoPreview}
-                alt="Preview"
-                className="mt-2 h-20 w-20 rounded-md border object-cover"
-              />
+              <div className="relative mt-2 inline-block">
+                <img
+                  src={photoPreview}
+                  alt="Preview"
+                  className="h-20 w-20 rounded-md border object-cover"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPhotoFile(null);
+                    setPhotoPreview(null);
+                    if (photoInputRef.current) photoInputRef.current.value = '';
+                  }}
+                  className="absolute -top-2 -right-2 h-5 w-5 rounded-full bg-red-500 text-white text-xs font-bold flex items-center justify-center hover:bg-red-600"
+                >
+                  ×
+                </button>
+              </div>
             )}
 
             <input
@@ -232,6 +277,16 @@ export function SpeakerFormDialog() {
               accept="image/*"
               className="hidden"
               onChange={handlePhotoChange}
+            />
+
+            {errors.photo && <p className="mt-1 text-xs text-red-500">{errors.photo}</p>}
+          </FormField>
+
+          {/* Company */}
+          <FormField label="Company">
+            <Input
+              value={formData.companyName}
+              onChange={(e) => updateField('companyName', e.target.value)}
             />
           </FormField>
 
@@ -247,9 +302,7 @@ export function SpeakerFormDialog() {
         </div>
 
         <DialogFooter className="mt-4">
-          <Button variant="outline" onClick={handleClose}>
-            Cancel
-          </Button>
+          <Button variant="outline" onClick={handleClose}>Cancel</Button>
           <Button onClick={handleSubmit} disabled={loading}>
             {loading ? 'Saving…' : editing ? 'Update' : 'Add Speaker'}
           </Button>

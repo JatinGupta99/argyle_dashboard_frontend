@@ -68,14 +68,14 @@ export const usersSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-   .addCase(fetchUsers.fulfilled, (state, action: PayloadAction<PaginatedUsers>) => {
-  state.loading = false;
-  state.items = action.payload.items;
-  state.meta.total = action.payload.total;
-  state.meta.page = action.payload.page;
-  state.meta.limit = action.payload.limit;
-  state.meta.totalPages = action.payload.totalPages;
-})
+      .addCase(fetchUsers.fulfilled, (state, action: PayloadAction<PaginatedUsers>) => {
+        state.loading = false;
+        state.items = action.payload.items;
+        state.meta.total = action.payload.total;
+        state.meta.page = action.payload.page;
+        state.meta.limit = action.payload.limit;
+        state.meta.totalPages = action.payload.totalPages;
+      })
       .addCase(fetchUsers.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload ?? 'Failed to fetch users';
@@ -106,9 +106,7 @@ export const usersSlice = createSlice({
         console.log('Reducer payload:', action.payload);
         state.formLoading = false;
         const updated = action.payload;
-        state.items = state.items.map((u) =>
-          u._id === updated._id ? updated : u
-        );
+        state.items = state.items.map((u) => (u._id === updated._id ? updated : u));
         state.formOpen = false;
         state.editing = null;
       })
@@ -134,13 +132,7 @@ export const usersSlice = createSlice({
   },
 });
 
-export const {
-  openUserForm,
-  closeUserForm,
-  setUserDeleteTarget,
-  clearError,
-  setPage,
-  setLimit,
-} = usersSlice.actions;
+export const { openUserForm, closeUserForm, setUserDeleteTarget, clearError, setPage, setLimit } =
+  usersSlice.actions;
 
 export default usersSlice.reducer;

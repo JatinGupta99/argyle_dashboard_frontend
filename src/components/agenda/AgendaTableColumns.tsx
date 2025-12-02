@@ -35,57 +35,61 @@ export const getAgendaColumns = ({
     accessorKey: 'title',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Session Title" />,
     cell: ({ row }) => (
-      <span className="line-clamp-2 cursor-pointer text-gray-700 font-medium">{row.original.title}</span>
+      <span className="line-clamp-2 cursor-pointer font-medium text-gray-700">
+        {row.original.title}
+      </span>
     ),
   },
-{
-  id: 'time',
-  header: ({ column }) => <DataTableColumnHeader column={column} title="Time" />,
-  cell: ({ row }) => {
-    const { startTime, endTime } = row.original; // use direct properties
-    return (
-      <div className="flex items-center gap-2 whitespace-nowrap">
-        <Clock className="h-4 w-4 text-sky-400" />
-        <span>{formatAgendaTime(startTime, endTime)}</span>
-      </div>
-    );
-  },
-},
- {
-  accessorKey: 'audiencePolls',
-  header: ({ column }) => <DataTableColumnHeader column={column} title="Audience Polls" />,
-  cell: ({ row }) => {
-    const hasPoll = row.original.hasPoll;
-    return (
-      <span className={hasPoll ? 'text-green-600 font-bold' : 'text-red-600'}>
-        {hasPoll ? 'Yes' : 'No'}
-      </span>
-    );
-  },
-},
-{
-  id: 'speaker',
-  header: ({ column }) => <DataTableColumnHeader column={column} title="Speaker" />,
-  cell: ({ row }) => {
-    const speaker = row.original.speakers?.[0]; // Assuming first speaker from the array
-    return (
-      <div className="flex items-center gap-2">
-        <Avatar className="h-6 w-6 border-2 border-white">
-          {speaker?.pictureUrl ? (
-            <AvatarImage src={speaker.pictureUrl} alt={`${speaker.name.firstName} ${speaker.name.lastName}`} />
-          ) : (
-            <AvatarFallback className="bg-gray-200 text-[8px] text-gray-700">N/A</AvatarFallback>
-          )}
-        </Avatar>
-        <div className="flex flex-col">
-          <span className="font-medium text-sm">{`${speaker?.name.firstName || ''} ${speaker?.name.lastName || ''}`}</span>
-          <span className="text-xs text-gray-500">{speaker?.title || '—'}</span>
+  {
+    id: 'time',
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Time" />,
+    cell: ({ row }) => {
+      const { startTime, endTime } = row.original; // use direct properties
+      return (
+        <div className="flex items-center gap-2 whitespace-nowrap">
+          <Clock className="h-4 w-4 text-sky-400" />
+          <span>{formatAgendaTime(startTime, endTime)}</span>
         </div>
-      </div>
-    );
+      );
+    },
   },
-}
-,
+  {
+    accessorKey: 'audiencePolls',
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Audience Polls" />,
+    cell: ({ row }) => {
+      const hasPoll = row.original.hasPoll;
+      return (
+        <span className={hasPoll ? 'font-bold text-green-600' : 'text-red-600'}>
+          {hasPoll ? 'Yes' : 'No'}
+        </span>
+      );
+    },
+  },
+  {
+    id: 'speaker',
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Speaker" />,
+    cell: ({ row }) => {
+      const speaker = row.original.speakers?.[0]; // Assuming first speaker from the array
+      return (
+        <div className="flex items-center gap-2">
+          <Avatar className="h-6 w-6 border-2 border-white">
+            {speaker?.pictureUrl ? (
+              <AvatarImage
+                src={speaker.pictureUrl}
+                alt={`${speaker.name.firstName} ${speaker.name.lastName}`}
+              />
+            ) : (
+              <AvatarFallback className="bg-gray-200 text-[8px] text-gray-700">N/A</AvatarFallback>
+            )}
+          </Avatar>
+          <div className="flex flex-col">
+            <span className="text-sm font-medium">{`${speaker?.name.firstName || ''} ${speaker?.name.lastName || ''}`}</span>
+            <span className="text-xs text-gray-500">{speaker?.title || '—'}</span>
+          </div>
+        </div>
+      );
+    },
+  },
   {
     id: 'actions',
     header: () => <div className="text-center">Action</div>,
@@ -102,7 +106,10 @@ export const getAgendaColumns = ({
                 <Pencil className="mr-2 h-4 w-4 text-sky-500" />
                 Edit
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onDelete?.(agenda)} className="text-red-600 focus:text-red-600">
+              <DropdownMenuItem
+                onClick={() => onDelete?.(agenda)}
+                className="text-red-600 focus:text-red-600"
+              >
                 <Trash2 className="mr-2 h-4 w-4 text-red-600" />
                 Delete
               </DropdownMenuItem>

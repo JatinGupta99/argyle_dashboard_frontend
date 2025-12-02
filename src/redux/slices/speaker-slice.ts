@@ -1,11 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import type { Speaker } from '@/lib/types/speaker';
-import {
-  createSpeaker,
-  updateSpeaker,
-  deleteSpeaker,
-  fetchSpeakers,
-} from './speaker-thunks';
+import { createSpeaker, updateSpeaker, deleteSpeaker, fetchSpeakers } from './speaker-thunks';
+import { Speaker } from '@/lib/types/schedule';
 
 interface SpeakerState {
   items: Speaker[];
@@ -110,9 +105,7 @@ export const speakerSlice = createSlice({
 
     // UPDATE
     builder.addCase(updateSpeaker.fulfilled, (state, action) => {
-      state.items = state.items.map((s) =>
-        s._id === action.payload._id ? action.payload : s
-      );
+      state.items = state.items.map((s) => (s._id === action.payload._id ? action.payload : s));
       state.formOpen = false;
       state.editing = null;
     });

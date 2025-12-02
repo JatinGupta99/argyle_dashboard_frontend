@@ -5,7 +5,12 @@ import { Sponsor } from '@/lib/types/sponsor';
 import { DataTableColumnHeader } from '@/app/dashboard/schedule/components/data-table-column-header';
 import { MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from '@/components/ui/dropdown-menu';
 
 export const getSponsorColumns = ({
   onEdit,
@@ -38,15 +43,21 @@ export const getSponsorColumns = ({
       );
     },
   },
-{
-  accessorKey: 'website',
-  header: ({ column }) => <DataTableColumnHeader column={column} title="Website" />,
-cell: ({ row }) => row.original.websiteUrl ? (
-  <a href={row.original.websiteUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline line-clamp-2">
-    {row.original.websiteUrl}
-  </a>
-) : null
-},
+  {
+    accessorKey: 'website',
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Website" />,
+    cell: ({ row }) =>
+      row.original.websiteUrl ? (
+        <a
+          href={row.original.websiteUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="line-clamp-2 text-blue-600 hover:underline"
+        >
+          {row.original.websiteUrl}
+        </a>
+      ) : null,
+  },
   {
     id: 'actions',
     header: () => <div className="text-center">Actions</div>,
@@ -62,7 +73,10 @@ cell: ({ row }) => row.original.websiteUrl ? (
               <DropdownMenuItem onClick={() => onEdit?.(sponsor)}>
                 <Pencil className="mr-2 h-4 w-4 text-sky-500" /> Edit
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onDelete?.(sponsor)} className="text-red-600 focus:text-red-600">
+              <DropdownMenuItem
+                onClick={() => onDelete?.(sponsor)}
+                className="text-red-600 focus:text-red-600"
+              >
                 <Trash2 className="mr-2 h-4 w-4 text-red-600" /> Delete
               </DropdownMenuItem>
             </DropdownMenuContent>

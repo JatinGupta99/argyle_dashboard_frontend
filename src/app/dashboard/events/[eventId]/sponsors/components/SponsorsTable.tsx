@@ -13,10 +13,17 @@ export interface SponsorTableProps {
   onDelete?: (sponsor: Sponsor) => void;
 }
 
-export function SponsorsTable({ data, meta, query, setQuery, onEdit, onDelete }: SponsorTableProps) {
+export function SponsorsTable({
+  data,
+  meta,
+  query,
+  setQuery,
+  onEdit,
+  onDelete,
+}: SponsorTableProps) {
   return (
     <DataTable
-      data={data.map(d => ({ ...d, key: d._id }))}
+      data={data.map((d) => ({ ...d, key: d._id }))}
       columns={getSponsorColumns({ onEdit, onDelete })}
       totalItems={meta?.total ?? data.length}
       query={query}

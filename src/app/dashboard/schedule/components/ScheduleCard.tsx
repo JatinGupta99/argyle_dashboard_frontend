@@ -48,7 +48,7 @@ export function ScheduleCard({
         {/* Header */}
         <CardHeader className="pb-2">
           <h3 className="text-base leading-tight font-semibold">{title}</h3>
-          <p className="mt-1 text-sm text-gray-700 line-clamp-3">{description}</p>
+          <p className="mt-1 line-clamp-3 text-sm text-gray-700">{description}</p>
         </CardHeader>
 
         {/* Schedule Row */}

@@ -20,7 +20,7 @@ export default function UsersTableContent() {
     if (!deleteTarget) return;
 
     try {
-      await dispatch(deleteUser((deleteTarget._id as string))).unwrap();
+      await dispatch(deleteUser(deleteTarget._id as string)).unwrap();
       dispatch(setUserDeleteTarget(null));
     } catch (err) {
       console.error('Failed to delete user', err);
@@ -36,7 +36,7 @@ export default function UsersTableContent() {
         onButtonClick={openCreateUserForm}
       />
 
-      <h2 className="text-lg font-semibold pl-6 mt-2">List of all Argyle Internals</h2>
+      <h2 className="mt-2 pl-6 text-lg font-semibold">List of all Argyle Internals</h2>
       <div className="mt-4 mb-2 pl-6">
         <UsersTable />
       </div>

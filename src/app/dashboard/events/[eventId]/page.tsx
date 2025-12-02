@@ -55,9 +55,21 @@ export default function EventOverviewPage() {
   const [speakerQuery, setSpeakerQuery] = useState({ page: 1, limit: 10 });
   const [sponsorQuery, setSponsorQuery] = useState({ page: 1, limit: 10 });
 
-  const { items: speakers, deleteTarget: speakerDelete,meta: speakerMeta } = useAppSelector((s) => s.speakers);
-  const { items: sponsors, deleteTarget: sponsorDelete, meta: sponsorsMeta } = useAppSelector((s) => s.sponsors);
-  const { items: agendas, deleteTarget: agendaDelete, meta: agendasMeta } = useAppSelector((s) => s.agendas);
+  const {
+    items: speakers,
+    deleteTarget: speakerDelete,
+    meta: speakerMeta,
+  } = useAppSelector((s) => s.speakers);
+  const {
+    items: sponsors,
+    deleteTarget: sponsorDelete,
+    meta: sponsorsMeta,
+  } = useAppSelector((s) => s.sponsors);
+  const {
+    items: agendas,
+    deleteTarget: agendaDelete,
+    meta: agendasMeta,
+  } = useAppSelector((s) => s.agendas);
 
   /* ─── Sync eventId & fetch data ─── */
   useEffect(() => {
@@ -145,13 +157,13 @@ export default function EventOverviewPage() {
             </CardHeader>
             <CardContent className="p-0">
               <SpeakersTable
-              data={speakers.map(mapSpeakerToRow)}
-              meta={speakerMeta}
-              query={speakerQuery}
-              setQuery={setSpeakerQuery}
-              onEdit={(row) => dispatch(openSpeakerForm(row))}
-              onDelete={(row) => dispatch(setSpeakerDeleteTarget(row))}
-            />
+                data={speakers.map(mapSpeakerToRow)}
+                meta={speakerMeta}
+                query={speakerQuery}
+                setQuery={setSpeakerQuery}
+                onEdit={(row) => dispatch(openSpeakerForm(row))}
+                onDelete={(row) => dispatch(setSpeakerDeleteTarget(row))}
+              />
             </CardContent>
           </Card>
         </div>

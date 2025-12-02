@@ -6,16 +6,14 @@ export const UserService = {
   /* ------------------------------------------------------------
      GET ALL USERS
   -------------------------------------------------------------*/
-  getAll: async (
-    query?: {
-      page?: number;
-      limit?: number;
-      search?: string;
-      sortBy?: string;
-      sortOrder?: 'asc' | 'desc';
-      role?: string;
-    }
-  ) => {
+  getAll: async (query?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
+    role?: string;
+  }) => {
     const params = new URLSearchParams();
 
     if (query?.page) params.append('page', String(query.page));

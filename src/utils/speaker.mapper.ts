@@ -2,8 +2,7 @@ import type { SpeakerAssiciatedwithAgendas } from '@/lib/types/agenda';
 import type { Speaker } from '@/lib/types/schedule';
 
 export function mapSpeakerToRow(a: Partial<Speaker>): SpeakerAssiciatedwithAgendas {
- 
-  const obj= {
+  const obj = {
     _id: a._id || '',
     name: {
       firstName: a.name?.firstName || '',
@@ -12,7 +11,8 @@ export function mapSpeakerToRow(a: Partial<Speaker>): SpeakerAssiciatedwithAgend
     title: a.title || '',
     pictureUrl: a.pictureUrl || '',
     linkedInUrl: a.linkedInUrl || '',
+    youtubeUrl: a.youtubeUrl || '',
+    email:a.email||'',
   };
-   console.log(obj,'mapSpeakerToRow')
   return obj;
 }

@@ -2,10 +2,22 @@
 
 import { FormField } from '@/components/form/FormField';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Role } from '@/lib/types/user';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Role, User } from '@/lib/types/user';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { closeUserForm } from '@/redux/slices/user-slice';
 import { createUser, updateUser } from '@/redux/slices/user-thunks';
@@ -37,10 +49,10 @@ export function UserFormDialog() {
     if (!formOpen) {
       setFormData(DEFAULT_FORM);
     } else if (editing) {
-        const fullName = editing.name || '';
-  const parts = fullName.trim().split(' ');
-  const firstName = parts[0];
-  const lastName = parts.length > 1 ? parts.slice(1).join(' ') : '';
+      const fullName = editing.name || '';
+      const parts = fullName.trim().split(' ');
+      const firstName = parts[0];
+      const lastName = parts.length > 1 ? parts.slice(1).join(' ') : '';
       setFormData({
         firstName: firstName || '',
         lastName: lastName || '',
@@ -91,8 +103,13 @@ export function UserFormDialog() {
   };
 
   return (
-    <Dialog open={formOpen} onOpenChange={(open) => { if (!open) handleClose(); }}>
-      <DialogContent className="max-w-md p-6 space-y-4">
+    <Dialog
+      open={formOpen}
+      onOpenChange={(open) => {
+        if (!open) handleClose();
+      }}
+    >
+      <DialogContent className="max-w-md space-y-4 p-6">
         <DialogHeader>
           <DialogTitle>{editing ? 'Edit User' : 'Add User'}</DialogTitle>
         </DialogHeader>
@@ -126,10 +143,7 @@ export function UserFormDialog() {
           </FormField>
 
           <FormField label="Role">
-            <Select
-              value={formData.role}
-              onValueChange={(v) => updateField('role', v as Role)}
-            >
+            <Select value={formData.role} onValueChange={(v) => updateField('role', v as Role)}>
               <SelectTrigger>
                 <SelectValue placeholder="Select role" />
               </SelectTrigger>
@@ -143,7 +157,9 @@ export function UserFormDialog() {
         </div>
 
         <DialogFooter className="flex justify-end gap-2">
-          <Button variant="outline" onClick={handleClose}>Cancel</Button>
+          <Button variant="outline" onClick={handleClose}>
+            Cancel
+          </Button>
           <Button onClick={handleSubmit} disabled={formLoading}>
             {formLoading ? 'Saving…' : editing ? 'Update User' : 'Add User'}
           </Button>

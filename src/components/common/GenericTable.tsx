@@ -1,18 +1,36 @@
 'use client';
 
-import { useReactTable, getCoreRowModel, getPaginationRowModel, flexRender } from '@tanstack/react-table';
-import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from '@/components/ui/table';
+import {
+  useReactTable,
+  getCoreRowModel,
+  getPaginationRowModel,
+  flexRender,
+} from '@tanstack/react-table';
+import {
+  Table,
+  TableHeader,
+  TableHead,
+  TableRow,
+  TableBody,
+  TableCell,
+} from '@/components/ui/table';
 import { DataTablePagination } from '@/app/dashboard/schedule/components/DataTablePagination';
 
 interface DataTableProps<T> {
   data: T[];
   columns: any[];
-  totalItems?: number; 
+  totalItems?: number;
   query: { page: number; limit: number };
   setQuery: (query: { page: number; limit: number }) => void;
 }
 
-export function DataTable<T>({ data, columns, totalItems = 0, query, setQuery }: DataTableProps<T>) {
+export function DataTable<T>({
+  data,
+  columns,
+  totalItems = 0,
+  query,
+  setQuery,
+}: DataTableProps<T>) {
   const pageCount = Math.ceil(totalItems / query.limit);
 
   const table = useReactTable({
@@ -23,8 +41,11 @@ export function DataTable<T>({ data, columns, totalItems = 0, query, setQuery }:
     manualPagination: true,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    onPaginationChange: updater => {
-      const next = typeof updater === 'function' ? updater({ pageIndex: query.page - 1, pageSize: query.limit }) : updater;
+    onPaginationChange: (updater) => {
+      const next =
+        typeof updater === 'function'
+          ? updater({ pageIndex: query.page - 1, pageSize: query.limit })
+          : updater;
       setQuery({ page: next.pageIndex + 1, limit: next.pageSize });
     },
   });
@@ -33,11 +54,13 @@ export function DataTable<T>({ data, columns, totalItems = 0, query, setQuery }:
     <div className="rounded-md border bg-white">
       <Table>
         <TableHeader>
-          {table.getHeaderGroups().map(hg => (
+          {table.getHeaderGroups().map((hg) => (
             <TableRow key={hg.id} className="bg-sky-50 shadow-sm">
-              {hg.headers.map(header => (
+              {hg.headers.map((header) => (
                 <TableHead key={header.id} className="px-4 py-2 text-center">
-                  {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                  {header.isPlaceholder
+                    ? null
+                    : flexRender(header.column.columnDef.header, header.getContext())}
                 </TableHead>
               ))}
             </TableRow>
@@ -46,9 +69,9 @@ export function DataTable<T>({ data, columns, totalItems = 0, query, setQuery }:
 
         <TableBody>
           {table.getRowModel().rows.length ? (
-            table.getRowModel().rows.map(row => (
+            table.getRowModel().rows.map((row) => (
               <TableRow key={row.id} className="hover:bg-gray-50">
-                {row.getVisibleCells().map(cell => (
+                {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id} className="px-4 py-3 text-center">
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </TableCell>

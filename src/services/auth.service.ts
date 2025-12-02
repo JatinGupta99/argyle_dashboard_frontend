@@ -38,26 +38,25 @@ export const AuthService = {
     }
   },
 
- setupPassword: async (payload: { token: string; newPassword: string }): Promise<void> => {
-  const { token, newPassword } = payload;
+  setupPassword: async (payload: { token: string; newPassword: string }): Promise<void> => {
+    const { token, newPassword } = payload;
 
-  try {
-    const res = await fetchApi<{ message?: string }>(ENDPOINTS.AUTH.SETUP_PASSWORD, {
-      method: HTTP_METHODS[3], // POST
-      body: JSON.stringify({ token, newPassword }),
-    });
+    try {
+      const res = await fetchApi<{ message?: string }>(ENDPOINTS.AUTH.SETUP_PASSWORD, {
+        method: HTTP_METHODS[3], // POST
+        body: JSON.stringify({ token, newPassword }),
+      });
 
-    if (!res || !res.data) {
-      throw new Error('Failed to setup password');
+      if (!res || !res.data) {
+        throw new Error('Failed to setup password');
+      }
+    } catch (err: any) {
+      // Extract backend error message if exists
+      console.log(err.message, 'ascknasclknsclsncl');
+      const backendMessage = err?.message || err?.message || 'Failed to setup password';
+      throw new Error(backendMessage);
     }
-  } catch (err: any) {
-    // Extract backend error message if exists
-    console.log(err.message,'ascknasclknsclsncl')
-    const backendMessage = err?.message || err?.message || 'Failed to setup password';
-    throw new Error(backendMessage);
-  }
-},
-
+  },
 
   forgotPassword: async (payload: { email: string }): Promise<void> => {
     const { email } = payload;

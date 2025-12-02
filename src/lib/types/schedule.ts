@@ -1,3 +1,5 @@
+import { SpeakerType } from './types';
+
 export interface Schedule {
   _id: string;
   title: string;
@@ -17,14 +19,22 @@ export type CreateScheduleDto = Omit<Schedule, '_id' | 'createdAt' | 'updatedAt'
 export type ScheduleStatus = 'ALL' | 'UPCOMING' | 'PAST';
 
 export interface Speaker {
-  _id:string;
-  pictureUrl: string;
-  linkedInUrl: string;
+  _id: string;
   name: {
-    firstName:string;
-    lastName:string;
+    firstName: string;
+    lastName: string;
   };
   title: string;
+  email: string;
+  participantType: string;
+  participationStatus: string;
+  contactId: string;
+  speakerType: SpeakerType;
+  companyName?: string;
+  bio?: string;
+  pictureUrl: string;
+  linkedInUrl: string;
+  youtubeUrl: string;
 }
 
 export interface ScheduleItem {

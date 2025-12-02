@@ -4,32 +4,28 @@ import { Agenda } from '@/lib/types/agenda';
 import { HTTP_METHODS } from 'next/dist/server/web/http';
 
 export const AgendaService = {
-getAll: async (
-  eventId: string,
-  query?: {
-    page?: number;
-    limit?: number;
-    search?: string;
-    sortBy?: string;
-    sortOrder?: 'asc' | 'desc';
-  }
-) => {
-  const params = new URLSearchParams();
-  params.append('page', String(query?.page ?? 1));
-  params.append('limit', String(query?.limit ?? 10));
+  getAll: async (
+    eventId: string,
+    query?: {
+      page?: number;
+      limit?: number;
+      search?: string;
+      sortBy?: string;
+      sortOrder?: 'asc' | 'desc';
+    },
+  ) => {
+    const params = new URLSearchParams();
+    params.append('page', String(query?.page ?? 1));
+    params.append('limit', String(query?.limit ?? 10));
 
-  if (query?.search) params.append('search', query.search);
-  if (query?.sortBy) params.append('sortBy', query.sortBy);
-  if (query?.sortOrder) params.append('sortOrder', query.sortOrder);
+    if (query?.search) params.append('search', query.search);
+    if (query?.sortBy) params.append('sortBy', query.sortBy);
+    if (query?.sortOrder) params.append('sortOrder', query.sortOrder);
 
-  return await fetchApi(
-    `${ENDPOINTS.AGENDAS.ROOT(eventId)}?${params.toString()}`,
-    {
+    return await fetchApi(`${ENDPOINTS.AGENDAS.ROOT(eventId)}?${params.toString()}`, {
       method: HTTP_METHODS[0], // GET
-    }
-  );
-},
-
+    });
+  },
 
   getById: async (eventId: string, agendaId: string) => {
     return await fetchApi<Agenda>(ENDPOINTS.AGENDAS.BY_ID(eventId, agendaId), {

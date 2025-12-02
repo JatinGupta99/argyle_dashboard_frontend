@@ -8,7 +8,14 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { resetPasswordSchema, ResetPasswordFormValues } from '@/lib/validation-schemas';
 import { Eye, EyeOff } from 'lucide-react'; // 👁️ eye icons
 
@@ -37,15 +44,14 @@ export default function ResetPasswordPage() {
       toast.success('Password reset successfully');
       router.push('/auth/login');
     } catch (err: any) {
-        console.error('[ResetPassword] Error:', err);
-        const message = err?.message || 'Failed to update password';
-        toast.error(message);
+      console.error('[ResetPassword] Error:', err);
+      const message = err?.message || 'Failed to update password';
+      toast.error(message);
     }
   };
 
   return (
     <div className="flex h-screen items-center justify-center bg-gray-50 px-4">
-      
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
@@ -70,7 +76,7 @@ export default function ResetPasswordPage() {
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                      className="absolute top-1/2 right-2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
                     >
                       {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                     </button>
@@ -98,7 +104,7 @@ export default function ResetPasswordPage() {
                     <button
                       type="button"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                      className="absolute top-1/2 right-2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
                     >
                       {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                     </button>

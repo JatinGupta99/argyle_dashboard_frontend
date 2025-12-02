@@ -6,7 +6,14 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
@@ -36,9 +43,9 @@ export default function SetupPasswordPage() {
       toast.success('Password updated successfully!');
       router.push('/auth/login');
     } catch (err: any) {
-     console.error('[SetupPassword] Error:', err);
-    const message = err?.message || 'Failed to update password';
-    toast.error(message);
+      console.error('[SetupPassword] Error:', err);
+      const message = err?.message || 'Failed to update password';
+      toast.error(message);
     }
   };
 
@@ -49,9 +56,7 @@ export default function SetupPasswordPage() {
           onSubmit={form.handleSubmit(onSubmit)}
           className="w-80 space-y-6 rounded-lg border border-gray-200 bg-white p-6 shadow-sm"
         >
-          <h1 className="text-center text-xl font-semibold text-gray-800">
-            Setup Your Password
-          </h1>
+          <h1 className="text-center text-xl font-semibold text-gray-800">Setup Your Password</h1>
 
           {['newPassword', 'confirmPassword'].map((field) => (
             <FormField
@@ -60,9 +65,17 @@ export default function SetupPasswordPage() {
               name={field as keyof SetupPasswordFormValues}
               render={({ field: f }) => (
                 <FormItem className="grid gap-1">
-                  <FormLabel>{field === 'newPassword' ? 'New Password' : 'Confirm Password'}</FormLabel>
+                  <FormLabel>
+                    {field === 'newPassword' ? 'New Password' : 'Confirm Password'}
+                  </FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder={field === 'newPassword' ? 'Enter new password' : 'Confirm new password'} {...f} />
+                    <Input
+                      type="password"
+                      placeholder={
+                        field === 'newPassword' ? 'Enter new password' : 'Confirm new password'
+                      }
+                      {...f}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

@@ -11,15 +11,14 @@ import {
 } from '@/components/ui/sidebar';
 import { useAuth } from '@/context/AuthContext';
 import { cn } from '@/lib/utils';
-import { Calendar, LogOut, Settings, ChevronRight } from 'lucide-react';
+import { Calendar, ChevronRight, LogOut, Settings } from 'lucide-react';
 import Image from 'next/image';
-import { usePathname, useRouter, useParams } from 'next/navigation';
-import React from 'react';
+import { useParams, usePathname, useRouter } from 'next/navigation';
 
 export function AppSidebar() {
   const router = useRouter();
   const pathname = usePathname();
-  const params = useParams(); // get eventId from URL
+  const params = useParams();
   const { logout } = useAuth();
 
   const handleLogout = async () => {
@@ -42,87 +41,80 @@ export function AppSidebar() {
       </SidebarHeader>
 
       {/* Main Menu */}
-      <SidebarContent className="mt-6 flex-1">
-        <div className="mb-2 px-4 text-xs font-semibold text-black">Main Menu</div>
+      <SidebarContent className="mt-6 flex-1 flex flex-col justify-between">
+        <div>
+          <div className="mb-2 px-4 text-xs font-semibold text-black">Main Menu</div>
 
-        <SidebarMenu className="space-y-2 pl-3">
-          {/* Event Schedule parent */}
+          <SidebarMenu className="space-y-2 pl-3">
+            {/* Event Schedule */}
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                onClick={() => router.push('/dashboard/schedule/card')}
+                className={cn(
+                  'flex cursor-pointer items-center justify-between transition',
+                  pathname.startsWith('/dashboard/schedule') && 'bg-muted text-primary'
+                )}
+              >
+                <div className="flex items-center gap-2">
+                  <Calendar size={16} />
+                  Event Schedule
+                </div>
+                {params?.eventId && (
+                  <ChevronRight
+                    size={16}
+                    className={cn('transition-transform', isEventPage && 'rotate-90')}
+                  />
+                )}
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+
+            {params?.eventId && (
+              <div className="mt-1 flex flex-col space-y-1 pl-6">
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    onClick={() => router.push(`/dashboard/events/${params.eventId}`)}
+                    className="text-sm font-bold text-sky-300"
+                  >
+                    {params.eventId.slice(0, 8)}
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </div>
+            )}
+
+            {/* Users */}
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                onClick={() => router.push('/dashboard/users')}
+                className={cn(
+                  'flex cursor-pointer items-center justify-between transition',
+                  pathname.startsWith('/dashboard/users') && 'bg-muted text-primary'
+                )}
+              >
+                <div className="flex items-center gap-2">
+                  <Settings size={16} />
+                  Users
+                </div>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+
+               <SidebarFooter className="pb-8 pl-0">
           <SidebarMenuItem>
             <SidebarMenuButton
-              onClick={() => router.push('/dashboard/schedule/card')}
-              className={cn(
-                'cursor-pointer transition flex justify-between items-center',
-                pathname.startsWith('/dashboard/schedule') && 'bg-muted text-primary'
-              )}
+              onClick={handleLogout}
+              className="flex items-center gap-2 rounded-md text-sm font-medium text-red-500 transition hover:bg-red-50"
             >
-              <div className="flex items-center gap-2">
-                <Calendar size={16} />
-                Event Schedule
-              </div>
-              {params?.eventId && (
-                <ChevronRight
-                  size={16}
-                  className={cn('transition-transform', isEventPage && 'rotate-90')}
-                />
-              )}
+              <LogOut size={16} /> Logout
             </SidebarMenuButton>
-
-            
           </SidebarMenuItem>
-          
+        </SidebarFooter>
+          </SidebarMenu>
 
-          {params?.eventId && (
-            <div className="pl-6 mt-1 flex flex-col space-y-1">
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  onClick={() =>
-                    router.push(`/dashboard/events/${params.eventId}`)
-                  }
-                  className="text-sm font-bold text-sky-300"
-                >
-                  {params.eventId.slice(0, 8)} 
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </div>
-          )}
+        
+        </div>
 
-          <SidebarMenuItem>
-  <SidebarMenuButton
-    onClick={() => router.push('/dashboard/users')}
-    className={cn(
-      'cursor-pointer transition flex justify-between items-center',
-      pathname.startsWith('/dashboard/users') && 'bg-muted text-primary'
-    )}
-  >
-    <div className="flex items-center gap-2">
-      <Settings size={16} /> {/* You can change icon if needed */}
-      Users
-    </div>
-  </SidebarMenuButton>
-</SidebarMenuItem>
-        </SidebarMenu>
+        {/* Footer with Logout */}
+       
       </SidebarContent>
-
-      {/* Footer */}
-      <div className="mt-auto mb-2 px-4 text-xs font-semibold text-black">Other</div>
-      <SidebarFooter>
-        <SidebarMenuItem>
-          <SidebarMenuButton
-            onClick={() => router.push('/dashboard/settings')}
-            className="hover:bg-muted/40 flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition"
-          >
-            <Settings size={16} /> Setting
-          </SidebarMenuButton>
-        </SidebarMenuItem>
-        <SidebarMenuItem>
-          <SidebarMenuButton
-            onClick={handleLogout}
-            className="hover:bg-muted/40 flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition text-red-500 hover:bg-red-50"
-          >
-            <LogOut size={16} /> Logout
-          </SidebarMenuButton>
-        </SidebarMenuItem>
-      </SidebarFooter>
     </Sidebar>
   );
 }

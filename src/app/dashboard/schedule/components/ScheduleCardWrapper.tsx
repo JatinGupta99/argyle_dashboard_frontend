@@ -21,7 +21,7 @@ export function ScheduleCardWrapper({
     format(new Date(event.schedule.startTime), 'hh:mm a') +
     ' - ' +
     format(new Date(event.schedule.endTime), 'hh:mm a');
-  console.log(event.eventDetails,'acsnlskn')
+  console.log(event.eventDetails, 'acsnlskn');
   return (
     <ScheduleCard
       description={event.eventDetails}

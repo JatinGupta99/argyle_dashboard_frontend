@@ -1,7 +1,12 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
 import { ListUser, User } from '@/lib/types/user';
 import StatusBadge from '../../schedule/cells/StatusBadge';
@@ -10,10 +15,13 @@ interface UserColumnsProps {
   onDelete?: (user: User) => void;
 }
 
-export function userColumns({ onEdit, onDelete }: UserColumnsProps,currentPage: number,        // pass in current page
-  pageSize: number ): ColumnDef<ListUser>[] {
+export function userColumns(
+  { onEdit, onDelete }: UserColumnsProps,
+  currentPage: number, // pass in current page
+  pageSize: number,
+): ColumnDef<ListUser>[] {
   return [
-   {
+    {
       id: 'serial',
       header: 'No',
       cell: ({ row }) => {

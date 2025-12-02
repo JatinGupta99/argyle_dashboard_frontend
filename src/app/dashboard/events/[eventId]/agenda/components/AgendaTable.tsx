@@ -16,7 +16,7 @@ export interface AgendaTableProps {
 export function AgendaTable({ data, meta, query, setQuery, onEdit, onDelete }: AgendaTableProps) {
   return (
     <DataTable
-      data={data.map(d => ({ ...d, key: d._id }))}
+      data={data.map((d) => ({ ...d, key: d._id }))}
       columns={getAgendaColumns({ onEdit, onDelete })}
       totalItems={meta?.total ?? data.length}
       query={query}

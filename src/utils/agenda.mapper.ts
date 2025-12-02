@@ -1,4 +1,4 @@
-import { Agenda } from "@/lib/types/agenda";
+import { Agenda } from '@/lib/types/agenda';
 
 export function mapAgendaToRow(a: Agenda): Agenda {
   return {
@@ -13,6 +13,6 @@ export function mapAgendaToRow(a: Agenda): Agenda {
     event: a.event ?? '',
     createdAt: a.createdAt ?? '',
     updatedAt: a.updatedAt ?? '',
-    __v:a.__v??''
+    __v: a.__v ?? '',
   };
 }

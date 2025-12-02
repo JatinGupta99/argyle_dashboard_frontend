@@ -23,10 +23,9 @@ export interface User {
   createdAt?: string;
 }
 
-
 export interface ListUser {
   _id: string;
-  name:string;
+  name: string;
   email: string;
   role: Role;
   createdAt: string;

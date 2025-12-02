@@ -1,6 +1,6 @@
-import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { fetchUsers } from "@/redux/slices/user-thunks";
-import { useEffect } from "react";
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import { fetchUsers } from '@/redux/slices/user-thunks';
+import { useEffect } from 'react';
 
 export const useUsers = () => {
   const dispatch = useAppDispatch();
